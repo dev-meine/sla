@@ -24,12 +24,13 @@ export async function uploadImage(file: File, bucket: string = 'images'): Promis
       if (createError) throw createError;
     }
 
-    // Generate unique filename
+    // Generate unique filename with timestamp to prevent collisions
+    const timestamp = Date.now();
     const fileExt = file.name.split('.').pop();
-    const fileName = `${Math.random().toString(36).substring(2)}.${fileExt}`;
+    const fileName = `${timestamp}-${Math.random().toString(36).substring(2)}.${fileExt}`;
 
     // Upload file
-    const { error: uploadError } = await supabase.storage
+    const { data, error: uploadError } = await supabase.storage
       .from(bucket)
       .upload(fileName, file, {
         cacheControl: '3600',
@@ -39,13 +40,17 @@ export async function uploadImage(file: File, bucket: string = 'images'): Promis
     if (uploadError) throw uploadError;
 
     // Get public URL
-    const { data: { publicUrl } } = supabase.storage
+    const { data: urlData } = supabase.storage
       .from(bucket)
       .getPublicUrl(fileName);
 
-    return publicUrl;
+    if (!urlData?.publicUrl) {
+      throw new Error('Failed to get public URL');
+    }
+
+    return urlData.publicUrl;
   } catch (error) {
     console.error('Error uploading image:', error);
-    return null;
+    throw error; // Re-throw to handle in the component
   }
 }
