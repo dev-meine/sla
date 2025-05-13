@@ -13,31 +13,45 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const { data: { session }, error } = await supabase.auth.getSession();
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
         
-        if (error) {
-          console.error('Auth error:', error);
+        if (sessionError) {
+          console.error('Session error:', sessionError);
+          await supabase.auth.signOut(); // Clear any invalid session
           setIsAuthenticated(false);
           return;
         }
 
-        // If session exists but is expired, try to refresh
-        if (session?.expires_at && session.expires_at <= Math.floor(Date.now() / 1000)) {
-          const { data: { session: refreshedSession }, error: refreshError } = 
-            await supabase.auth.refreshSession();
-          
-          if (refreshError) {
+        if (!session) {
+          setIsAuthenticated(false);
+          return;
+        }
+
+        // Check if session is expired
+        if (session.expires_at && session.expires_at <= Math.floor(Date.now() / 1000)) {
+          try {
+            const { data: { session: refreshedSession }, error: refreshError } = 
+              await supabase.auth.refreshSession();
+            
+            if (refreshError) {
+              console.error('Session refresh error:', refreshError);
+              await supabase.auth.signOut(); // Clear invalid session data
+              setIsAuthenticated(false);
+              return;
+            }
+            
+            setIsAuthenticated(!!refreshedSession);
+          } catch (refreshError) {
             console.error('Session refresh error:', refreshError);
+            await supabase.auth.signOut();
             setIsAuthenticated(false);
-            return;
           }
-          
-          setIsAuthenticated(!!refreshedSession);
         } else {
-          setIsAuthenticated(!!session);
+          setIsAuthenticated(true);
         }
       } catch (error) {
         console.error('Auth check error:', error);
+        await supabase.auth.signOut();
         setIsAuthenticated(false);
       }
     };
@@ -47,19 +61,12 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (event === 'SIGNED_OUT' || event === 'USER_DELETED') {
         setIsAuthenticated(false);
-      } else if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+      } else if (event === 'SIGNED_IN') {
         setIsAuthenticated(true);
-      } else if (event === 'TOKEN_EXPIRED') {
-        const { data: { session: refreshedSession }, error } = 
-          await supabase.auth.refreshSession();
-        
-        if (error) {
-          console.error('Session refresh error:', error);
-          setIsAuthenticated(false);
-          return;
-        }
-        
-        setIsAuthenticated(!!refreshedSession);
+      } else if (event === 'TOKEN_REFRESHED') {
+        setIsAuthenticated(!!session);
+      } else if (event === 'INITIAL_SESSION') {
+        setIsAuthenticated(!!session);
       }
     });
 
@@ -77,7 +84,6 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   }
 
   if (!isAuthenticated) {
-    // Redirect to login page with return path
     return <Navigate to="/admin/login" state={{ from: location }} replace />;
   }
 
