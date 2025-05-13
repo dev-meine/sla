@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
-import { LayoutDashboard, Users, Calendar, Image, FileText, LogOut, Users2, Plane, UserCog } from 'lucide-react';
+import { LayoutDashboard, Users, Calendar, Image, FileText, LogOut, Users2, Plane, UserCog, Home } from 'lucide-react';
 
 interface AdminLayoutProps {
   children: React.ReactNode;
@@ -51,6 +51,13 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
               <span className="ml-3">{item.label}</span>
             </Link>
           ))}
+          <Link
+            to="/"
+            className="flex items-center w-full px-6 py-3 text-gray-700 hover:bg-green-50 hover:text-green-600"
+          >
+            <Home size={20} />
+            <span className="ml-3">Return to Website</span>
+          </Link>
           <button
             onClick={handleSignOut}
             className="flex items-center w-full px-6 py-3 text-gray-700 hover:bg-red-50 hover:text-red-600"
