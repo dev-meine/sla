@@ -234,7 +234,7 @@ const AdminActivities: React.FC = () => {
                           <img
                             src={event.image}
                             alt={event.title}
-                            className="h-10 w-10 rounded mr-3 object-cover"
+                            className="h-10 w-10 rounded-full object-cover mr-3"
                           />
                         )}
                         <div className="text-sm font-medium text-gray-900">{event.title}</div>
