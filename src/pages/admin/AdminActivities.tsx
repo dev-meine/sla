@@ -45,7 +45,8 @@ const AdminActivities: React.FC = () => {
         description: data.description,
         image: data.image,
         category: data.category,
-        date: data.date
+        date: data.date,
+        created_at: new Date().toISOString()
       };
 
       let result;
@@ -53,7 +54,10 @@ const AdminActivities: React.FC = () => {
       if (editingEvent) {
         result = await supabase
           .from('events')
-          .update(eventData)
+          .update({
+            ...eventData,
+            updated_at: new Date().toISOString()
+          })
           .eq('id', editingEvent.id)
           .select()
           .single();
@@ -65,7 +69,9 @@ const AdminActivities: React.FC = () => {
           .single();
       }
 
-      if (result.error) throw result.error;
+      if (result.error) {
+        throw result.error;
+      }
 
       reset();
       setIsAdding(false);
@@ -234,7 +240,11 @@ const AdminActivities: React.FC = () => {
                           <img
                             src={event.image}
                             alt={event.title}
-                            className="h-10 w-10 rounded-full object-cover mr-3"
+                            className="h-12 w-12 rounded-lg object-cover mr-3"
+                            onError={(e) => {
+                              const target = e.target as HTMLImageElement;
+                              target.src = 'https://via.placeholder.com/48';
+                            }}
                           />
                         )}
                         <div className="text-sm font-medium text-gray-900">{event.title}</div>
