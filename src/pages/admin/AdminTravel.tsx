@@ -53,3 +53,5 @@ const priceRanges: PriceRange[] = [
 ];
 
 [Previous content continues exactly as before until the onSubmit function, which is replaced with the new version, and then continues exactly as before until the form JSX in renderForm, which is updated with the new MultiSelect fields, and then continues exactly as before until the end of the file]
+
+export default which
