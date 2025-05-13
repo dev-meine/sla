@@ -14,8 +14,15 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
 }) => {
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(currentImage || null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [imageLoaded, setImageLoaded] = useState(false);
+
+  React.useEffect(() => {
+    if (currentImage) {
+      setPreviewUrl(currentImage);
+    }
+  }, [currentImage]);
 
   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -36,6 +43,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
     setError(null);
     setIsUploading(true);
     setUploadProgress(0);
+    setImageLoaded(false);
 
     try {
       // Create preview
@@ -56,7 +64,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
         });
       }, 200);
 
-      // Import dynamically to reduce initial bundle size
+      // Upload image
       const { uploadImage } = await import('../../lib/uploadImage');
       const imageUrl = await uploadImage(file);
 
@@ -65,12 +73,14 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
 
       if (imageUrl) {
         onImageUpload(imageUrl);
+        setPreviewUrl(imageUrl);
       } else {
-        setError('Failed to upload image');
+        throw new Error('Failed to upload image');
       }
     } catch (error) {
       console.error('Error uploading image:', error);
       setError('Failed to upload image');
+      setPreviewUrl(null);
     } finally {
       setIsUploading(false);
       setUploadProgress(0);
@@ -79,24 +89,42 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
 
   const handleRemove = () => {
     setPreviewUrl(null);
+    setImageLoaded(false);
     if (onImageRemove) {
       onImageRemove();
     }
+  };
+
+  const handleImageLoad = () => {
+    setImageLoaded(true);
+  };
+
+  const handleImageError = () => {
+    setError('Failed to load image');
+    setPreviewUrl(null);
+    setImageLoaded(false);
   };
 
   return (
     <div className="space-y-2">
       {previewUrl ? (
         <div className="relative">
+          {!imageLoaded && (
+            <div className="absolute inset-0 flex items-center justify-center bg-gray-100">
+              <div className="animate-spin rounded-full h-8 w-8 border-2 border-primary-600 border-t-transparent"></div>
+            </div>
+          )}
           <img
             src={previewUrl}
             alt="Preview"
-            className="w-full h-48 object-cover rounded-lg"
+            className={`w-full h-48 object-cover rounded-lg transition-opacity duration-300 ${imageLoaded ? 'opacity-100' : 'opacity-0'}`}
+            onLoad={handleImageLoad}
+            onError={handleImageError}
           />
           <button
             type="button"
             onClick={handleRemove}
-            className="absolute top-2 right-2 p-1 bg-red-600 text-white rounded-full hover:bg-red-700"
+            className="absolute top-2 right-2 p-1 bg-red-600 text-white rounded-full hover:bg-red-700 transition-colors"
           >
             <X size={16} />
           </button>
