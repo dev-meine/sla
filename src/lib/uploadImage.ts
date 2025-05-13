@@ -19,13 +19,17 @@ export async function uploadImage(file: File, bucket: string = 'images'): Promis
       throw new Error('File size too large. Maximum size is 5MB.');
     }
 
-    // Generate unique filename with original extension
+    // Generate secure random filename with original extension
     const timestamp = Date.now();
-    const randomString = Math.random().toString(36).substring(2);
+    const randomBytes = new Uint8Array(16);
+    crypto.getRandomValues(randomBytes);
+    const randomString = Array.from(randomBytes)
+      .map(byte => byte.toString(16).padStart(2, '0'))
+      .join('');
     const fileExt = file.name.split('.').pop()?.toLowerCase() || 'jpg';
     const fileName = `${timestamp}-${randomString}.${fileExt}`;
 
-    // Upload file
+    // Upload file with content type and caching headers
     const { error: uploadError, data } = await supabase.storage
       .from(bucket)
       .upload(fileName, file, {
