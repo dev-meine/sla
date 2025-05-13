@@ -138,7 +138,6 @@ const AdminTravel: React.FC = () => {
       setIsLoading(true);
       
       if (editingRecord) {
-        // Update travel record
         const { error: recordError } = await supabase
           .from('travel_records')
           .update({
@@ -155,14 +154,12 @@ const AdminTravel: React.FC = () => {
           
         if (recordError) throw recordError;
 
-        // Delete existing relationships
         await Promise.all([
           supabase.from('travel_record_athletes').delete().eq('travel_record_id', editingRecord.id),
           supabase.from('travel_record_staff').delete().eq('travel_record_id', editingRecord.id),
           supabase.from('travel_record_board_members').delete().eq('travel_record_id', editingRecord.id)
         ]);
 
-        // Insert new relationships
         await Promise.all([
           supabase.from('travel_record_athletes').insert(
             data.selected_athletes.map(athleteId => ({
@@ -184,7 +181,6 @@ const AdminTravel: React.FC = () => {
           )
         ]);
       } else {
-        // Insert new travel record
         const { data: newRecord, error: recordError } = await supabase
           .from('travel_records')
           .insert([{
@@ -202,7 +198,6 @@ const AdminTravel: React.FC = () => {
           
         if (recordError) throw recordError;
 
-        // Insert relationships
         await Promise.all([
           supabase.from('travel_record_athletes').insert(
             data.selected_athletes.map(athleteId => ({
@@ -506,6 +501,75 @@ const AdminTravel: React.FC = () => {
     </div>
   );
 
+  const renderFerrySchedules = () => (
+    <div className="space-y-8">
+      <div className="bg-white rounded-lg shadow-md overflow-hidden">
+        <div className="p-6">
+          <h3 className="text-xl font-semibold mb-4">Live Ferry Schedule</h3>
+          <div className="aspect-w-16 aspect-h-9 rounded-lg overflow-hidden">
+            <iframe
+              src="https://seacoachexpress.com/schedule"
+              className="w-full h-[800px] border-0"
+              title="Ferry Schedule"
+              sandbox="allow-same-origin allow-scripts allow-popups allow-forms"
+            />
+          </div>
+        </div>
+      </div>
+
+      <div className="bg-white shadow-md rounded-lg overflow-hidden">
+        <table className="min-w-full divide-y divide-gray-200">
+          <thead className="bg-gray-50">
+            <tr>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Operator</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Route</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Schedule</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+            </tr>
+          </thead>
+          <tbody className="bg-white divide-y divide-gray-200">
+            {ferrySchedules.map((schedule) => (
+              <tr key={schedule.id}>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  {schedule.operator}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  {schedule.departure_port} → {schedule.arrival_port}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  {new Date(schedule.departure_time).toLocaleString()} - {new Date(schedule.arrival_time).toLocaleString()}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full
+                    ${schedule.booking_status === 'confirmed' ? 'bg-green-100 text-green-800' :
+                      schedule.booking_status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
+                      'bg-red-100 text-red-800'}`}>
+                    {schedule.booking_status.charAt(0).toUpperCase() + schedule.booking_status.slice(1)}
+                  </span>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  <button
+                    onClick={() => handleEdit(schedule)}
+                    className="text-blue-600 hover:text-blue-900 mr-4"
+                  >
+                    <Edit2 className="h-4 w-4" />
+                  </button>
+                  <button
+                    onClick={() => handleDelete(schedule.id)}
+                    className="text-red-600 hover:text-red-900"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+
   const renderHotelSearch = () => (
     <div className="space-y-6">
       <div className="flex gap-4 items-end">
@@ -656,6 +720,7 @@ const AdminTravel: React.FC = () => {
           <div className="space-y-6">
             {isAdding && activeTab === 'travel' && renderForm()}
             {!isAdding && activeTab === 'travel' && renderTravelRecords()}
+            {activeTab === 'ferry' && renderFerrySchedules()}
             {activeTab === 'hotels' && renderHotelSearch()}
           </div>
         )}
