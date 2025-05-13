@@ -40,17 +40,25 @@ const AdminActivities: React.FC = () => {
     try {
       setIsLoading(true);
       
+      const eventData = {
+        title: data.title,
+        description: data.description,
+        image: data.image,
+        category: data.category,
+        date: data.date
+      };
+      
       if (editingEvent) {
         const { error } = await supabase
           .from('events')
-          .update(data)
+          .update(eventData)
           .eq('id', editingEvent.id);
           
         if (error) throw error;
       } else {
         const { error } = await supabase
           .from('events')
-          .insert([data]);
+          .insert([eventData]);
           
         if (error) throw error;
       }
@@ -58,7 +66,7 @@ const AdminActivities: React.FC = () => {
       reset();
       setIsAdding(false);
       setEditingEvent(null);
-      fetchEvents();
+      await fetchEvents(); // Refresh the list after adding/updating
     } catch (error) {
       console.error('Error saving event:', error);
     } finally {
@@ -85,7 +93,7 @@ const AdminActivities: React.FC = () => {
         .eq('id', id);
         
       if (error) throw error;
-      fetchEvents();
+      await fetchEvents(); // Refresh the list after deleting
     } catch (error) {
       console.error('Error deleting event:', error);
     } finally {
@@ -157,7 +165,7 @@ const AdminActivities: React.FC = () => {
                 <ImageUpload
                   currentImage={editingEvent?.image}
                   onImageUpload={(url) => setValue('image', url)}
-                  onImageRemove={() => setValue('image', '')}
+                  onImageRemove={() => setValue('image', null)}
                 />
               </div>
 
