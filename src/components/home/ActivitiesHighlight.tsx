@@ -10,6 +10,7 @@ type Event = Database['public']['Tables']['events']['Row'];
 const ActivitiesHighlight: React.FC = () => {
   const [events, setEvents] = React.useState<Event[]>([]);
   const [isLoading, setIsLoading] = React.useState(true);
+  const [imageError, setImageError] = React.useState<Record<string, boolean>>({});
 
   React.useEffect(() => {
     fetchEvents();
@@ -24,7 +25,14 @@ const ActivitiesHighlight: React.FC = () => {
         .limit(6);
       
       if (error) throw error;
-      setEvents(data || []);
+      
+      // Validate image URLs
+      const validatedEvents = data?.map(event => ({
+        ...event,
+        image: event.image || 'https://images.pexels.com/photos/863988/pexels-photo-863988.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1'
+      })) || [];
+      
+      setEvents(validatedEvents);
     } catch (error) {
       console.error('Error fetching events:', error);
     } finally {
@@ -48,6 +56,13 @@ const ActivitiesHighlight: React.FC = () => {
     if (!dateString) return '';
     const options: Intl.DateTimeFormatOptions = { year: 'numeric', month: 'long', day: 'numeric' };
     return new Date(dateString).toLocaleDateString('en-US', options);
+  };
+
+  const handleImageError = (eventId: string) => {
+    setImageError(prev => ({
+      ...prev,
+      [eventId]: true
+    }));
   };
 
   if (isLoading) {
@@ -82,9 +97,13 @@ const ActivitiesHighlight: React.FC = () => {
             viewport={{ once: true }}
           >
             <img 
-              src="https://images.pexels.com/photos/1263349/pexels-photo-1263349.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" 
-              alt="Swimming Competition" 
+              src={events[0]?.image || "https://images.pexels.com/photos/863988/pexels-photo-863988.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"}
+              alt="Featured Activity"
               className="w-full h-full object-cover"
+              onError={(e) => {
+                const target = e.target as HTMLImageElement;
+                target.src = "https://images.pexels.com/photos/863988/pexels-photo-863988.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1";
+              }}
             />
           </motion.div>
 
@@ -104,11 +123,26 @@ const ActivitiesHighlight: React.FC = () => {
                   <ul className="space-y-4">
                     {categorizedEvents[category].map((event) => (
                       <li key={event.id} className="border-l-2 border-primary-600 pl-4">
-                        <h4 className="font-medium text-primary-700">{event.title}</h4>
-                        <div className="flex items-center text-sm text-gray-500 mt-1">
-                          <Calendar size={14} className="mr-1" />
-                          <span>{formatDate(event.date)}</span>
+                        <div className="flex items-center mb-2">
+                          {event.image && !imageError[event.id] && (
+                            <img
+                              src={event.image}
+                              alt={event.title}
+                              className="w-12 h-12 rounded object-cover mr-3"
+                              onError={() => handleImageError(event.id)}
+                            />
+                          )}
+                          <div>
+                            <h4 className="font-medium text-primary-700">{event.title}</h4>
+                            <div className="flex items-center text-sm text-gray-500 mt-1">
+                              <Calendar size={14} className="mr-1" />
+                              <span>{formatDate(event.date)}</span>
+                            </div>
+                          </div>
                         </div>
+                        {event.description && (
+                          <p className="text-sm text-gray-600 mt-1">{event.description}</p>
+                        )}
                       </li>
                     ))}
                   </ul>
