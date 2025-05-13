@@ -4,6 +4,7 @@ import { supabase } from '../../lib/supabase';
 import { PlusCircle, Edit2, Trash2 } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { Database } from '../../types/supabase';
+import ImageUpload from '../../components/ui/ImageUpload';
 
 type BoardMember = Database['public']['Tables']['board_members']['Row'];
 
@@ -151,11 +152,11 @@ const AdminBoard: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Image URL</label>
-                <input
-                  type="url"
-                  {...register('image_url')}
-                  className="w-full px-3 py-2 border rounded-md"
+                <label className="block text-sm font-medium text-gray-700 mb-1">Profile Image</label>
+                <ImageUpload
+                  currentImage={editingMember?.image_url}
+                  onImageUpload={(url) => setValue('image_url', url)}
+                  onImageRemove={() => setValue('image_url', '')}
                 />
               </div>
 
