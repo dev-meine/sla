@@ -17,6 +17,7 @@ import AdminGallery from './pages/admin/AdminGallery';
 import AdminPosts from './pages/admin/AdminPosts';
 import AdminBoard from './pages/admin/AdminBoard';
 import AdminTravel from './pages/admin/AdminTravel';
+import AdminTechnicalStaff from './pages/admin/AdminTechnicalStaff';
 
 function App() {
   return (
@@ -66,6 +67,11 @@ function App() {
         <Route path="/admin/travel" element={
           <ProtectedRoute>
             <AdminTravel />
+          </ProtectedRoute>
+        } />
+        <Route path="/admin/technical-staff" element={
+          <ProtectedRoute>
+            <AdminTechnicalStaff />
           </ProtectedRoute>
         } />
       </Routes>
