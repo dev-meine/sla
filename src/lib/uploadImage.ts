@@ -19,25 +19,16 @@ export async function uploadImage(file: File, bucket: string = 'images'): Promis
       throw new Error('File size too large. Maximum size is 5MB.');
     }
 
-    // Generate unique filename
+    // Generate unique filename with original extension
     const timestamp = Date.now();
     const randomString = Math.random().toString(36).substring(2);
-    const fileExt = file.name.split('.').pop()?.toLowerCase();
+    const fileExt = file.name.split('.').pop()?.toLowerCase() || 'jpg';
     const fileName = `${timestamp}-${randomString}.${fileExt}`;
-    const filePath = `${fileName}`;
-
-    // Check if bucket exists
-    const { data: buckets } = await supabase.storage.listBuckets();
-    const bucketExists = buckets?.some(b => b.name === bucket);
-
-    if (!bucketExists) {
-      throw new Error('Storage bucket not found');
-    }
 
     // Upload file
-    const { error: uploadError } = await supabase.storage
+    const { error: uploadError, data } = await supabase.storage
       .from(bucket)
-      .upload(filePath, file, {
+      .upload(fileName, file, {
         cacheControl: '3600',
         upsert: false,
         contentType: file.type
@@ -48,10 +39,14 @@ export async function uploadImage(file: File, bucket: string = 'images'): Promis
       throw uploadError;
     }
 
+    if (!data?.path) {
+      throw new Error('Upload successful but no path returned');
+    }
+
     // Get public URL
     const { data: { publicUrl } } = supabase.storage
       .from(bucket)
-      .getPublicUrl(filePath);
+      .getPublicUrl(data.path);
 
     if (!publicUrl) {
       throw new Error('Failed to get public URL');
