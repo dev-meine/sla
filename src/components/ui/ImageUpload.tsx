@@ -1,0 +1,118 @@
+import React, { useState } from 'react';
+import { Upload, X } from 'lucide-react';
+
+interface ImageUploadProps {
+  onImageUpload: (url: string) => void;
+  currentImage?: string | null;
+  onImageRemove?: () => void;
+}
+
+const ImageUpload: React.FC<ImageUploadProps> = ({ 
+  onImageUpload, 
+  currentImage,
+  onImageRemove 
+}) => {
+  const [isUploading, setIsUploading] = useState(false);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(currentImage || null);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      setError('Please upload an image file');
+      return;
+    }
+
+    // Validate file size (5MB limit)
+    if (file.size > 5 * 1024 * 1024) {
+      setError('Image size should be less than 5MB');
+      return;
+    }
+
+    setError(null);
+    setIsUploading(true);
+
+    try {
+      // Create preview
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPreviewUrl(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+
+      // Import dynamically to reduce initial bundle size
+      const { uploadImage } = await import('../../lib/uploadImage');
+      const imageUrl = await uploadImage(file);
+
+      if (imageUrl) {
+        onImageUpload(imageUrl);
+      } else {
+        setError('Failed to upload image');
+      }
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      setError('Failed to upload image');
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  const handleRemove = () => {
+    setPreviewUrl(null);
+    if (onImageRemove) {
+      onImageRemove();
+    }
+  };
+
+  return (
+    <div className="space-y-2">
+      {previewUrl ? (
+        <div className="relative">
+          <img
+            src={previewUrl}
+            alt="Preview"
+            className="w-full h-48 object-cover rounded-lg"
+          />
+          <button
+            type="button"
+            onClick={handleRemove}
+            className="absolute top-2 right-2 p-1 bg-red-600 text-white rounded-full hover:bg-red-700"
+          >
+            <X size={16} />
+          </button>
+        </div>
+      ) : (
+        <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
+          <input
+            type="file"
+            accept="image/*"
+            onChange={handleFileChange}
+            className="hidden"
+            id="image-upload"
+            disabled={isUploading}
+          />
+          <label
+            htmlFor="image-upload"
+            className="cursor-pointer flex flex-col items-center justify-center space-y-2"
+          >
+            <Upload className="w-8 h-8 text-gray-400" />
+            <span className="text-sm text-gray-500">
+              {isUploading ? 'Uploading...' : 'Click to upload image'}
+            </span>
+            <span className="text-xs text-gray-400">
+              PNG, JPG up to 5MB
+            </span>
+          </label>
+        </div>
+      )}
+      {error && (
+        <p className="text-red-500 text-sm">{error}</p>
+      )}
+    </div>
+  );
+};
+
+export default ImageUpload;
