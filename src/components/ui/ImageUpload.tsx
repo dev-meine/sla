@@ -13,6 +13,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
   onImageRemove 
 }) => {
   const [isUploading, setIsUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
   const [previewUrl, setPreviewUrl] = useState<string | null>(currentImage || null);
   const [error, setError] = useState<string | null>(null);
 
@@ -34,6 +35,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
 
     setError(null);
     setIsUploading(true);
+    setUploadProgress(0);
 
     try {
       // Create preview
@@ -43,9 +45,23 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
       };
       reader.readAsDataURL(file);
 
+      // Simulate upload progress
+      const progressInterval = setInterval(() => {
+        setUploadProgress(prev => {
+          if (prev >= 90) {
+            clearInterval(progressInterval);
+            return 90;
+          }
+          return prev + 10;
+        });
+      }, 200);
+
       // Import dynamically to reduce initial bundle size
       const { uploadImage } = await import('../../lib/uploadImage');
       const imageUrl = await uploadImage(file);
+
+      clearInterval(progressInterval);
+      setUploadProgress(100);
 
       if (imageUrl) {
         onImageUpload(imageUrl);
@@ -57,6 +73,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
       setError('Failed to upload image');
     } finally {
       setIsUploading(false);
+      setUploadProgress(0);
     }
   };
 
@@ -108,6 +125,21 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
           </label>
         </div>
       )}
+
+      {isUploading && (
+        <div className="space-y-2">
+          <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+            <div 
+              className="h-full bg-primary-600 transition-all duration-300 rounded-full"
+              style={{ width: `${uploadProgress}%` }}
+            />
+          </div>
+          <p className="text-sm text-gray-600 text-center">
+            {uploadProgress}% uploaded
+          </p>
+        </div>
+      )}
+
       {error && (
         <p className="text-red-500 text-sm">{error}</p>
       )}
