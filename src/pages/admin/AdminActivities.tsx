@@ -47,26 +47,30 @@ const AdminActivities: React.FC = () => {
         category: data.category,
         date: data.date
       };
+
+      let result;
       
       if (editingEvent) {
-        const { error } = await supabase
+        result = await supabase
           .from('events')
           .update(eventData)
-          .eq('id', editingEvent.id);
-          
-        if (error) throw error;
+          .eq('id', editingEvent.id)
+          .select()
+          .single();
       } else {
-        const { error } = await supabase
+        result = await supabase
           .from('events')
-          .insert([eventData]);
-          
-        if (error) throw error;
+          .insert([eventData])
+          .select()
+          .single();
       }
+
+      if (result.error) throw result.error;
 
       reset();
       setIsAdding(false);
       setEditingEvent(null);
-      await fetchEvents(); // Refresh the list after adding/updating
+      await fetchEvents();
     } catch (error) {
       console.error('Error saving event:', error);
     } finally {
@@ -93,7 +97,7 @@ const AdminActivities: React.FC = () => {
         .eq('id', id);
         
       if (error) throw error;
-      await fetchEvents(); // Refresh the list after deleting
+      await fetchEvents();
     } catch (error) {
       console.error('Error deleting event:', error);
     } finally {
