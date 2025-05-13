@@ -53,6 +53,66 @@ export interface Database {
           updated_at?: string | null
         }
       }
+      travel_record_athletes: {
+        Row: {
+          id: string
+          travel_record_id: string
+          athlete_id: string
+          created_at: string | null
+        }
+        Insert: {
+          id?: string
+          travel_record_id: string
+          athlete_id: string
+          created_at?: string | null
+        }
+        Update: {
+          id?: string
+          travel_record_id?: string
+          athlete_id?: string
+          created_at?: string | null
+        }
+      }
+      travel_record_staff: {
+        Row: {
+          id: string
+          travel_record_id: string
+          staff_id: string
+          created_at: string | null
+        }
+        Insert: {
+          id?: string
+          travel_record_id: string
+          staff_id: string
+          created_at?: string | null
+        }
+        Update: {
+          id?: string
+          travel_record_id?: string
+          staff_id?: string
+          created_at?: string | null
+        }
+      }
+      travel_record_board_members: {
+        Row: {
+          id: string
+          travel_record_id: string
+          board_member_id: string
+          created_at: string | null
+        }
+        Insert: {
+          id?: string
+          travel_record_id: string
+          board_member_id: string
+          created_at?: string | null
+        }
+        Update: {
+          id?: string
+          travel_record_id?: string
+          board_member_id?: string
+          created_at?: string | null
+        }
+      }
       technical_staff: {
         Row: {
           id: string
