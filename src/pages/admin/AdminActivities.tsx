@@ -5,6 +5,7 @@ import { PlusCircle, Edit2, Trash2 } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { Database } from '../../types/supabase';
 import ImageUpload from '../../components/ui/ImageUpload';
+import Modal from '../../components/ui/Modal';
 
 type Event = Database['public']['Tables']['events']['Row'];
 
@@ -13,6 +14,8 @@ const AdminActivities: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isAdding, setIsAdding] = useState(false);
   const [editingEvent, setEditingEvent] = useState<Event | null>(null);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [eventToDelete, setEventToDelete] = useState<string | null>(null);
   
   const { register, handleSubmit, reset, setValue, formState: { errors } } = useForm<Event>();
 
@@ -92,15 +95,20 @@ const AdminActivities: React.FC = () => {
     });
   };
 
-  const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this event?')) return;
+  const handleDeleteClick = (id: string) => {
+    setEventToDelete(id);
+    setDeleteModalOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!eventToDelete) return;
     
     try {
       setIsLoading(true);
       const { error } = await supabase
         .from('events')
         .delete()
-        .eq('id', id);
+        .eq('id', eventToDelete);
         
       if (error) throw error;
       await fetchEvents();
@@ -108,6 +116,8 @@ const AdminActivities: React.FC = () => {
       console.error('Error deleting event:', error);
     } finally {
       setIsLoading(false);
+      setDeleteModalOpen(false);
+      setEventToDelete(null);
     }
   };
 
@@ -266,7 +276,7 @@ const AdminActivities: React.FC = () => {
                         <Edit2 size={16} />
                       </button>
                       <button
-                        onClick={() => handleDelete(event.id)}
+                        onClick={() => handleDeleteClick(event.id)}
                         className="text-red-600 hover:text-red-900"
                       >
                         <Trash2 size={16} />
@@ -278,6 +288,19 @@ const AdminActivities: React.FC = () => {
             </table>
           </div>
         )}
+
+        <Modal
+          isOpen={deleteModalOpen}
+          onClose={() => {
+            setDeleteModalOpen(false);
+            setEventToDelete(null);
+          }}
+          onConfirm={handleDeleteConfirm}
+          title="Delete Activity"
+          message="Are you sure you want to delete this activity? This action cannot be undone."
+          confirmText="Delete"
+          cancelText="Cancel"
+        />
       </div>
     </AdminLayout>
   );
