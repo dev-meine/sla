@@ -70,7 +70,7 @@ const BoardPage: React.FC = () => {
       <PageHeader
         title="Executive Board"
         description="Meet the leadership team guiding the Sierra Leone Swimming Federation."
-        image="https://images.pexels.com/photos/3184360/pexels-photo-3184360.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
+        image="https://i.ibb.co/KpkYVshn/Screenshot-2025-05-14-at-2-11-58-AM-min.png"
       />
 
       <section className="section">
