@@ -53,7 +53,7 @@ const HeroSection: React.FC = () => {
       {/* Hero image with overlay */}
       <div className="absolute inset-0 z-0">
         <img 
-          src="https://images.pexels.com/photos/19558567/pexels-photo-19558567.jpeg"
+          src="https://ibb.co/S4jBh1HH"
           alt="Olympic swimming pool with athletes ready to compete" 
           className="w-full h-full object-cover opacity-30"
         />
