@@ -104,15 +104,15 @@ const FeaturedAthletes: React.FC = () => {
         >
           {athletes.map((athlete) => (
             <motion.div key={athlete.id} className="card group" variants={item}>
-              <div className="relative h-72 overflow-hidden">
+              <div className="relative h-[400px] overflow-hidden">
                 <img 
                   src={athlete.image || "https://images.pexels.com/photos/863988/pexels-photo-863988.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"}
                   alt={athlete.name}
-                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  className="w-full h-full object-cover object-top transition-transform duration-500 group-hover:scale-105"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-80"></div>
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
                 <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
-                  <h3 className="text-xl font-semibold mb-1">{athlete.name}</h3>
+                  <h3 className="text-xl font-semibold mb-1 text-white">{athlete.name}</h3>
                   <p className="text-gray-200 capitalize">{athlete.sport?.replace('-', ' ') || 'Athlete'}</p>
                 </div>
               </div>

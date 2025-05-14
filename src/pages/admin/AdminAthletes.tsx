@@ -1,23 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import AdminLayout from '../../components/admin/AdminLayout';
 import { supabase } from '../../lib/supabase';
-import { PlusCircle, Edit2, Trash2, Medal, Trophy, Timer } from 'lucide-react';
+import { PlusCircle, Edit2, Trash2, Calendar, MapPin, Timer, Medal } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { Database } from '../../types/supabase';
 import ImageUpload from '../../components/ui/ImageUpload';
+import Modal from '../../components/ui/Modal';
 
-type Athlete = Database['public']['Tables']['athletes']['Row'] & {
-  specialties: Database['public']['Tables']['specialties']['Row'][];
-  records: Database['public']['Tables']['records']['Row'][];
-  achievements: Database['public']['Tables']['achievements']['Row'][];
-  personal_bests: Database['public']['Tables']['personal_bests']['Row'][];
-};
+type Athlete = Database['public']['Tables']['athletes']['Row'];
 
 const AdminAthletes: React.FC = () => {
   const [athletes, setAthletes] = useState<Athlete[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isAdding, setIsAdding] = useState(false);
   const [editingAthlete, setEditingAthlete] = useState<Athlete | null>(null);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [athleteToDelete, setAthleteToDelete] = useState<string | null>(null);
   
   const { register, handleSubmit, reset, setValue, formState: { errors } } = useForm<Athlete>();
 
@@ -27,36 +25,13 @@ const AdminAthletes: React.FC = () => {
 
   const fetchAthletes = async () => {
     try {
-      const { data: athletesData, error: athletesError } = await supabase
+      const { data, error } = await supabase
         .from('athletes')
         .select('*')
         .order('name');
       
-      if (athletesError) throw athletesError;
-
-      const fullAthletes = await Promise.all((athletesData || []).map(async (athlete) => {
-        const [
-          { data: specialties },
-          { data: records },
-          { data: achievements },
-          { data: personalBests }
-        ] = await Promise.all([
-          supabase.from('specialties').select('*').eq('athlete_id', athlete.id),
-          supabase.from('records').select('*').eq('athlete_id', athlete.id),
-          supabase.from('achievements').select('*').eq('athlete_id', athlete.id),
-          supabase.from('personal_bests').select('*').eq('athlete_id', athlete.id)
-        ]);
-
-        return {
-          ...athlete,
-          specialties: specialties || [],
-          records: records || [],
-          achievements: achievements || [],
-          personal_bests: personalBests || []
-        };
-      }));
-
-      setAthletes(fullAthletes);
+      if (error) throw error;
+      setAthletes(data || []);
     } catch (error) {
       console.error('Error fetching athletes:', error);
     } finally {
@@ -64,21 +39,46 @@ const AdminAthletes: React.FC = () => {
     }
   };
 
+  const sanitizeText = (text: string | null): string | null => {
+    if (!text) return null;
+    // Remove any potential null bytes and invalid characters
+    return text.replace(/\0/g, '').trim();
+  };
+
   const onSubmit = async (data: Athlete) => {
     try {
       setIsLoading(true);
       
+      const athleteData = {
+        name: sanitizeText(data.name),
+        nickname: sanitizeText(data.nickname),
+        image: data.image,
+        sport: sanitizeText(data.sport),
+        bio: sanitizeText(data.bio),
+        nationality: sanitizeText(data.nationality),
+        date_of_birth: data.date_of_birth,
+        club: sanitizeText(data.club),
+        coach: sanitizeText(data.coach),
+        training_base: sanitizeText(data.training_base),
+        height_meters: data.height_meters,
+        weight_kg: data.weight_kg,
+        place_of_birth: sanitizeText(data.place_of_birth),
+        personal_bests: sanitizeText(data.personal_bests),
+        specialties: sanitizeText(data.specialties),
+        caps: sanitizeText(data.caps)
+      };
+
       if (editingAthlete) {
         const { error } = await supabase
           .from('athletes')
-          .update(data)
+          .update(athleteData)
           .eq('id', editingAthlete.id);
           
         if (error) throw error;
       } else {
         const { error } = await supabase
           .from('athletes')
-          .insert([data]);
+          .insert([athleteData]);
           
         if (error) throw error;
       }
@@ -102,15 +102,20 @@ const AdminAthletes: React.FC = () => {
     });
   };
 
-  const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this athlete?')) return;
+  const handleDeleteClick = (id: string) => {
+    setAthleteToDelete(id);
+    setDeleteModalOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!athleteToDelete) return;
     
     try {
       setIsLoading(true);
       const { error } = await supabase
         .from('athletes')
         .delete()
-        .eq('id', id);
+        .eq('id', athleteToDelete);
         
       if (error) throw error;
       fetchAthletes();
@@ -118,6 +123,8 @@ const AdminAthletes: React.FC = () => {
       console.error('Error deleting athlete:', error);
     } finally {
       setIsLoading(false);
+      setDeleteModalOpen(false);
+      setAthleteToDelete(null);
     }
   };
 
@@ -147,15 +154,26 @@ const AdminAthletes: React.FC = () => {
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
                   <input
                     type="text"
                     {...register('name', { required: 'Name is required' })}
                     className="w-full px-3 py-2 border rounded-md"
+                    placeholder="e.g., OLAMIDAY ELIZABETH SAM"
                   />
                   {errors.name && (
                     <p className="text-red-500 text-xs mt-1">{errors.name.message}</p>
                   )}
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Nickname</label>
+                  <input
+                    type="text"
+                    {...register('nickname')}
+                    className="w-full px-3 py-2 border rounded-md"
+                    placeholder="e.g., OLY"
+                  />
                 </div>
 
                 <div>
@@ -179,7 +197,60 @@ const AdminAthletes: React.FC = () => {
                   <ImageUpload
                     currentImage={editingAthlete?.image}
                     onImageUpload={(url) => setValue('image', url)}
-                    onImageRemove={() => setValue('image', '')}
+                    onImageRemove={() => setValue('image', null)}
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Height (meters)</label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    {...register('height_meters', {
+                      min: { value: 0.5, message: 'Height must be at least 0.5m' },
+                      max: { value: 2.5, message: 'Height must be less than 2.5m' }
+                    })}
+                    className="w-full px-3 py-2 border rounded-md"
+                    placeholder="e.g., 1.75"
+                  />
+                  {errors.height_meters && (
+                    <p className="text-red-500 text-xs mt-1">{errors.height_meters.message}</p>
+                  )}
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Weight (kg)</label>
+                  <input
+                    type="number"
+                    step="0.1"
+                    {...register('weight_kg', {
+                      min: { value: 30, message: 'Weight must be at least 30kg' },
+                      max: { value: 150, message: 'Weight must be less than 150kg' }
+                    })}
+                    className="w-full px-3 py-2 border rounded-md"
+                    placeholder="e.g., 65.5"
+                  />
+                  {errors.weight_kg && (
+                    <p className="text-red-500 text-xs mt-1">{errors.weight_kg.message}</p>
+                  )}
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Date of Birth</label>
+                  <input
+                    type="date"
+                    {...register('date_of_birth')}
+                    className="w-full px-3 py-2 border rounded-md"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Place of Birth</label>
+                  <input
+                    type="text"
+                    {...register('place_of_birth')}
+                    className="w-full px-3 py-2 border rounded-md"
+                    placeholder="e.g., Freetown, Sierra Leone"
                   />
                 </div>
 
@@ -188,15 +259,6 @@ const AdminAthletes: React.FC = () => {
                   <input
                     type="text"
                     {...register('nationality')}
-                    className="w-full px-3 py-2 border rounded-md"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Date of Birth</label>
-                  <input
-                    type="date"
-                    {...register('date_of_birth')}
                     className="w-full px-3 py-2 border rounded-md"
                   />
                 </div>
@@ -239,13 +301,42 @@ const AdminAthletes: React.FC = () => {
               </div>
 
               <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Specialties</label>
+                <textarea
+                  {...register('specialties')}
+                  rows={4}
+                  className="w-full px-3 py-2 border rounded-md"
+                  placeholder="Enter specialties (one per line)"
+                ></textarea>
+                <p className="text-sm text-gray-500 mt-1">
+                  Enter each specialty on a new line (e.g., Freestyle, Butterfly, Platform Diving)
+                </p>
+              </div>
+
+              <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Personal Bests</label>
                 <textarea
                   {...register('personal_bests')}
                   rows={4}
-                  placeholder="Enter personal bests (e.g., 100m Freestyle - 52.31s - National Championships 2023)"
                   className="w-full px-3 py-2 border rounded-md"
+                  placeholder="Enter personal bests (e.g., 100m Freestyle - 48.23s (2024-01-15))"
                 ></textarea>
+                <p className="text-sm text-gray-500 mt-1">
+                  Enter each personal best on a new line in the format: Event - Time in seconds (Date)
+                </p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">International Caps</label>
+                <textarea
+                  {...register('caps')}
+                  rows={4}
+                  className="w-full px-3 py-2 border rounded-md"
+                  placeholder="Enter international caps (e.g., 2024 African Games - Cairo, Egypt)"
+                ></textarea>
+                <p className="text-sm text-gray-500 mt-1">
+                  Enter each cap on a new line in the format: Year Competition - Location
+                </p>
               </div>
 
               <div className="flex justify-end gap-4">
@@ -276,105 +367,112 @@ const AdminAthletes: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {athletes.map((athlete) => (
               <div key={athlete.id} className="bg-white rounded-lg shadow-md overflow-hidden">
-                <div className="relative h-48">
-                  <img
-                    src={athlete.image || 'https://via.placeholder.com/400x300'}
-                    alt={athlete.name}
-                    className="w-full h-full object-cover"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
-                  <div className="absolute bottom-0 left-0 right-0 p-4 text-white">
-                    <h3 className="text-xl font-semibold">{athlete.name}</h3>
-                    <p className="text-sm opacity-90">{athlete.sport}</p>
+                <div className="grid grid-cols-1">
+                  <div className="relative h-[400px]">
+                    <img 
+                      src={athlete.image || "https://images.pexels.com/photos/863988/pexels-photo-863988.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"}
+                      alt={athlete.name}
+                      className="absolute inset-0 w-full h-full object-cover object-top"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
+                    <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
+                      <h3 className="text-2xl font-semibold mb-1 text-white">{athlete.name}</h3>
+                      {athlete.nickname && (
+                        <p className="text-gray-200">"{athlete.nickname}"</p>
+                      )}
+                      <p className="text-gray-200 capitalize">{athlete.sport?.replace('-', ' ') || 'Athlete'}</p>
+                    </div>
                   </div>
-                </div>
-                
-                <div className="p-4">
-                  {athlete.specialties.length > 0 && (
-                    <div className="mb-4">
-                      <h4 className="text-sm font-semibold text-gray-700 mb-2">Specialties</h4>
-                      <div className="flex flex-wrap gap-2">
-                        {athlete.specialties.map((specialty, index) => (
-                          <span
-                            key={index}
-                            className="px-2 py-1 bg-primary-50 text-primary-700 rounded-full text-sm"
-                          >
-                            {specialty.specialty}
-                          </span>
-                        ))}
+
+                  <div className="p-6">
+                    <div className="space-y-4">
+                      <div className="flex items-center text-sm text-gray-600">
+                        <Calendar size={16} className="mr-2" />
+                        Born: {athlete.date_of_birth ? new Date(athlete.date_of_birth).toLocaleDateString() : 'N/A'}
                       </div>
-                    </div>
-                  )}
+                      
+                      <div className="flex items-center text-sm text-gray-600">
+                        <MapPin size={16} className="mr-2" />
+                        Training: {athlete.training_base || 'Not specified'}
+                      </div>
 
-                  {athlete.records.length > 0 && (
-                    <div className="mb-4">
-                      <h4 className="text-sm font-semibold text-gray-700 mb-2">Records</h4>
-                      <ul className="space-y-1">
-                        {athlete.records.map((record, index) => (
-                          <li key={index} className="flex items-center text-sm text-gray-600">
-                            <Trophy size={14} className="mr-2 text-yellow-500" />
-                            {record.record}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-
-                  {athlete.achievements.length > 0 && (
-                    <div className="mb-4">
-                      <h4 className="text-sm font-semibold text-gray-700 mb-2">Achievements</h4>
-                      <ul className="space-y-1">
-                        {athlete.achievements.map((achievement, index) => (
-                          <li key={index} className="flex items-center text-sm text-gray-600">
-                            <Medal size={14} className="mr-2 text-yellow-500" />
-                            {achievement.achievement}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-
-                  {athlete.personal_bests.length > 0 && (
-                    <div className="mb-4">
-                      <h4 className="text-sm font-semibold text-gray-700 mb-2">Personal Bests</h4>
-                      <div className="space-y-2">
-                        {athlete.personal_bests.map((pb, index) => (
-                          <div key={index} className="bg-gray-50 p-2 rounded">
-                            <div className="flex items-center justify-between">
-                              <span className="text-sm font-medium">{pb.event}</span>
-                              <span className="text-sm text-primary-600 flex items-center">
-                                <Timer size={14} className="mr-1" />
-                                {pb.time}
+                      {athlete.specialties && (
+                        <div className="mb-4">
+                          <h4 className="text-sm font-semibold text-gray-700 mb-2">Specialties</h4>
+                          <div className="flex flex-wrap gap-2">
+                            {athlete.specialties.split('\n').map((specialty, index) => (
+                              <span
+                                key={index}
+                                className="px-2 py-1 bg-primary-50 text-primary-700 rounded-full text-sm"
+                              >
+                                {specialty}
                               </span>
-                            </div>
-                            <div className="text-xs text-gray-500 mt-1">
-                              {new Date(pb.date).toLocaleDateString()} • {pb.location}
-                            </div>
+                            ))}
                           </div>
-                        ))}
+                        </div>
+                      )}
+
+                      {athlete.personal_bests && (
+                        <div className="mb-4">
+                          <h4 className="text-sm font-semibold text-gray-700 mb-2">Personal Bests</h4>
+                          <div className="space-y-2">
+                            {athlete.personal_bests.split('\n').map((pb, index) => (
+                              <div key={index} className="bg-gray-50 p-2 rounded">
+                                <div className="text-sm text-gray-600">{pb}</div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {athlete.caps && (
+                        <div className="mb-4">
+                          <h4 className="text-sm font-semibold text-gray-700 mb-2">International Caps</h4>
+                          <div className="space-y-2">
+                            {athlete.caps.split('\n').map((cap, index) => (
+                              <div key={index} className="flex items-center text-sm text-gray-600">
+                                <Medal size={14} className="mr-2 text-yellow-500" />
+                                {cap}
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      <div className="flex justify-end space-x-2 mt-4 pt-4 border-t">
+                        <button
+                          onClick={() => handleEdit(athlete)}
+                          className="text-primary-600 hover:text-primary-900"
+                        >
+                          <Edit2 size={16} />
+                        </button>
+                        <button
+                          onClick={() => handleDeleteClick(athlete.id)}
+                          className="text-red-600 hover:text-red-900"
+                        >
+                          <Trash2 size={16} />
+                        </button>
                       </div>
                     </div>
-                  )}
-
-                  <div className="flex justify-end space-x-2 mt-4 pt-4 border-t">
-                    <button
-                      onClick={() => handleEdit(athlete)}
-                      className="text-primary-600 hover:text-primary-900"
-                    >
-                      <Edit2 size={16} />
-                    </button>
-                    <button
-                      onClick={() => handleDelete(athlete.id)}
-                      className="text-red-600 hover:text-red-900"
-                    >
-                      <Trash2 size={16} />
-                    </button>
                   </div>
                 </div>
               </div>
             ))}
           </div>
         )}
+
+        <Modal
+          isOpen={deleteModalOpen}
+          onClose={() => {
+            setDeleteModalOpen(false);
+            setAthleteToDelete(null);
+          }}
+          onConfirm={handleDeleteConfirm}
+          title="Delete Athlete"
+          message="Are you sure you want to delete this athlete? This action cannot be undone."
+          confirmText="Delete"
+          cancelText="Cancel"
+        />
       </div>
     </AdminLayout>
   );
