@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
-import { LayoutDashboard, Users, Calendar, Image, FileText, LogOut, Users2, Plane, UserCog, Home, Shield } from 'lucide-react';
+import { LayoutDashboard, Users, Calendar, Image, FileText, LogOut, Users2, Plane, UserCog, Home } from 'lucide-react';
 
 interface AdminLayoutProps {
   children: React.ReactNode;
@@ -20,7 +20,6 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
     { label: 'Board Members', icon: <Users2 size={20} />, path: '/admin/board' },
     { label: 'Technical Staff', icon: <UserCog size={20} />, path: '/admin/technical-staff' },
     { label: 'Travel', icon: <Plane size={20} />, path: '/admin/travel' },
-    { label: 'Admin Users', icon: <Shield size={20} />, path: '/admin/users' },
   ];
 
   const handleSignOut = async () => {
