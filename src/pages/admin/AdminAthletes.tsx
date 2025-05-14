@@ -14,6 +14,18 @@ type Athlete = Database['public']['Tables']['athletes']['Row'] & {
   caps: Database['public']['Tables']['athlete_caps']['Row'][];
 };
 
+type PersonalBestInput = {
+  event: string;
+  time: string;
+  date: string;
+};
+
+type CapInput = {
+  competition_name: string;
+  year: number;
+  location: string;
+};
+
 const AdminAthletes: React.FC = () => {
   const [athletes, setAthletes] = useState<Athlete[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -21,6 +33,8 @@ const AdminAthletes: React.FC = () => {
   const [editingAthlete, setEditingAthlete] = useState<Athlete | null>(null);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [athleteToDelete, setAthleteToDelete] = useState<string | null>(null);
+  const [personalBests, setPersonalBests] = useState<PersonalBestInput[]>([{ event: '', time: '', date: '' }]);
+  const [caps, setCaps] = useState<CapInput[]>([{ competition_name: '', year: new Date().getFullYear(), location: '' }]);
   
   const { register, handleSubmit, reset, setValue, formState: { errors } } = useForm<Athlete>();
 
@@ -87,6 +101,8 @@ const AdminAthletes: React.FC = () => {
         place_of_birth: data.place_of_birth
       };
 
+      let athleteId = editingAthlete?.id;
+
       if (editingAthlete) {
         const { error } = await supabase
           .from('athletes')
@@ -95,16 +111,73 @@ const AdminAthletes: React.FC = () => {
           
         if (error) throw error;
       } else {
-        const { error } = await supabase
+        const { data: newAthlete, error } = await supabase
           .from('athletes')
-          .insert([athleteData]);
+          .insert([athleteData])
+          .select()
+          .single();
           
         if (error) throw error;
+        athleteId = newAthlete.id;
+      }
+
+      if (athleteId) {
+        // Save personal bests
+        if (personalBests.length > 0) {
+          await supabase
+            .from('athlete_personal_bests')
+            .delete()
+            .eq('athlete_id', athleteId);
+
+          const personalBestsData = personalBests
+            .filter(pb => pb.event && pb.time)
+            .map(pb => ({
+              athlete_id: athleteId,
+              event: pb.event,
+              time_seconds: parseFloat(pb.time),
+              date: pb.date || null
+            }));
+
+          if (personalBestsData.length > 0) {
+            const { error: pbError } = await supabase
+              .from('athlete_personal_bests')
+              .insert(personalBestsData);
+            
+            if (pbError) throw pbError;
+          }
+        }
+
+        // Save caps
+        if (caps.length > 0) {
+          await supabase
+            .from('athlete_caps')
+            .delete()
+            .eq('athlete_id', athleteId);
+
+          const capsData = caps
+            .filter(cap => cap.competition_name && cap.location)
+            .map(cap => ({
+              athlete_id: athleteId,
+              competition_name: cap.competition_name,
+              year: cap.year,
+              location: cap.location
+            }));
+
+          if (capsData.length > 0) {
+            const { error: capsError } = await supabase
+              .from('athlete_caps')
+              .insert(capsData);
+            
+            if (capsError) throw capsError;
+          }
+        }
       }
 
       reset();
       setIsAdding(false);
       setEditingAthlete(null);
+      setPersonalBests([{ event: '', time: '', date: '' }]);
+      setCaps([{ competition_name: '', year: new Date().getFullYear(), location: '' }]);
       fetchAthletes();
     } catch (error) {
       console.error('Error saving athlete:', error);
@@ -119,6 +192,28 @@ const AdminAthletes: React.FC = () => {
     Object.keys(athlete).forEach((key) => {
       setValue(key as keyof Athlete, athlete[key as keyof Athlete]);
     });
+
+    // Set personal bests
+    if (athlete.personal_bests && athlete.personal_bests.length > 0) {
+      setPersonalBests(athlete.personal_bests.map(pb => ({
+        event: pb.event,
+        time: pb.time_seconds.toString(),
+        date: pb.date || ''
+      })));
+    } else {
+      setPersonalBests([{ event: '', time: '', date: '' }]);
+    }
+
+    // Set caps
+    if (athlete.caps && athlete.caps.length > 0) {
+      setCaps(athlete.caps.map(cap => ({
+        competition_name: cap.competition_name,
+        year: cap.year,
+        location: cap.location
+      })));
+    } else {
+      setCaps([{ competition_name: '', year: new Date().getFullYear(), location: '' }]);
+    }
   };
 
   const handleDeleteClick = (id: string) => {
@@ -147,6 +242,22 @@ const AdminAthletes: React.FC = () => {
     }
   };
 
+  const addPersonalBest = () => {
+    setPersonalBests([...personalBests, { event: '', time: '', date: '' }]);
+  };
+
+  const removePersonalBest = (index: number) => {
+    setPersonalBests(personalBests.filter((_, i) => i !== index));
+  };
+
+  const addCap = () => {
+    setCaps([...caps, { competition_name: '', year: new Date().getFullYear(), location: '' }]);
+  };
+
+  const removeCap = (index: number) => {
+    setCaps(caps.filter((_, i) => i !== index));
+  };
+
   return (
     <AdminLayout>
       <div className="p-8">
@@ -157,6 +268,8 @@ const AdminAthletes: React.FC = () => {
               setIsAdding(!isAdding);
               setEditingAthlete(null);
               reset();
+              setPersonalBests([{ event: '', time: '', date: '' }]);
+              setCaps([{ competition_name: '', year: new Date().getFullYear(), location: '' }]);
             }}
             className="btn btn-primary"
           >
@@ -319,6 +432,138 @@ const AdminAthletes: React.FC = () => {
                 ></textarea>
               </div>
 
+              {/* Personal Bests Section */}
+              <div className="space-y-4">
+                <div className="flex justify-between items-center">
+                  <label className="block text-sm font-medium text-gray-700">Personal Bests</label>
+                  <button
+                    type="button"
+                    onClick={addPersonalBest}
+                    className="text-primary-600 hover:text-primary-700 text-sm font-medium"
+                  >
+                    + Add Personal Best
+                  </button>
+                </div>
+                {personalBests.map((pb, index) => (
+                  <div key={index} className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 bg-gray-50 rounded-lg">
+                    <div>
+                      <input
+                        type="text"
+                        value={pb.event}
+                        onChange={(e) => {
+                          const newPBs = [...personalBests];
+                          newPBs[index].event = e.target.value;
+                          setPersonalBests(newPBs);
+                        }}
+                        placeholder="Event (e.g., 100m Freestyle)"
+                        className="w-full px-3 py-2 border rounded-md"
+                      />
+                    </div>
+                    <div>
+                      <input
+                        type="number"
+                        step="0.01"
+                        value={pb.time}
+                        onChange={(e) => {
+                          const newPBs = [...personalBests];
+                          newPBs[index].time = e.target.value;
+                          setPersonalBests(newPBs);
+                        }}
+                        placeholder="Time in seconds"
+                        className="w-full px-3 py-2 border rounded-md"
+                      />
+                    </div>
+                    <div className="flex gap-2">
+                      <input
+                        type="date"
+                        value={pb.date}
+                        onChange={(e) => {
+                          const newPBs = [...personalBests];
+                          newPBs[index].date = e.target.value;
+                          setPersonalBests(newPBs);
+                        }}
+                        className="w-full px-3 py-2 border rounded-md"
+                      />
+                      {personalBests.length > 1 && (
+                        <button
+                          type="button"
+                          onClick={() => removePersonalBest(index)}
+                          className="text-red-600 hover:text-red-700"
+                        >
+                          <Trash2 size={20} />
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Caps Section */}
+              <div className="space-y-4">
+                <div className="flex justify-between items-center">
+                  <label className="block text-sm font-medium text-gray-700">International Appearances (Caps)</label>
+                  <button
+                    type="button"
+                    onClick={addCap}
+                    className="text-primary-600 hover:text-primary-700 text-sm font-medium"
+                  >
+                    + Add Cap
+                  </button>
+                </div>
+                {caps.map((cap, index) => (
+                  <div key={index} className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 bg-gray-50 rounded-lg">
+                    <div>
+                      <input
+                        type="text"
+                        value={cap.competition_name}
+                        onChange={(e) => {
+                          const newCaps = [...caps];
+                          newCaps[index].competition_name = e.target.value;
+                          setCaps(newCaps);
+                        }}
+                        placeholder="Competition Name"
+                        className="w-full px-3 py-2 border rounded-md"
+                      />
+                    </div>
+                    <div>
+                      <input
+                        type="number"
+                        value={cap.year}
+                        onChange={(e) => {
+                          const newCaps = [...caps];
+                          newCaps[index].year = parseInt(e.target.value);
+                          setCaps(newCaps);
+                        }}
+                        placeholder="Year"
+                        className="w-full px-3 py-2 border rounded-md"
+                      />
+                    </div>
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        value={cap.location}
+                        onChange={(e) => {
+                          const newCaps = [...caps];
+                          newCaps[index].location = e.target.value;
+                          setCaps(newCaps);
+                        }}
+                        placeholder="Location"
+                        className="w-full px-3 py-2 border rounded-md"
+                      />
+                      {caps.length > 1 && (
+                        <button
+                          type="button"
+                          onClick={() => removeCap(index)}
+                          className="text-red-600 hover:text-red-700"
+                        >
+                          <Trash2 size={20} />
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+
               <div className="flex justify-end gap-4">
                 <button
                   type="button"
@@ -326,6 +571,8 @@ const AdminAthletes: React.FC = () => {
                     setIsAdding(false);
                     setEditingAthlete(null);
                     reset();
+                    setPersonalBests([{ event: '', time: '', date: '' }]);
+                    setCaps([{ competition_name: '', year: new Date().getFullYear(), location: '' }]);
                   }}
                   className="btn btn-outline"
                 >
@@ -383,36 +630,6 @@ const AdminAthletes: React.FC = () => {
                     </div>
                   </div>
 
-                  {athlete.specialties.length > 0 && (
-                    <div className="mb-4">
-                      <h4 className="text-sm font-semibold text-gray-700 mb-2">Specialties</h4>
-                      <div className="flex flex-wrap gap-2">
-                        {athlete.specialties.map((specialty, index) => (
-                          <span
-                            key={index}
-                            className="px-2 py-1 bg-primary-50 text-primary-700 rounded-full text-sm"
-                          >
-                            {specialty.specialty}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  {athlete.records.length > 0 && (
-                    <div className="mb-4">
-                      <h4 className="text-sm font-semibold text-gray-700 mb-2">Records</h4>
-                      <ul className="space-y-1">
-                        {athlete.records.map((record, index) => (
-                          <li key={index} className="flex items-center text-sm text-gray-600">
-                            <Trophy size={14} className="mr-2 text-yellow-500" />
-                            {record.record}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-
                   {athlete.personal_bests.length > 0 && (
                     <div className="mb-4">
                       <h4 className="text-sm font-semibold text-gray-700 mb-2">Personal Bests</h4>
@@ -426,9 +643,11 @@ const AdminAthletes: React.FC = () => {
                                 {pb.time_seconds}s
                               </span>
                             </div>
-                            <div className="text-xs text-gray-500 mt-1">
-                              {new Date(pb.date || '').toLocaleDateString()}
-                            </div>
+                            {pb.date && (
+                              <div className="text-xs text-gray-500 mt-1">
+                                {new Date(pb.date).toLocaleDateString()}
+                              </div>
+                            )}
                           </div>
                         ))}
                       </div>
