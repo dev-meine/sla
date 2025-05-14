@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import AdminLayout from '../../components/admin/AdminLayout';
 import { supabase } from '../../lib/supabase';
-import { PlusCircle, Edit2, Trash2, Calendar, MapPin, Timer } from 'lucide-react';
+import { PlusCircle, Edit2, Trash2, Calendar, MapPin, Timer, Medal } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { Database } from '../../types/supabase';
 import ImageUpload from '../../components/ui/ImageUpload';
@@ -57,7 +57,9 @@ const AdminAthletes: React.FC = () => {
         height_meters: data.height_meters,
         weight_kg: data.weight_kg,
         place_of_birth: data.place_of_birth,
-        personal_bests: data.personal_bests
+        personal_bests: data.personal_bests,
+        specialties: data.specialties,
+        caps: data.caps
       };
 
       if (editingAthlete) {
@@ -293,6 +295,19 @@ const AdminAthletes: React.FC = () => {
               </div>
 
               <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Specialties</label>
+                <textarea
+                  {...register('specialties')}
+                  rows={4}
+                  className="w-full px-3 py-2 border rounded-md"
+                  placeholder="Enter specialties (one per line)"
+                ></textarea>
+                <p className="text-sm text-gray-500 mt-1">
+                  Enter each specialty on a new line (e.g., Freestyle, Butterfly, Platform Diving)
+                </p>
+              </div>
+
+              <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Personal Bests</label>
                 <textarea
                   {...register('personal_bests')}
@@ -302,6 +317,19 @@ const AdminAthletes: React.FC = () => {
                 ></textarea>
                 <p className="text-sm text-gray-500 mt-1">
                   Enter each personal best on a new line in the format: Event - Time in seconds (Date)
+                </p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">International Caps</label>
+                <textarea
+                  {...register('caps')}
+                  rows={4}
+                  className="w-full px-3 py-2 border rounded-md"
+                  placeholder="Enter international caps (e.g., 2024 African Games - Cairo, Egypt)"
+                ></textarea>
+                <p className="text-sm text-gray-500 mt-1">
+                  Enter each cap on a new line in the format: Year Competition - Location
                 </p>
               </div>
 
@@ -369,6 +397,22 @@ const AdminAthletes: React.FC = () => {
                     </div>
                   </div>
 
+                  {athlete.specialties && (
+                    <div className="mb-4">
+                      <h4 className="text-sm font-semibold text-gray-700 mb-2">Specialties</h4>
+                      <div className="flex flex-wrap gap-2">
+                        {athlete.specialties.split('\n').map((specialty, index) => (
+                          <span
+                            key={index}
+                            className="px-2 py-1 bg-primary-50 text-primary-700 rounded-full text-sm"
+                          >
+                            {specialty}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
                   {athlete.personal_bests && (
                     <div className="mb-4">
                       <h4 className="text-sm font-semibold text-gray-700 mb-2">Personal Bests</h4>
@@ -376,6 +420,20 @@ const AdminAthletes: React.FC = () => {
                         {athlete.personal_bests.split('\n').map((pb, index) => (
                           <div key={index} className="bg-gray-50 p-2 rounded">
                             <div className="text-sm text-gray-600">{pb}</div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {athlete.caps && (
+                    <div className="mb-4">
+                      <h4 className="text-sm font-semibold text-gray-700 mb-2">International Caps</h4>
+                      <div className="space-y-2">
+                        {athlete.caps.split('\n').map((cap, index) => (
+                          <div key={index} className="flex items-center text-sm text-gray-600">
+                            <Medal size={14} className="mr-2 text-yellow-500" />
+                            {cap}
                           </div>
                         ))}
                       </div>
