@@ -50,10 +50,8 @@ const ContactPage: React.FC = () => {
                     <Mail size={24} />
                   </div>
                   <div>
-                    <h3 className="text-lg font-medium mb-1">Email Addresses</h3>
-                    <p className="text-gray-600">General Inquiries: info@slsdwa.org</p>
-                    <p className="text-gray-600">Media Contact: media@slsdwa.org</p>
-                    <p className="text-gray-600">Secretary: secretary@slsdwa.org</p>
+                    <h3 className="text-lg font-medium mb-1">Email Addresse</h3>
+                    <p className="text-gray-600">General Inquiries: saloneswim@gmail.com</p>
                   </div>
                 </div>
                 
