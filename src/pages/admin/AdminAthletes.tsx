@@ -30,11 +30,7 @@ type AthleteForm = {
   place_of_birth: string;
   specialties: { specialty: string }[];
   records: { record: string, date: string }[];
-  personal_bests: {
-    event: string;
-    time_seconds: number;
-    date: string;
-  }[];
+  personal_bests: { value: string }[];
   caps: {
     competition_name: string;
     year: number;
@@ -54,7 +50,7 @@ const AdminAthletes: React.FC = () => {
     defaultValues: {
       specialties: [{ specialty: '' }],
       records: [{ record: '', date: '' }],
-      personal_bests: [{ event: '', time_seconds: 0, date: '' }],
+      personal_bests: [{ value: '' }],
       caps: [{ competition_name: '', year: new Date().getFullYear(), location: '' }]
     }
   });
@@ -147,7 +143,6 @@ const AdminAthletes: React.FC = () => {
       };
 
       if (editingAthlete) {
-        // Update athlete
         const { error: athleteError } = await supabase
           .from('athletes')
           .update(athleteData)
@@ -155,7 +150,6 @@ const AdminAthletes: React.FC = () => {
           
         if (athleteError) throw athleteError;
 
-        // Delete existing related records
         await Promise.all([
           supabase.from('athlete_specialties').delete().eq('athlete_id', editingAthlete.id),
           supabase.from('athlete_records').delete().eq('athlete_id', editingAthlete.id),
@@ -163,7 +157,6 @@ const AdminAthletes: React.FC = () => {
           supabase.from('athlete_caps').delete().eq('athlete_id', editingAthlete.id)
         ]);
 
-        // Insert new related records
         await Promise.all([
           supabase.from('athlete_specialties').insert(
             data.specialties
@@ -184,12 +177,10 @@ const AdminAthletes: React.FC = () => {
           ),
           supabase.from('athlete_personal_bests').insert(
             data.personal_bests
-              .filter(pb => pb.event.trim())
+              .filter(pb => pb.value.trim())
               .map(pb => ({
                 athlete_id: editingAthlete.id,
-                event: pb.event.trim(),
-                time_seconds: pb.time_seconds,
-                date: pb.date
+                event: pb.value.trim()
               }))
           ),
           supabase.from('athlete_caps').insert(
@@ -204,7 +195,6 @@ const AdminAthletes: React.FC = () => {
           )
         ]);
       } else {
-        // Insert new athlete
         const { data: newAthlete, error: athleteError } = await supabase
           .from('athletes')
           .insert([athleteData])
@@ -213,7 +203,6 @@ const AdminAthletes: React.FC = () => {
           
         if (athleteError) throw athleteError;
 
-        // Insert related records
         await Promise.all([
           supabase.from('athlete_specialties').insert(
             data.specialties
@@ -234,12 +223,10 @@ const AdminAthletes: React.FC = () => {
           ),
           supabase.from('athlete_personal_bests').insert(
             data.personal_bests
-              .filter(pb => pb.event.trim())
+              .filter(pb => pb.value.trim())
               .map(pb => ({
                 athlete_id: newAthlete.id,
-                event: pb.event.trim(),
-                time_seconds: pb.time_seconds,
-                date: pb.date
+                event: pb.value.trim()
               }))
           ),
           supabase.from('athlete_caps').insert(
@@ -290,12 +277,8 @@ const AdminAthletes: React.FC = () => {
         ? athlete.records.map(r => ({ record: r.record, date: r.date || '' }))
         : [{ record: '', date: '' }],
       personal_bests: athlete.personal_bests.length > 0
-        ? athlete.personal_bests.map(pb => ({
-            event: pb.event,
-            time_seconds: pb.time_seconds,
-            date: pb.date || ''
-          }))
-        : [{ event: '', time_seconds: 0, date: '' }],
+        ? athlete.personal_bests.map(pb => ({ value: pb.event }))
+        : [{ value: '' }],
       caps: athlete.caps.length > 0
         ? athlete.caps.map(c => ({
             competition_name: c.competition_name,
@@ -356,7 +339,6 @@ const AdminAthletes: React.FC = () => {
               {editingAthlete ? 'Edit Athlete' : 'Add New Athlete'}
             </h3>
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-              {/* Basic Information */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
@@ -505,7 +487,6 @@ const AdminAthletes: React.FC = () => {
                 ></textarea>
               </div>
 
-              {/* Specialties */}
               <div>
                 <div className="flex justify-between items-center mb-2">
                   <label className="block text-sm font-medium text-gray-700">Specialties</label>
@@ -537,7 +518,6 @@ const AdminAthletes: React.FC = () => {
                 ))}
               </div>
 
-              {/* Records */}
               <div>
                 <div className="flex justify-between items-center mb-2">
                   <label className="block text-sm font-medium text-gray-700">Records</label>
@@ -580,60 +560,37 @@ const AdminAthletes: React.FC = () => {
                 ))}
               </div>
 
-              {/* Personal Bests */}
               <div>
                 <div className="flex justify-between items-center mb-2">
                   <label className="block text-sm font-medium text-gray-700">Personal Bests</label>
                   <button
                     type="button"
-                    onClick={() => appendPersonalBest({ event: '', time_seconds: 0, date: '' })}
+                    onClick={() => appendPersonalBest({ value: '' })}
                     className="text-sm text-primary-600 hover:text-primary-700"
                   >
                     + Add Personal Best
                   </button>
                 </div>
                 {personalBestFields.map((field, index) => (
-                  <div key={field.id} className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4 p-4 border rounded-md">
-                    <div>
-                      <label className="block text-sm text-gray-600 mb-1">Event</label>
-                      <input
-                        {...register(`personal_bests.${index}.event`)}
-                        placeholder="e.g., 50m Freestyle"
-                        className="w-full px-3 py-2 border rounded-md"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm text-gray-600 mb-1">Time (seconds)</label>
-                      <input
-                        type="number"
-                        step="0.01"
-                        {...register(`personal_bests.${index}.time_seconds`)}
-                        placeholder="e.g., 42.48"
-                        className="w-full px-3 py-2 border rounded-md"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm text-gray-600 mb-1">Date</label>
-                      <input
-                        type="date"
-                        {...register(`personal_bests.${index}.date`)}
-                        className="w-full px-3 py-2 border rounded-md"
-                      />
-                    </div>
+                  <div key={field.id} className="flex gap-2 mb-2">
+                    <input
+                      {...register(`personal_bests.${index}.value`)}
+                      placeholder="Enter personal best (e.g., 50m Freestyle - 23.45s)"
+                      className="flex-1 px-3 py-2 border rounded-md"
+                    />
                     {index > 0 && (
                       <button
                         type="button"
                         onClick={() => removePersonalBest(index)}
-                        className="text-red-600 hover:text-red-700 md:col-span-3 text-center"
+                        className="text-red-600 hover:text-red-700"
                       >
-                        Remove Personal Best
+                        Remove
                       </button>
                     )}
                   </div>
                 ))}
               </div>
 
-              {/* International Appearances (Caps) */}
               <div>
                 <div className="flex justify-between items-center mb-2">
                   <label className="block text-sm font-medium text-gray-700">International Appearances</label>
@@ -783,24 +740,14 @@ const AdminAthletes: React.FC = () => {
                   {athlete.personal_bests.length > 0 && (
                     <div className="mb-4">
                       <h4 className="text-sm font-semibold text-gray-700 mb-2">Personal Bests</h4>
-                      <div className="space-y-2">
+                      <ul className="space-y-1">
                         {athlete.personal_bests.map((pb, index) => (
-                          <div key={index} className="bg-gray-50 p-2 rounded">
-                            <div className="flex items-center justify-between">
-                              <span className="text-sm font-medium">{pb.event}</span>
-                              <span className="text-sm text-primary-600 flex items-center">
-                                <Timer size={14} className="mr-1" />
-                                {pb.time_seconds}s
-                              </span>
-                            </div>
-                            {pb.date && (
-                              <div className="text-xs text-gray-500 mt-1">
-                                {new Date(pb.date).toLocaleDateString()}
-                              </div>
-                            )}
-                          </div>
+                          <li key={index} className="flex items-center text-sm text-gray-600">
+                            <Timer size={14} className="mr-2 text-primary-600" />
+                            {pb.event}
+                          </li>
                         ))}
-                      </div>
+                      </ul>
                     </div>
                   )}
 
@@ -826,7 +773,7 @@ const AdminAthletes: React.FC = () => {
                       <Edit2 size={16} />
                     </button>
                     <button
-                      onClick={() => handleDeleteClick(athlete.id)}
+                      onClick={() => handleDelete Click(athlete.id)}
                       className="text-red-600 hover:text-red-900"
                     >
                       <Trash2 size={16} />
