@@ -23,15 +23,23 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
   ];
 
   const handleSignOut = async () => {
-    await supabase.auth.signOut();
-    navigate('/admin');
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        await supabase.auth.signOut();
+      }
+      navigate('/admin/login');
+    } catch (error) {
+      console.error('Sign out error:', error);
+      // Still navigate to login even if there's an error
+      navigate('/admin/login');
+    }
   };
 
   const isActive = (path: string) => location.pathname === path;
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Sidebar */}
       <aside className="fixed top-0 left-0 h-full w-64 bg-white shadow-lg">
         <div className="p-6">
           <h1 className="text-xl font-bold text-primary-600">Admin</h1>
@@ -68,7 +76,6 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
         </nav>
       </aside>
 
-      {/* Main content */}
       <main className="ml-64 min-h-screen">
         {children}
       </main>

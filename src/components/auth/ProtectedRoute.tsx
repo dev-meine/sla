@@ -17,7 +17,6 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
         
         if (sessionError) {
           console.error('Session error:', sessionError);
-          await supabase.auth.signOut(); // Clear any invalid session
           setIsAuthenticated(false);
           return;
         }
@@ -35,7 +34,6 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
             
             if (refreshError) {
               console.error('Session refresh error:', refreshError);
-              await supabase.auth.signOut(); // Clear invalid session data
               setIsAuthenticated(false);
               return;
             }
@@ -43,7 +41,6 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
             setIsAuthenticated(!!refreshedSession);
           } catch (refreshError) {
             console.error('Session refresh error:', refreshError);
-            await supabase.auth.signOut();
             setIsAuthenticated(false);
           }
         } else {
@@ -51,7 +48,6 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
         }
       } catch (error) {
         console.error('Auth check error:', error);
-        await supabase.auth.signOut();
         setIsAuthenticated(false);
       }
     };
