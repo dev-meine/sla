@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import AdminLayout from '../../components/admin/AdminLayout';
 import { supabase } from '../../lib/supabase';
-import { PlusCircle, Edit2, Trash2, Medal, Trophy, Timer } from 'lucide-react';
+import { PlusCircle, Edit2, Trash2, Calendar, MapPin, Timer } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { Database } from '../../types/supabase';
 import ImageUpload from '../../components/ui/ImageUpload';
@@ -94,15 +94,20 @@ const AdminAthletes: React.FC = () => {
     });
   };
 
-  const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this athlete?')) return;
+  const handleDeleteClick = (id: string) => {
+    setAthleteToDelete(id);
+    setDeleteModalOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!athleteToDelete) return;
     
     try {
       setIsLoading(true);
       const { error } = await supabase
         .from('athletes')
         .delete()
-        .eq('id', id);
+        .eq('id', athleteToDelete);
         
       if (error) throw error;
       fetchAthletes();
@@ -110,6 +115,8 @@ const AdminAthletes: React.FC = () => {
       console.error('Error deleting athlete:', error);
     } finally {
       setIsLoading(false);
+      setDeleteModalOpen(false);
+      setAthleteToDelete(null);
     }
   };
 
@@ -383,7 +390,7 @@ const AdminAthletes: React.FC = () => {
                       <Edit2 size={16} />
                     </button>
                     <button
-                      onClick={() => handleDelete(athlete.id)}
+                      onClick={() => handleDeleteClick(athlete.id)}
                       className="text-red-600 hover:text-red-900"
                     >
                       <Trash2 size={16} />
