@@ -22,10 +22,13 @@ const AboutPage: React.FC = () => {
             >
               <h2 className="mb-6">Our Story</h2>
               <p className="text-gray-600 mb-4">
-                The Sierra Leone Swimming, Diving & Water Polo Association (SLSDWA) was established in 1996 to develop and promote aquatic sports across Sierra Leone. As the national governing body for swimming, diving, and water polo, we are recognized by the Sierra Leone Sports Ministry and affiliated with World Aquatics.
+                FOUNDED IN FREETOWN – 10TH JUNE 1979
+The Sierra Leone Swimming Federation is the national governing body for all Aquatic sports in Sierra Leone.
+This includes but is not limited to Open Water Swimming, Surfing, Water Polo and Diving.
+The Federation has sole rights for the organization, development, growth and promotion of these sports at all levels locally and internationally
               </p>
               <p className="text-gray-600 mb-4">
-                From humble beginnings with just a handful of swimmers and one pool, our organization has grown to support hundreds of athletes across the country. We organize national championships, development programs, and represent Sierra Leone in international competitions.
+              We organize national championships, development programs, and represent Sierra Leone in international competitions.
               </p>
               <p className="text-gray-600">
                 Our mission is to make aquatic sports accessible to all Sierra Leoneans, develop world-class athletes, and promote water safety throughout the country.
