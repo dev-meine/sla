@@ -7,6 +7,7 @@ export type NavItem = {
 export interface Athlete {
   id: string;
   name: string;
+  nickname?: string;
   image: string;
   sport: 'swimming' | 'diving' | 'water-polo';
   specialties?: string[];
@@ -24,6 +25,14 @@ export interface Athlete {
   club?: string;
   coach?: string;
   trainingBase?: string;
+  height_meters?: number;
+  weight_kg?: number;
+  place_of_birth?: string;
+  caps?: {
+    competition: string;
+    year: number;
+    location: string;
+  }[];
 }
 
 export interface BoardMember {

@@ -13,6 +13,7 @@ export interface Database {
         Row: {
           id: string
           name: string
+          nickname: string | null
           image: string | null
           sport: string | null
           bio: string | null
@@ -21,12 +22,16 @@ export interface Database {
           club: string | null
           coach: string | null
           training_base: string | null
+          height_meters: number | null
+          weight_kg: number | null
+          place_of_birth: string | null
           created_at: string | null
           updated_at: string | null
         }
         Insert: {
           id?: string
           name: string
+          nickname?: string | null
           image?: string | null
           sport?: string | null
           bio?: string | null
@@ -35,12 +40,16 @@ export interface Database {
           club?: string | null
           coach?: string | null
           training_base?: string | null
+          height_meters?: number | null
+          weight_kg?: number | null
+          place_of_birth?: string | null
           created_at?: string | null
           updated_at?: string | null
         }
         Update: {
           id?: string
           name?: string
+          nickname?: string | null
           image?: string | null
           sport?: string | null
           bio?: string | null
@@ -49,6 +58,116 @@ export interface Database {
           club?: string | null
           coach?: string | null
           training_base?: string | null
+          height_meters?: number | null
+          weight_kg?: number | null
+          place_of_birth?: string | null
+          created_at?: string | null
+          updated_at?: string | null
+        }
+      }
+      athlete_specialties: {
+        Row: {
+          id: string
+          athlete_id: string
+          specialty: string
+          created_at: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          id?: string
+          athlete_id: string
+          specialty: string
+          created_at?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          id?: string
+          athlete_id?: string
+          specialty?: string
+          created_at?: string | null
+          updated_at?: string | null
+        }
+      }
+      athlete_records: {
+        Row: {
+          id: string
+          athlete_id: string
+          record: string
+          date: string | null
+          created_at: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          id?: string
+          athlete_id: string
+          record: string
+          date?: string | null
+          created_at?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          id?: string
+          athlete_id?: string
+          record?: string
+          date?: string | null
+          created_at?: string | null
+          updated_at?: string | null
+        }
+      }
+      athlete_personal_bests: {
+        Row: {
+          id: string
+          athlete_id: string
+          event: string
+          time_seconds: number
+          date: string | null
+          created_at: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          id?: string
+          athlete_id: string
+          event: string
+          time_seconds: number
+          date?: string | null
+          created_at?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          id?: string
+          athlete_id?: string
+          event?: string
+          time_seconds?: number
+          date?: string | null
+          created_at?: string | null
+          updated_at?: string | null
+        }
+      }
+      athlete_caps: {
+        Row: {
+          id: string
+          athlete_id: string
+          competition_name: string
+          year: number
+          location: string
+          created_at: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          id?: string
+          athlete_id: string
+          competition_name: string
+          year: number
+          location: string
+          created_at?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          id?: string
+          athlete_id?: string
+          competition_name?: string
+          year?: number
+          location?: string
           created_at?: string | null
           updated_at?: string | null
         }
@@ -160,7 +279,6 @@ export interface Database {
           updated_at?: string | null
         }
       }
-      // ... rest of the existing types
     }
     Views: {
       [_ in never]: never
