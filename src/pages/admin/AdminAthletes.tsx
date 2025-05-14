@@ -367,98 +367,93 @@ const AdminAthletes: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {athletes.map((athlete) => (
               <div key={athlete.id} className="bg-white rounded-lg shadow-md overflow-hidden">
-                <div className="relative h-48">
-                  <img
-                    src={athlete.image || "https://images.pexels.com/photos/863988/pexels-photo-863988.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"}
-                    alt={athlete.name}
-                    className="w-full h-full object-cover"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
-                  <div className="absolute bottom-0 left-0 right-0 p-4 text-white">
-                    <h3 className="text-xl font-semibold">{athlete.name}</h3>
-                    {athlete.nickname && (
-                      <p className="text-sm opacity-90">"{athlete.nickname}"</p>
-                    )}
-                    <p className="text-sm opacity-90">{athlete.sport}</p>
-                  </div>
-                </div>
-
-                <div className="p-4">
-                  <div className="grid grid-cols-2 gap-4 mb-4">
-                    <div>
-                      <p className="text-sm text-gray-600">Height</p>
-                      <p className="font-medium">{athlete.height_meters}m</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-600">Weight</p>
-                      <p className="font-medium">{athlete.weight_kg}kg</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-600">Birth Place</p>
-                      <p className="font-medium">{athlete.place_of_birth || 'N/A'}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-600">Nationality</p>
-                      <p className="font-medium">{athlete.nationality}</p>
+                <div className="grid grid-cols-1">
+                  <div className="relative h-[400px]">
+                    <img 
+                      src={athlete.image || "https://images.pexels.com/photos/863988/pexels-photo-863988.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"}
+                      alt={athlete.name}
+                      className="absolute inset-0 w-full h-full object-cover object-top"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
+                    <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
+                      <h3 className="text-2xl font-semibold mb-1 text-white">{athlete.name}</h3>
+                      {athlete.nickname && (
+                        <p className="text-gray-200">"{athlete.nickname}"</p>
+                      )}
+                      <p className="text-gray-200 capitalize">{athlete.sport?.replace('-', ' ') || 'Athlete'}</p>
                     </div>
                   </div>
 
-                  {athlete.specialties && (
-                    <div className="mb-4">
-                      <h4 className="text-sm font-semibold text-gray-700 mb-2">Specialties</h4>
-                      <div className="flex flex-wrap gap-2">
-                        {athlete.specialties.split('\n').map((specialty, index) => (
-                          <span
-                            key={index}
-                            className="px-2 py-1 bg-primary-50 text-primary-700 rounded-full text-sm"
-                          >
-                            {specialty}
-                          </span>
-                        ))}
+                  <div className="p-6">
+                    <div className="space-y-4">
+                      <div className="flex items-center text-sm text-gray-600">
+                        <Calendar size={16} className="mr-2" />
+                        Born: {athlete.date_of_birth ? new Date(athlete.date_of_birth).toLocaleDateString() : 'N/A'}
                       </div>
-                    </div>
-                  )}
+                      
+                      <div className="flex items-center text-sm text-gray-600">
+                        <MapPin size={16} className="mr-2" />
+                        Training: {athlete.training_base || 'Not specified'}
+                      </div>
 
-                  {athlete.personal_bests && (
-                    <div className="mb-4">
-                      <h4 className="text-sm font-semibold text-gray-700 mb-2">Personal Bests</h4>
-                      <div className="space-y-2">
-                        {athlete.personal_bests.split('\n').map((pb, index) => (
-                          <div key={index} className="bg-gray-50 p-2 rounded">
-                            <div className="text-sm text-gray-600">{pb}</div>
+                      {athlete.specialties && (
+                        <div className="mb-4">
+                          <h4 className="text-sm font-semibold text-gray-700 mb-2">Specialties</h4>
+                          <div className="flex flex-wrap gap-2">
+                            {athlete.specialties.split('\n').map((specialty, index) => (
+                              <span
+                                key={index}
+                                className="px-2 py-1 bg-primary-50 text-primary-700 rounded-full text-sm"
+                              >
+                                {specialty}
+                              </span>
+                            ))}
                           </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
+                        </div>
+                      )}
 
-                  {athlete.caps && (
-                    <div className="mb-4">
-                      <h4 className="text-sm font-semibold text-gray-700 mb-2">International Caps</h4>
-                      <div className="space-y-2">
-                        {athlete.caps.split('\n').map((cap, index) => (
-                          <div key={index} className="flex items-center text-sm text-gray-600">
-                            <Medal size={14} className="mr-2 text-yellow-500" />
-                            {cap}
+                      {athlete.personal_bests && (
+                        <div className="mb-4">
+                          <h4 className="text-sm font-semibold text-gray-700 mb-2">Personal Bests</h4>
+                          <div className="space-y-2">
+                            {athlete.personal_bests.split('\n').map((pb, index) => (
+                              <div key={index} className="bg-gray-50 p-2 rounded">
+                                <div className="text-sm text-gray-600">{pb}</div>
+                              </div>
+                            ))}
                           </div>
-                        ))}
+                        </div>
+                      )}
+
+                      {athlete.caps && (
+                        <div className="mb-4">
+                          <h4 className="text-sm font-semibold text-gray-700 mb-2">International Caps</h4>
+                          <div className="space-y-2">
+                            {athlete.caps.split('\n').map((cap, index) => (
+                              <div key={index} className="flex items-center text-sm text-gray-600">
+                                <Medal size={14} className="mr-2 text-yellow-500" />
+                                {cap}
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      <div className="flex justify-end space-x-2 mt-4 pt-4 border-t">
+                        <button
+                          onClick={() => handleEdit(athlete)}
+                          className="text-primary-600 hover:text-primary-900"
+                        >
+                          <Edit2 size={16} />
+                        </button>
+                        <button
+                          onClick={() => handleDeleteClick(athlete.id)}
+                          className="text-red-600 hover:text-red-900"
+                        >
+                          <Trash2 size={16} />
+                        </button>
                       </div>
                     </div>
-                  )}
-
-                  <div className="flex justify-end space-x-2 mt-4 pt-4 border-t">
-                    <button
-                      onClick={() => handleEdit(athlete)}
-                      className="text-primary-600 hover:text-primary-900"
-                    >
-                      <Edit2 size={16} />
-                    </button>
-                    <button
-                      onClick={() => handleDeleteClick(athlete.id)}
-                      className="text-red-600 hover:text-red-900"
-                    >
-                      <Trash2 size={16} />
-                    </button>
                   </div>
                 </div>
               </div>
