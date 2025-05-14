@@ -39,27 +39,33 @@ const AdminAthletes: React.FC = () => {
     }
   };
 
+  const sanitizeText = (text: string | null): string | null => {
+    if (!text) return null;
+    // Remove any potential null bytes and invalid characters
+    return text.replace(/\0/g, '').trim();
+  };
+
   const onSubmit = async (data: Athlete) => {
     try {
       setIsLoading(true);
       
       const athleteData = {
-        name: data.name,
-        nickname: data.nickname,
+        name: sanitizeText(data.name),
+        nickname: sanitizeText(data.nickname),
         image: data.image,
-        sport: data.sport,
-        bio: data.bio,
-        nationality: data.nationality,
+        sport: sanitizeText(data.sport),
+        bio: sanitizeText(data.bio),
+        nationality: sanitizeText(data.nationality),
         date_of_birth: data.date_of_birth,
-        club: data.club,
-        coach: data.coach,
-        training_base: data.training_base,
+        club: sanitizeText(data.club),
+        coach: sanitizeText(data.coach),
+        training_base: sanitizeText(data.training_base),
         height_meters: data.height_meters,
         weight_kg: data.weight_kg,
-        place_of_birth: data.place_of_birth,
-        personal_bests: data.personal_bests,
-        specialties: data.specialties,
-        caps: data.caps
+        place_of_birth: sanitizeText(data.place_of_birth),
+        personal_bests: sanitizeText(data.personal_bests),
+        specialties: sanitizeText(data.specialties),
+        caps: sanitizeText(data.caps)
       };
 
       if (editingAthlete) {
