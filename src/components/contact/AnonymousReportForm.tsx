@@ -52,7 +52,7 @@ const AnonymousReportForm: React.FC<AnonymousReportFormProps> = ({ onClose }) =>
         {submitSuccess ? (
           <div className="text-center py-8">
             <p className="text-green-600 font-medium mb-2">Report submitted successfully!</p>
-            <p className="text-gray-600">Thank you for bringing this to our attention.</p>
+            <p className="text-gray-600">Thank you for bringing this to our attention. We will investigate and make sure to resolve this issue</p>
           </div>
         ) : (
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
