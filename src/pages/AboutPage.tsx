@@ -8,7 +8,7 @@ const AboutPage: React.FC = () => {
       <PageHeader
         title="About Us"
         description="Learn about the Sierra Leone Swimming, Diving & Water Polo Association."
-        image="https://images.pexels.com/photos/260598/pexels-photo-260598.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
+        image="https://i.ibb.co/DPc6MhdS/20240430-165712-11zon.jpg"
       />
 
       <section className="section">
