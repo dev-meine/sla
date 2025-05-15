@@ -12,7 +12,7 @@ const ContactPage: React.FC = () => {
       <PageHeader
         title="Contact Us"
         description="Get in touch with the Sierra Leone Swimming, Diving & Water Polo Association."
-        image="https://images.pexels.com/photos/260598/pexels-photo-260598.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
+        image="https://i.ibb.co/K3VFCBD/20240801-112429-min.jpg"
       />
 
       <section className="section">
