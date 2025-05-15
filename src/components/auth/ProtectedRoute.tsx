@@ -13,42 +13,37 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+        const { data: { session } } = await supabase.auth.getSession();
         
-        if (sessionError) {
-          console.error('Session error:', sessionError);
-          setIsAuthenticated(false);
-          return;
-        }
-
         if (!session) {
           setIsAuthenticated(false);
           return;
         }
 
-        // Check if session is expired
-        if (session.expires_at && session.expires_at <= Math.floor(Date.now() / 1000)) {
-          try {
-            const { data: { session: refreshedSession }, error: refreshError } = 
-              await supabase.auth.refreshSession();
-            
-            if (refreshError) {
-              console.error('Session refresh error:', refreshError);
-              setIsAuthenticated(false);
-              return;
-            }
-            
-            setIsAuthenticated(!!refreshedSession);
-          } catch (refreshError) {
-            console.error('Session refresh error:', refreshError);
+        // Check if session is expired or will expire soon (within 5 minutes)
+        const expiresAt = session.expires_at ? session.expires_at * 1000 : 0; // Convert to milliseconds
+        const fiveMinutes = 5 * 60 * 1000;
+        const isExpiringSoon = expiresAt - Date.now() < fiveMinutes;
+
+        if (isExpiringSoon) {
+          const { data: { session: refreshedSession }, error: refreshError } = 
+            await supabase.auth.refreshSession();
+
+          if (refreshError || !refreshedSession) {
+            console.error('Session refresh failed:', refreshError);
             setIsAuthenticated(false);
+            await supabase.auth.signOut();
+            return;
           }
+
+          setIsAuthenticated(true);
         } else {
           setIsAuthenticated(true);
         }
       } catch (error) {
         console.error('Auth check error:', error);
         setIsAuthenticated(false);
+        await supabase.auth.signOut();
       }
     };
 
@@ -57,11 +52,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (event === 'SIGNED_OUT' || event === 'USER_DELETED') {
         setIsAuthenticated(false);
-      } else if (event === 'SIGNED_IN') {
-        setIsAuthenticated(true);
-      } else if (event === 'TOKEN_REFRESHED') {
-        setIsAuthenticated(!!session);
-      } else if (event === 'INITIAL_SESSION') {
+      } else if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
         setIsAuthenticated(!!session);
       }
     });
