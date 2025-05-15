@@ -96,7 +96,7 @@ const AdminReports: React.FC = () => {
               Anonymous Reports
             </h2>
             <p className="text-gray-600 mt-1">
-              Review and manage anonymous reports submitted through the contact page.
+              Review and manage anonymous reports submitted.
             </p>
           </div>
         </div>
