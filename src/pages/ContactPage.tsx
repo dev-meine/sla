@@ -1,9 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 import PageHeader from '../components/ui/PageHeader';
 import ContactForm from '../components/contact/ContactForm';
-import { MapPin, Phone, Mail, Clock } from 'lucide-react';
+import AnonymousReportForm from '../components/contact/AnonymousReportForm';
+import { MapPin, Phone, Mail, Clock, AlertTriangle } from 'lucide-react';
 
 const ContactPage: React.FC = () => {
+  const [showReportForm, setShowReportForm] = useState(false);
+
   return (
     <>
       <PageHeader
@@ -50,7 +53,7 @@ const ContactPage: React.FC = () => {
                     <Mail size={24} />
                   </div>
                   <div>
-                    <h3 className="text-lg font-medium mb-1">Email Addresse</h3>
+                    <h3 className="text-lg font-medium mb-1">Email Address</h3>
                     <p className="text-gray-600">General Inquiries: saloneswim@gmail.com</p>
                   </div>
                 </div>
@@ -65,6 +68,23 @@ const ContactPage: React.FC = () => {
                     <p className="text-gray-600">Saturday: 9:00 AM - 1:00 PM</p>
                     <p className="text-gray-600">Sunday: Closed</p>
                   </div>
+                </div>
+
+                <div className="mt-8 p-6 bg-red-50 rounded-lg border border-red-100">
+                  <div className="flex items-center mb-4">
+                    <AlertTriangle className="text-red-500 mr-2" size={24} />
+                    <h3 className="text-lg font-medium text-red-900">Report a Concern</h3>
+                  </div>
+                  <p className="text-gray-700 mb-4">
+                    If you need to report a sensitive issue or concern, you can submit an anonymous report. Your privacy and safety are our top priority.
+                  </p>
+                  <button
+                    onClick={() => setShowReportForm(true)}
+                    className="inline-flex items-center px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
+                  >
+                    <AlertTriangle size={16} className="mr-2" />
+                    Submit Anonymous Report
+                  </button>
                 </div>
               </div>
             </div>
@@ -91,6 +111,10 @@ const ContactPage: React.FC = () => {
           title="SLSDWA Location"
         ></iframe>
       </section>
+
+      {showReportForm && (
+        <AnonymousReportForm onClose={() => setShowReportForm(false)} />
+      )}
     </>
   );
 };
