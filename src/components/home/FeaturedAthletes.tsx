@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Medal, ArrowRight } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { supabase } from '../../lib/supabase';
+import { supabase, cachedQuery } from '../../lib/supabase';
 import { Database } from '../../types/supabase';
 
 type Athlete = Database['public']['Tables']['athletes']['Row'] & {
@@ -20,31 +20,27 @@ const FeaturedAthletes: React.FC = () => {
 
   const fetchAthletes = async () => {
     try {
-      const { data: athletesData, error: athletesError } = await supabase
-        .from('athletes')
-        .select('*')
-        .order('name')
-        .limit(3);
-      
-      if (athletesError) throw athletesError;
+      const { data: athletesData, error } = await cachedQuery(
+        'featured-athletes',
+        () => supabase
+          .from('athletes')
+          .select(`
+            *,
+            specialties (
+              id,
+              specialty
+            ),
+            achievements (
+              id,
+              achievement
+            )
+          `)
+          .order('name')
+          .limit(3)
+      );
 
-      const fullAthletes = await Promise.all((athletesData || []).map(async (athlete) => {
-        const [
-          { data: specialties },
-          { data: achievements }
-        ] = await Promise.all([
-          supabase.from('specialties').select('*').eq('athlete_id', athlete.id),
-          supabase.from('achievements').select('*').eq('athlete_id', athlete.id)
-        ]);
-
-        return {
-          ...athlete,
-          specialties: specialties || [],
-          achievements: achievements || []
-        };
-      }));
-
-      setAthletes(fullAthletes);
+      if (error) throw error;
+      setAthletes(athletesData || []);
     } catch (error) {
       console.error('Error fetching athletes:', error);
     } finally {
