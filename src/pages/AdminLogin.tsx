@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import Logo from '../components/ui/Logo';
 import { Link } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
+import { AlertCircle } from 'lucide-react';
 
 interface LoginForm {
   email: string;
@@ -28,11 +29,18 @@ const AdminLogin: React.FC = () => {
         password: data.password,
       });
 
-      if (error) throw error;
+      if (error) {
+        if (error.message.includes('captcha')) {
+          setError('Captcha verification failed. Please try again.');
+        } else {
+          setError(error.message);
+        }
+        return;
+      }
 
-      navigate('/admin'); // Changed from /admin/dashboard to /admin
+      navigate('/admin');
     } catch (error: any) {
-      setError(error.message);
+      setError('An unexpected error occurred. Please try again.');
     } finally {
       setIsLoading(false);
     }
@@ -75,8 +83,22 @@ const AdminLogin: React.FC = () => {
       >
         <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
           {error && (
-            <div className="mb-4 p-4 bg-red-50 border border-red-200 text-red-600 rounded-md text-sm">
-              {error}
+            <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-md">
+              <div className="flex items-center">
+                <AlertCircle className="h-5 w-5 text-red-500 mr-2" />
+                <p className="text-sm text-red-600">{error}</p>
+              </div>
+              {error.includes('captcha') && (
+                <p className="mt-2 text-xs text-red-500">
+                  This could happen if:
+                  <ul className="list-disc ml-4 mt-1">
+                    <li>The page was inactive for too long</li>
+                    <li>Your browser is blocking third-party cookies</li>
+                    <li>You're using a VPN or proxy service</li>
+                  </ul>
+                  Try refreshing the page or using a different browser.
+                </p>
+              )}
             </div>
           )}
           
