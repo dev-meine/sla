@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Masonry from 'react-masonry-css';
 import { motion } from 'framer-motion';
-import { supabase } from '../../lib/supabase';
+import { supabase, cachedQuery } from '../../lib/supabase';
 import { Database } from '../../types/supabase';
 
 type GalleryItem = Database['public']['Tables']['gallery_items']['Row'];
@@ -16,10 +16,13 @@ const GalleryGrid: React.FC = () => {
 
   const fetchGalleryItems = async () => {
     try {
-      const { data, error } = await supabase
-        .from('gallery_items')
-        .select('*')
-        .order('date', { ascending: false });
+      const { data, error } = await cachedQuery(
+        'gallery-items',
+        () => supabase
+          .from('gallery_items')
+          .select('*')
+          .order('date', { ascending: false })
+      );
       
       if (error) throw error;
       setGalleryItems(data || []);

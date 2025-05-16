@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Calendar, ArrowRight } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { supabase } from '../../lib/supabase';
+import { supabase, cachedQuery } from '../../lib/supabase';
 import { Database } from '../../types/supabase';
 
 type Event = Database['public']['Tables']['events']['Row'];
@@ -18,15 +18,17 @@ const ActivitiesHighlight: React.FC = () => {
 
   const fetchEvents = async () => {
     try {
-      const { data, error } = await supabase
-        .from('events')
-        .select('*')
-        .order('date', { ascending: true })
-        .limit(6);
+      const { data, error } = await cachedQuery(
+        'featured-events',
+        () => supabase
+          .from('events')
+          .select('*')
+          .order('date', { ascending: true })
+          .limit(6)
+      );
       
       if (error) throw error;
       
-      // Validate image URLs
       const validatedEvents = data?.map(event => ({
         ...event,
         image: event.image || 'https://images.pexels.com/photos/863988/pexels-photo-863988.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1'
