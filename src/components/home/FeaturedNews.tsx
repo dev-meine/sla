@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Calendar } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { supabase } from '../../lib/supabase';
+import { supabase, cachedQuery } from '../../lib/supabase';
 import { Database } from '../../types/supabase';
 
 type NewsPost = Database['public']['Tables']['news_posts']['Row'];
@@ -17,11 +17,14 @@ const FeaturedNews: React.FC = () => {
 
   const fetchNewsPosts = async () => {
     try {
-      const { data, error } = await supabase
-        .from('news_posts')
-        .select('*')
-        .order('created_at', { ascending: false })
-        .limit(3);
+      const { data, error } = await cachedQuery(
+        'featured-news',
+        () => supabase
+          .from('news_posts')
+          .select('*')
+          .order('created_at', { ascending: false })
+          .limit(3)
+      );
       
       if (error) throw error;
       setNewsPosts(data || []);
