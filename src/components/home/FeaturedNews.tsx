@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Calendar } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { supabase, cachedQuery } from '../../lib/supabase';
+import { supabase } from '../../lib/supabase';
 import { Database } from '../../types/supabase';
 
 type NewsPost = Database['public']['Tables']['news_posts']['Row'];
@@ -17,14 +17,11 @@ const FeaturedNews: React.FC = () => {
 
   const fetchNewsPosts = async () => {
     try {
-      const { data, error } = await cachedQuery(
-        'featured-news',
-        () => supabase
-          .from('news_posts')
-          .select('*')
-          .order('created_at', { ascending: false })
-          .limit(3)
-      );
+      const { data, error } = await supabase
+        .from('news_posts')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(3);
       
       if (error) throw error;
       setNewsPosts(data || []);
@@ -92,6 +89,10 @@ const FeaturedNews: React.FC = () => {
                   src={post.image_url || "https://images.pexels.com/photos/863988/pexels-photo-863988.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"}
                   alt={post.title}
                   className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    target.src = "https://images.pexels.com/photos/863988/pexels-photo-863988.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1";
+                  }}
                 />
               </div>
               <div className="p-6">

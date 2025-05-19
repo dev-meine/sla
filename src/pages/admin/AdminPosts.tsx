@@ -5,6 +5,7 @@ import { PlusCircle, Edit2, Trash2 } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { Database } from '../../types/supabase';
 import ImageUpload from '../../components/ui/ImageUpload';
+import Modal from '../../components/ui/Modal';
 
 type NewsPost = Database['public']['Tables']['news_posts']['Row'];
 
@@ -13,6 +14,8 @@ const AdminPosts: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isAdding, setIsAdding] = useState(false);
   const [editingPost, setEditingPost] = useState<NewsPost | null>(null);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [postToDelete, setPostToDelete] = useState<string | null>(null);
   
   const { register, handleSubmit, reset, setValue, formState: { errors } } = useForm<NewsPost>();
 
@@ -36,11 +39,54 @@ const AdminPosts: React.FC = () => {
     }
   };
 
+  const uploadImage = async (file: File): Promise<string | null> => {
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Math.random()}.${fileExt}`;
+      const filePath = `news/${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('images')
+        .upload(filePath, file);
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('images')
+        .getPublicUrl(filePath);
+
+      return publicUrl;
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      return null;
+    }
+  };
+
+  const deleteImage = async (imageUrl: string) => {
+    try {
+      const path = imageUrl.split('/').pop();
+      if (!path) return;
+
+      const { error } = await supabase.storage
+        .from('images')
+        .remove([`news/${path}`]);
+
+      if (error) throw error;
+    } catch (error) {
+      console.error('Error deleting image:', error);
+    }
+  };
+
   const onSubmit = async (data: NewsPost) => {
     try {
       setIsLoading(true);
       
       if (editingPost) {
+        // If image has changed, delete old image and upload new one
+        if (data.image_url !== editingPost.image_url && editingPost.image_url) {
+          await deleteImage(editingPost.image_url);
+        }
+
         const { error } = await supabase
           .from('news_posts')
           .update({
@@ -88,15 +134,27 @@ const AdminPosts: React.FC = () => {
     });
   };
 
-  const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this post?')) return;
+  const handleDeleteClick = (id: string) => {
+    setPostToDelete(id);
+    setDeleteModalOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!postToDelete) return;
     
     try {
       setIsLoading(true);
+      
+      // Get post details to delete image
+      const post = posts.find(p => p.id === postToDelete);
+      if (post?.image_url) {
+        await deleteImage(post.image_url);
+      }
+
       const { error } = await supabase
         .from('news_posts')
         .delete()
-        .eq('id', id);
+        .eq('id', postToDelete);
         
       if (error) throw error;
       fetchPosts();
@@ -104,6 +162,8 @@ const AdminPosts: React.FC = () => {
       console.error('Error deleting post:', error);
     } finally {
       setIsLoading(false);
+      setDeleteModalOpen(false);
+      setPostToDelete(null);
     }
   };
 
@@ -154,6 +214,7 @@ const AdminPosts: React.FC = () => {
                     <option value="Competition">Competition</option>
                     <option value="Announcement">Announcement</option>
                     <option value="Training">Training</option>
+                    <option value="Development">Development</option>
                   </select>
                 </div>
 
@@ -170,8 +231,11 @@ const AdminPosts: React.FC = () => {
                   <label className="block text-sm font-medium text-gray-700 mb-1">Featured Image</label>
                   <ImageUpload
                     currentImage={editingPost?.image_url}
-                    onImageUpload={(url) => setValue('image_url', url)}
-                    onImageRemove={() => setValue('image_url', '')}
+                    onImageUpload={async (file) => {
+                      const url = await uploadImage(file);
+                      if (url) setValue('image_url', url);
+                    }}
+                    onImageRemove={() => setValue('image_url', null)}
                   />
                 </div>
               </div>
@@ -253,6 +317,10 @@ const AdminPosts: React.FC = () => {
                             src={post.image_url}
                             alt={post.title}
                             className="h-10 w-10 rounded mr-3 object-cover"
+                            onError={(e) => {
+                              const target = e.target as HTMLImageElement;
+                              target.src = "https://images.pexels.com/photos/863988/pexels-photo-863988.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1";
+                            }}
                           />
                         )}
                         <div className="text-sm font-medium text-gray-900">{post.title}</div>
@@ -277,7 +345,7 @@ const AdminPosts: React.FC = () => {
                         <Edit2 size={16} />
                       </button>
                       <button
-                        onClick={() => handleDelete(post.id)}
+                        onClick={() => handleDeleteClick(post.id)}
                         className="text-red-600 hover:text-red-900"
                       >
                         <Trash2 size={16} />
@@ -289,6 +357,19 @@ const AdminPosts: React.FC = () => {
             </table>
           </div>
         )}
+
+        <Modal
+          isOpen={deleteModalOpen}
+          onClose={() => {
+            setDeleteModalOpen(false);
+            setPostToDelete(null);
+          }}
+          onConfirm={handleDeleteConfirm}
+          title="Delete Post"
+          message="Are you sure you want to delete this post? This action cannot be undone."
+          confirmText="Delete"
+          cancelText="Cancel"
+        />
       </div>
     </AdminLayout>
   );
