@@ -89,11 +89,11 @@ const BoardPage: React.FC = () => {
             >
               {boardMembers.map((member) => (
                 <motion.div key={member.id} className="card group" variants={item}>
-                  <div className="h-64 overflow-hidden">
+                  <div className="relative pb-[100%] overflow-hidden">
                     <img 
                       src={member.image || "https://images.pexels.com/photos/2379005/pexels-photo-2379005.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"}
                       alt={member.name}
-                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                      className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                       onError={(e) => {
                         const target = e.target as HTMLImageElement;
                         target.src = "https://images.pexels.com/photos/2379005/pexels-photo-2379005.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1";
