@@ -39,17 +39,60 @@ const AdminBoard: React.FC = () => {
     }
   };
 
+  const uploadImage = async (file: File): Promise<string | null> => {
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Math.random()}.${fileExt}`;
+      const filePath = `board-members/${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('images')
+        .upload(filePath, file);
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('images')
+        .getPublicUrl(filePath);
+
+      return publicUrl;
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      return null;
+    }
+  };
+
+  const deleteImage = async (imageUrl: string) => {
+    try {
+      const path = imageUrl.split('/').pop();
+      if (!path) return;
+
+      const { error } = await supabase.storage
+        .from('images')
+        .remove([`board-members/${path}`]);
+
+      if (error) throw error;
+    } catch (error) {
+      console.error('Error deleting image:', error);
+    }
+  };
+
   const onSubmit = async (data: BoardMember) => {
     try {
       setIsLoading(true);
       
       if (editingMember) {
+        // If image has changed, delete old image and upload new one
+        if (data.image !== editingMember.image && editingMember.image) {
+          await deleteImage(editingMember.image);
+        }
+
         const { error } = await supabase
           .from('board_members')
           .update({
             name: data.name,
             position: data.position,
-            image_url: data.image_url,
+            image: data.image,
             bio: data.bio
           })
           .eq('id', editingMember.id);
@@ -61,7 +104,7 @@ const AdminBoard: React.FC = () => {
           .insert([{
             name: data.name,
             position: data.position,
-            image_url: data.image_url,
+            image: data.image,
             bio: data.bio
           }]);
           
@@ -97,6 +140,13 @@ const AdminBoard: React.FC = () => {
     
     try {
       setIsLoading(true);
+      
+      // Get member details to delete image
+      const member = boardMembers.find(m => m.id === memberToDelete);
+      if (member?.image) {
+        await deleteImage(member.image);
+      }
+
       const { error } = await supabase
         .from('board_members')
         .delete()
@@ -164,9 +214,12 @@ const AdminBoard: React.FC = () => {
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Profile Image</label>
                 <ImageUpload
-                  currentImage={editingMember?.image_url}
-                  onImageUpload={(url) => setValue('image_url', url)}
-                  onImageRemove={() => setValue('image_url', null)}
+                  currentImage={editingMember?.image}
+                  onImageUpload={async (file) => {
+                    const url = await uploadImage(file);
+                    if (url) setValue('image', url);
+                  }}
+                  onImageRemove={() => setValue('image', null)}
                 />
               </div>
 
@@ -209,7 +262,7 @@ const AdminBoard: React.FC = () => {
               <div key={member.id} className="bg-white rounded-lg shadow-md overflow-hidden">
                 <div className="aspect-w-4 aspect-h-3">
                   <img
-                    src={member.image_url || 'https://via.placeholder.com/400x300'}
+                    src={member.image || 'https://via.placeholder.com/400x300'}
                     alt={member.name}
                     className="w-full h-full object-cover"
                     onError={(e) => {

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Upload, X } from 'lucide-react';
 
 interface ImageUploadProps {
-  onImageUpload: (url: string) => void;
+  onImageUpload: (file: File) => void;
   currentImage?: string | null;
   onImageRemove?: () => void;
 }
@@ -64,22 +64,12 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
         });
       }, 200);
 
-      // Upload image
-      const { uploadImage } = await import('../../lib/uploadImage');
-      const imageUrl = await uploadImage(file);
-
+      onImageUpload(file);
       clearInterval(progressInterval);
       setUploadProgress(100);
-
-      if (imageUrl) {
-        onImageUpload(imageUrl);
-        setPreviewUrl(imageUrl);
-      } else {
-        throw new Error('Failed to upload image');
-      }
     } catch (error) {
-      console.error('Error uploading image:', error);
-      setError('Failed to upload image');
+      console.error('Error handling image:', error);
+      setError('Failed to process image');
       setPreviewUrl(null);
     } finally {
       setIsUploading(false);
