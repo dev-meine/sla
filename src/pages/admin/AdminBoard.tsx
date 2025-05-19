@@ -5,6 +5,7 @@ import { PlusCircle, Edit2, Trash2 } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { Database } from '../../types/supabase';
 import ImageUpload from '../../components/ui/ImageUpload';
+import Modal from '../../components/ui/Modal';
 
 type BoardMember = Database['public']['Tables']['board_members']['Row'];
 
@@ -13,6 +14,8 @@ const AdminBoard: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isAdding, setIsAdding] = useState(false);
   const [editingMember, setEditingMember] = useState<BoardMember | null>(null);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [memberToDelete, setMemberToDelete] = useState<string | null>(null);
   
   const { register, handleSubmit, reset, setValue, formState: { errors } } = useForm<BoardMember>();
 
@@ -84,15 +87,20 @@ const AdminBoard: React.FC = () => {
     });
   };
 
-  const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this board member?')) return;
+  const handleDeleteClick = (id: string) => {
+    setMemberToDelete(id);
+    setDeleteModalOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!memberToDelete) return;
     
     try {
       setIsLoading(true);
       const { error } = await supabase
         .from('board_members')
         .delete()
-        .eq('id', id);
+        .eq('id', memberToDelete);
         
       if (error) throw error;
       fetchBoardMembers();
@@ -100,6 +108,8 @@ const AdminBoard: React.FC = () => {
       console.error('Error deleting board member:', error);
     } finally {
       setIsLoading(false);
+      setDeleteModalOpen(false);
+      setMemberToDelete(null);
     }
   };
 
@@ -156,7 +166,7 @@ const AdminBoard: React.FC = () => {
                 <ImageUpload
                   currentImage={editingMember?.image_url}
                   onImageUpload={(url) => setValue('image_url', url)}
-                  onImageRemove={() => setValue('image_url', '')}
+                  onImageRemove={() => setValue('image_url', null)}
                 />
               </div>
 
@@ -202,6 +212,10 @@ const AdminBoard: React.FC = () => {
                     src={member.image_url || 'https://via.placeholder.com/400x300'}
                     alt={member.name}
                     className="w-full h-full object-cover"
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.src = 'https://via.placeholder.com/400x300';
+                    }}
                   />
                 </div>
                 <div className="p-4">
@@ -216,7 +230,7 @@ const AdminBoard: React.FC = () => {
                       <Edit2 size={16} />
                     </button>
                     <button
-                      onClick={() => handleDelete(member.id)}
+                      onClick={() => handleDeleteClick(member.id)}
                       className="text-red-600 hover:text-red-900"
                     >
                       <Trash2 size={16} />
@@ -227,6 +241,19 @@ const AdminBoard: React.FC = () => {
             ))}
           </div>
         )}
+
+        <Modal
+          isOpen={deleteModalOpen}
+          onClose={() => {
+            setDeleteModalOpen(false);
+            setMemberToDelete(null);
+          }}
+          onConfirm={handleDeleteConfirm}
+          title="Delete Board Member"
+          message="Are you sure you want to delete this board member? This action cannot be undone."
+          confirmText="Delete"
+          cancelText="Cancel"
+        />
       </div>
     </AdminLayout>
   );
