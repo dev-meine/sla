@@ -5,6 +5,7 @@ import { PlusCircle, Edit2, Trash2 } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { Database } from '../../types/supabase';
 import ImageUpload from '../../components/ui/ImageUpload';
+import Modal from '../../components/ui/Modal';
 
 type GalleryItem = Database['public']['Tables']['gallery_items']['Row'];
 
@@ -13,8 +14,10 @@ const AdminGallery: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isAdding, setIsAdding] = useState(false);
   const [editingItem, setEditingItem] = useState<GalleryItem | null>(null);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [itemToDelete, setItemToDelete] = useState<string | null>(null);
   
-  const { register, handleSubmit, reset, setValue, formState: { errors } } = useForm<GalleryItem>();
+  const { register, handleSubmit, reset, setValue, watch, formState: { errors } } = useForm<GalleryItem>();
 
   useEffect(() => {
     fetchGalleryItems();
@@ -36,21 +39,76 @@ const AdminGallery: React.FC = () => {
     }
   };
 
+  const uploadImage = async (file: File): Promise<string | null> => {
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Math.random()}.${fileExt}`;
+      const filePath = `gallery/${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('images')
+        .upload(filePath, file);
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('images')
+        .getPublicUrl(filePath);
+
+      return publicUrl;
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      return null;
+    }
+  };
+
+  const deleteImage = async (imageUrl: string) => {
+    try {
+      const path = imageUrl.split('/').pop();
+      if (!path) return;
+
+      const { error } = await supabase.storage
+        .from('images')
+        .remove([`gallery/${path}`]);
+
+      if (error) throw error;
+    } catch (error) {
+      console.error('Error deleting image:', error);
+    }
+  };
+
   const onSubmit = async (data: GalleryItem) => {
     try {
       setIsLoading(true);
       
       if (editingItem) {
+        // If image has changed, delete old image and upload new one
+        if (data.url !== editingItem.url && editingItem.url) {
+          await deleteImage(editingItem.url);
+        }
+
         const { error } = await supabase
           .from('gallery_items')
-          .update(data)
+          .update({
+            title: data.title,
+            type: data.type,
+            url: data.url,
+            description: data.description,
+            date: data.date
+          })
           .eq('id', editingItem.id);
           
         if (error) throw error;
       } else {
         const { error } = await supabase
           .from('gallery_items')
-          .insert([data]);
+          .insert([{
+            title: data.title,
+            type: data.type,
+            url: data.url,
+            description: data.description,
+            date: data.date
+          }]);
           
         if (error) throw error;
       }
@@ -74,15 +132,27 @@ const AdminGallery: React.FC = () => {
     });
   };
 
-  const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this gallery item?')) return;
+  const handleDeleteClick = (id: string) => {
+    setItemToDelete(id);
+    setDeleteModalOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!itemToDelete) return;
     
     try {
       setIsLoading(true);
+      
+      // Get item details to delete image
+      const item = galleryItems.find(i => i.id === itemToDelete);
+      if (item?.type === 'image' && item.url) {
+        await deleteImage(item.url);
+      }
+
       const { error } = await supabase
         .from('gallery_items')
         .delete()
-        .eq('id', id);
+        .eq('id', itemToDelete);
         
       if (error) throw error;
       fetchGalleryItems();
@@ -90,6 +160,8 @@ const AdminGallery: React.FC = () => {
       console.error('Error deleting gallery item:', error);
     } finally {
       setIsLoading(false);
+      setDeleteModalOpen(false);
+      setItemToDelete(null);
     }
   };
 
@@ -146,7 +218,7 @@ const AdminGallery: React.FC = () => {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Media</label>
-                {register('type').value === 'video' ? (
+                {watch('type') === 'video' ? (
                   <input
                     type="url"
                     {...register('url', { required: 'URL is required' })}
@@ -156,7 +228,10 @@ const AdminGallery: React.FC = () => {
                 ) : (
                   <ImageUpload
                     currentImage={editingItem?.url}
-                    onImageUpload={(url) => setValue('url', url)}
+                    onImageUpload={async (file) => {
+                      const url = await uploadImage(file);
+                      if (url) setValue('url', url);
+                    }}
                     onImageRemove={() => setValue('url', '')}
                   />
                 )}
@@ -220,6 +295,10 @@ const AdminGallery: React.FC = () => {
                       src={item.url}
                       alt={item.title}
                       className="w-full h-full object-cover"
+                      onError={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        target.src = "https://images.pexels.com/photos/863988/pexels-photo-863988.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1";
+                      }}
                     />
                   ) : (
                     <iframe
@@ -246,7 +325,7 @@ const AdminGallery: React.FC = () => {
                       <Edit2 size={16} />
                     </button>
                     <button
-                      onClick={() => handleDelete(item.id)}
+                      onClick={() => handleDeleteClick(item.id)}
                       className="text-red-600 hover:text-red-900"
                     >
                       <Trash2 size={16} />
@@ -257,6 +336,19 @@ const AdminGallery: React.FC = () => {
             ))}
           </div>
         )}
+
+        <Modal
+          isOpen={deleteModalOpen}
+          onClose={() => {
+            setDeleteModalOpen(false);
+            setItemToDelete(null);
+          }}
+          onConfirm={handleDeleteConfirm}
+          title="Delete Gallery Item"
+          message="Are you sure you want to delete this gallery item? This action cannot be undone."
+          confirmText="Delete"
+          cancelText="Cancel"
+        />
       </div>
     </AdminLayout>
   );
