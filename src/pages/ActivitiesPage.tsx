@@ -67,7 +67,7 @@ const ActivitiesPage: React.FC = () => {
         <PageHeader
           title="Our Activities"
           description="Explore our programs, competitions, development initiatives, and training camps."
-          image="https://images.pexels.com/photos/1415810/pexels-photo-1415810.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
+          image="https://i.ibb.co/zzN3ygJ/Screenshot-2025-05-22-at-10-27-22-PM.png"
         />
         <section className="section">
           <div className="container-custom">
