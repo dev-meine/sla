@@ -11,7 +11,7 @@ const ContactPage: React.FC = () => {
     <>
       <PageHeader
         title="Contact Us"
-        description="Get in touch with us."
+        description="Get in touch with us, we'd love to hear from you"
         image="https://i.ibb.co/K3VFCBD/20240801-112429-min.jpg"
       />
 
