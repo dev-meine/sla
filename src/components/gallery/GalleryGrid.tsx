@@ -72,6 +72,10 @@ const GalleryGrid: React.FC = () => {
                   src={item.url}
                   alt={item.title}
                   className="w-full transition-transform duration-500 group-hover:scale-105"
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    target.src = "https://images.pexels.com/photos/863988/pexels-photo-863988.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1";
+                  }}
                 />
               ) : (
                 <iframe
