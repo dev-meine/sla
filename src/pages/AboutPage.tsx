@@ -57,7 +57,7 @@ The Federation has sole rights for the organization, development, growth and pro
           <div className="text-center max-w-3xl mx-auto mb-12">
             <h2 className="mb-6">Our Values</h2>
             <p className="text-lg text-gray-600">
-              Our core values guide everything we do at the Sierra Leone Swimming, Diving & Water Polo Association.
+              Our core values guide everything we do at the Sierra Leone Aquatics.
             </p>
           </div>
 
