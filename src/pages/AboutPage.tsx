@@ -146,14 +146,14 @@ The Federation has sole rights for the organization, development, growth and pro
               </div>
               
               <div className="p-6 border border-gray-200 rounded-lg">
-                <h3 className="text-xl mb-3">African Swimming Confederation</h3>
+                <h3 className="text-xl mb-3">African Aquatics</h3>
                 <p className="text-gray-600">
                   Active member of the continental governing body for aquatics in Africa
                 </p>
               </div>
               
               <div className="p-6 border border-gray-200 rounded-lg">
-                <h3 className="text-xl mb-3">Sierra Leone Olympic Committee</h3>
+                <h3 className="text-xl mb-3">Sierra Leone National Olympic Committee</h3>
                 <p className="text-gray-600">
                   National Olympic Committee member responsible for Olympic qualification
                 </p>
