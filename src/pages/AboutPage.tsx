@@ -43,7 +43,7 @@ The Federation has sole rights for the organization, development, growth and pro
               viewport={{ once: true }}
             >
               <img 
-                src="https://i.ibb.co/4RYBzK1j/20240430-112927.jpg" 
+                src="https://i.ibb.co/XZGL3t56/Screenshot-2025-05-22-at-9-48-52-PM-1.png" 
                 alt="Swimming competition" 
                 className="w-full h-full object-cover"
               />
