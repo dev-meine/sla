@@ -22,8 +22,8 @@ const AboutPage: React.FC = () => {
             >
               <h2 className="mb-6">Our Story</h2>
               <p className="text-gray-600 mb-4">
-                FOUNDED IN FREETOWN – 10TH JUNE 1979
-The Sierra Leone Swimming Federation is the national governing body for all Aquatic sports in Sierra Leone.
+                FOUNDED IN FREETOWN – 10TH JUNE 1979 as
+The Sierra Leone Swimming, Diving & Water Polo Association, now know as the Sierra Leone Swimming Federation, is the national governing body for all Aquatic sports in Sierra Leone.
 This includes but is not limited to Open Water Swimming, Surfing, Water Polo and Diving.
 The Federation has sole rights for the organization, development, growth and promotion of these sports at all levels locally and internationally
               </p>
