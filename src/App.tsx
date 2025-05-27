@@ -21,6 +21,7 @@ import AdminBoard from './pages/admin/AdminBoard';
 import AdminTravel from './pages/admin/AdminTravel';
 import AdminTechnicalStaff from './pages/admin/AdminTechnicalStaff';
 import AdminReports from './pages/admin/AdminReports';
+import AdminRegistrations from './pages/admin/AdminRegistrations';
 
 function App() {
   return (
@@ -82,6 +83,11 @@ function App() {
         <Route path="/admin/reports" element={
           <ProtectedRoute>
             <AdminReports />
+          </ProtectedRoute>
+        } />
+        <Route path="/admin/registrations" element={
+          <ProtectedRoute>
+            <AdminRegistrations />
           </ProtectedRoute>
         } />
       </Routes>
