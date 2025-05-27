@@ -3,6 +3,7 @@ import HeroSection from '../components/home/HeroSection';
 import FeaturedNews from '../components/home/FeaturedNews';
 import FeaturedAthletes from '../components/home/FeaturedAthletes';
 import ActivitiesHighlight from '../components/home/ActivitiesHighlight';
+import SwimmingPackages from '../components/home/SwimmingPackages';
 import ContactSection from '../components/home/ContactSection';
 
 const HomePage: React.FC = () => {
@@ -12,6 +13,7 @@ const HomePage: React.FC = () => {
       <FeaturedNews />
       <FeaturedAthletes />
       <ActivitiesHighlight />
+      <SwimmingPackages />
       <ContactSection />
     </>
   );
