@@ -7,7 +7,7 @@ const AboutPage: React.FC = () => {
     <>
       <PageHeader
         title="About Us"
-        description="Learn about the Sierra Leone Swimming Aquatics"
+        description="Learn about Sierra Leone Aquatics"
         image="https://i.ibb.co/DPc6MhdS/20240430-165712-11zon.jpg"
       />
 
