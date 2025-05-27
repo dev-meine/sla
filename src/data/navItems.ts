@@ -29,4 +29,8 @@ export const navItems: NavItem[] = [
     label: 'Contact Us',
     href: '/contact',
   },
+  {
+    label: 'Register',
+    href: '/register',
+  },
 ];

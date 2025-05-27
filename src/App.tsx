@@ -9,6 +9,7 @@ import GalleryPage from './pages/GalleryPage';
 import AboutPage from './pages/AboutPage';
 import ContactPage from './pages/ContactPage';
 import NewsPage from './pages/NewsPage';
+import RegistrationPage from './pages/RegistrationPage';
 import AdminLogin from './pages/AdminLogin';
 import AdminDashboard from './pages/AdminDashboard';
 import ProtectedRoute from './components/auth/ProtectedRoute';
@@ -34,6 +35,7 @@ function App() {
         <Route path="/about" element={<Layout><AboutPage /></Layout>} />
         <Route path="/contact" element={<Layout><ContactPage /></Layout>} />
         <Route path="/news" element={<Layout><NewsPage /></Layout>} />
+        <Route path="/register" element={<Layout><RegistrationPage /></Layout>} />
         
         {/* Admin Routes */}
         <Route path="/admin" element={
