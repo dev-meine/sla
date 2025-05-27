@@ -108,7 +108,7 @@ const ContactPage: React.FC = () => {
           allowFullScreen 
           loading="lazy" 
           referrerPolicy="no-referrer-when-downgrade"
-          title="SLSDWA Location"
+          title="Sierra Leone Swimming Federation Location"
         ></iframe>
       </section>
 
