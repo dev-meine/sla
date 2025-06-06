@@ -30,7 +30,7 @@ export const navItems: NavItem[] = [
     href: '/contact',
   },
   {
-    label: 'Register',
+    label: 'Lessons',
     href: '/register',
   },
 ];

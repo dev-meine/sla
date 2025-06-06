@@ -11,13 +11,57 @@ type SwimmingRegistration = Database['public']['Tables']['swimming_registrations
   } | null;
 };
 
+interface TutorOption {
+  id: string;
+  name: string;
+  type: 'athlete' | 'technical_staff';
+}
+
 const AdminRegistrations: React.FC = () => {
   const [registrations, setRegistrations] = useState<SwimmingRegistration[]>([]);
+  const [tutors, setTutors] = useState<TutorOption[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     fetchRegistrations();
+    fetchTutors();
   }, []);
+
+  const fetchTutors = async () => {
+    try {
+      // Fetch athletes
+      const { data: athletesData, error: athletesError } = await supabase
+        .from('athletes')
+        .select('id, name')
+        .order('name');
+
+      // Fetch technical staff
+      const { data: staffData, error: staffError } = await supabase
+        .from('technical_staff')
+        .select('id, name')
+        .order('name');
+
+      if (athletesError) throw athletesError;
+      if (staffError) throw staffError;
+
+      const allTutors: TutorOption[] = [
+        ...(athletesData || []).map(athlete => ({
+          id: athlete.id,
+          name: athlete.name,
+          type: 'athlete' as const
+        })),
+        ...(staffData || []).map(staff => ({
+          id: staff.id,
+          name: staff.name,
+          type: 'technical_staff' as const
+        }))
+      ];
+
+      setTutors(allTutors);
+    } catch (error) {
+      console.error('Error fetching tutors:', error);
+    }
+  };
 
   const fetchRegistrations = async () => {
     try {
@@ -55,6 +99,20 @@ const AdminRegistrations: React.FC = () => {
     }
   };
 
+  const updateRegistrationDetails = async (id: string, field: string, value: string) => {
+    try {
+      const { error } = await supabase
+        .from('swimming_registrations')
+        .update({ [field]: value })
+        .eq('id', id);
+
+      if (error) throw error;
+      fetchRegistrations();
+    } catch (error) {
+      console.error('Error updating registration details:', error);
+    }
+  };
+
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'pending':
@@ -69,6 +127,20 @@ const AdminRegistrations: React.FC = () => {
           <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
             <CheckCircle size={12} className="mr-1" />
             Payment Confirmed
+          </span>
+        );
+      case 'assigned':
+        return (
+          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+            <CheckCircle size={12} className="mr-1" />
+            Tutor Assigned
+          </span>
+        );
+      case 'scheduled':
+        return (
+          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+            <CheckCircle size={12} className="mr-1" />
+            Class Scheduled
           </span>
         );
       case 'completed':
@@ -130,6 +202,9 @@ const AdminRegistrations: React.FC = () => {
                     Transaction ID
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Tutor & Schedule
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Status
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -169,6 +244,39 @@ const AdminRegistrations: React.FC = () => {
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="space-y-2">
+                        <select
+                          value={registration.tutor_name || ''}
+                          onChange={(e) => updateRegistrationDetails(registration.id, 'tutor_name', e.target.value)}
+                          className="block w-full text-sm border-gray-300 rounded-md shadow-sm focus:border-primary-500 focus:ring-primary-500"
+                        >
+                          <option value="">Select Tutor</option>
+                          <optgroup label="Athletes">
+                            {tutors.filter(tutor => tutor.type === 'athlete').map(tutor => (
+                              <option key={tutor.id} value={tutor.name}>{tutor.name}</option>
+                            ))}
+                          </optgroup>
+                          <optgroup label="Technical Staff">
+                            {tutors.filter(tutor => tutor.type === 'technical_staff').map(tutor => (
+                              <option key={tutor.id} value={tutor.name}>{tutor.name}</option>
+                            ))}
+                          </optgroup>
+                        </select>
+                        <input
+                          type="date"
+                          value={registration.class_date || ''}
+                          onChange={(e) => updateRegistrationDetails(registration.id, 'class_date', e.target.value)}
+                          className="block w-full text-sm border-gray-300 rounded-md shadow-sm focus:border-primary-500 focus:ring-primary-500"
+                        />
+                        <input
+                          type="time"
+                          value={registration.class_time || ''}
+                          onChange={(e) => updateRegistrationDetails(registration.id, 'class_time', e.target.value)}
+                          className="block w-full text-sm border-gray-300 rounded-md shadow-sm focus:border-primary-500 focus:ring-primary-500"
+                        />
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
                       {getStatusBadge(registration.status || 'pending')}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
@@ -179,6 +287,8 @@ const AdminRegistrations: React.FC = () => {
                       >
                         <option value="pending">Pending</option>
                         <option value="confirmed">Payment Confirmed</option>
+                        <option value="assigned">Tutor Assigned</option>
+                        <option value="scheduled">Class Scheduled</option>
                         <option value="completed">Completed</option>
                         <option value="cancelled">Cancelled</option>
                       </select>
@@ -188,7 +298,7 @@ const AdminRegistrations: React.FC = () => {
 
                 {registrations.length === 0 && (
                   <tr>
-                    <td colSpan={6} className="px-6 py-4 text-center text-gray-500">
+                    <td colSpan={7} className="px-6 py-4 text-center text-gray-500">
                       No registrations found
                     </td>
                   </tr>
