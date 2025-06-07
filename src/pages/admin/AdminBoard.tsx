@@ -4,7 +4,7 @@ import { supabase } from '../../lib/supabase';
 import { PlusCircle, Edit2, Trash2 } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { Database } from '../../types/supabase';
-import ImageUpload from '../../components/ui/ImageUpload';
+import ImageCropUpload from '../../components/ui/ImageCropUpload';
 import Modal from '../../components/ui/Modal';
 
 type BoardMember = Database['public']['Tables']['board_members']['Row'];
@@ -213,13 +213,15 @@ const AdminBoard: React.FC = () => {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Profile Image</label>
-                <ImageUpload
+                <ImageCropUpload
                   currentImage={editingMember?.image}
                   onImageUpload={async (file) => {
                     const url = await uploadImage(file);
                     if (url) setValue('image', url);
                   }}
                   onImageRemove={() => setValue('image', null)}
+                  aspectRatio={1}
+                  cropShape="rect"
                 />
               </div>
 
@@ -260,11 +262,11 @@ const AdminBoard: React.FC = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
             {boardMembers.map((member) => (
               <div key={member.id} className="bg-white rounded-lg shadow-md overflow-hidden">
-                <div className="h-48 w-full overflow-hidden">
+                <div className="h-48 w-full overflow-hidden bg-gray-100">
                   <img
                     src={member.image || 'https://via.placeholder.com/400x300'}
                     alt={member.name}
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-cover object-top"
                     onError={(e) => {
                       const target = e.target as HTMLImageElement;
                       target.src = 'https://via.placeholder.com/400x300';
