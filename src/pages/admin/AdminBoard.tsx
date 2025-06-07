@@ -257,10 +257,10 @@ const AdminBoard: React.FC = () => {
             <div className="animate-spin rounded-full h-12 w-12 border-4 border-primary-600 border-t-transparent mx-auto"></div>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
             {boardMembers.map((member) => (
               <div key={member.id} className="bg-white rounded-lg shadow-md overflow-hidden">
-                <div className="aspect-w-4 aspect-h-3">
+                <div className="h-48 w-full overflow-hidden">
                   <img
                     src={member.image || 'https://via.placeholder.com/400x300'}
                     alt={member.name}
