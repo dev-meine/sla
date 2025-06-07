@@ -823,6 +823,35 @@ export type Database = {
         }
         Relationships: []
       }
+      board_members: {
+        Row: {
+          id: string
+          name: string
+          position: string
+          image: string | null
+          bio: string | null
+          created_at: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          id?: string
+          name: string
+          position: string
+          image?: string | null
+          bio?: string | null
+          created_at?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          id?: string
+          name?: string
+          position?: string
+          image?: string | null
+          bio?: string | null
+          created_at?: string | null
+          updated_at?: string | null
+        }
+      }
     }
     Views: {
       [_ in never]: never
