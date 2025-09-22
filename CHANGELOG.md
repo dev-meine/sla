@@ -40,6 +40,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Modified team image in Hero section to display in square format for better visual consistency
 
 ### Fixed
+- Resolved `ReferenceError: ChevronDown is not defined` in `AthletesPage.tsx` by importing `ChevronDown` and `ChevronUp` from `lucide-react`.
 - Reduced excessive spacing between Athletes and Activities sections on homepage
 - Improved accessibility with better contrast ratios
 - Enhanced mobile navigation usability

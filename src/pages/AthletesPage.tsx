@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import PageHeader from '../components/ui/PageHeader';
 import { motion } from 'framer-motion';
-import { Medal, Calendar, MapPin, Trophy, Timer } from 'lucide-react';
+import { Medal, Calendar, MapPin, Trophy, Timer, ChevronDown, ChevronUp } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { Database } from '../types/supabase';
 import { useParams } from 'react-router-dom';
