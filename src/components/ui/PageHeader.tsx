@@ -51,6 +51,8 @@ const PageHeader: React.FC<PageHeaderProps> = ({
           src={image} 
           alt={title}
           className="w-full h-full object-cover opacity-20"
+          width="1280" 
+          height="720"
         />
       </div>
       

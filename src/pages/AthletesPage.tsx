@@ -16,6 +16,7 @@ const AthletesPage: React.FC = () => {
   const [currentAthlete, setCurrentAthlete] = useState<Athlete | null>(null);
 
   useEffect(() => {
+    console.log('useEffect triggered, id:', id);
     if (id) {
       fetchAthlete(id);
     } else {
@@ -41,6 +42,7 @@ const AthletesPage: React.FC = () => {
   };
 
   const fetchAthletes = async () => {
+    console.log('Fetching all athletes...');
     try {
       const { data, error } = await supabase
         .from('athletes')
@@ -48,6 +50,7 @@ const AthletesPage: React.FC = () => {
         .order('name');
       
       if (error) throw error;
+      console.log('Fetched athletes:', data);
       setAthletes(data || []);
     } catch (error) {
       console.error('Error fetching athletes:', error);

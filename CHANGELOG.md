@@ -21,6 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Liquid glass style for swimming lessons cards with modern hover effects
 
 ### Changed
+- Added `width` and `height` attributes to image tag in `PageHeader.tsx` to prevent layout shifts.
 - Modernized Header component with improved navigation and mobile menu
 - Redesigned Footer with contemporary layout and interactive elements
 - Completely revamped Hero section with parallax effect and modern typography
