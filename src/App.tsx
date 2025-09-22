@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Layout from './components/layout/Layout';
 import HomePage from './pages/HomePage';
+import { initSmoothScroll } from './utils/smoothScroll';
 import AthletesPage from './pages/AthletesPage';
 import BoardPage from './pages/BoardPage';
 import ActivitiesPage from './pages/ActivitiesPage';
@@ -24,6 +25,11 @@ import AdminReports from './pages/admin/AdminReports';
 import AdminRegistrations from './pages/admin/AdminRegistrations';
 
 function App() {
+  useEffect(() => {
+    // Initialize smooth scrolling
+    initSmoothScroll();
+  }, []);
+
   return (
     <Router>
       <Routes>

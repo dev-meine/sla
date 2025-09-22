@@ -76,7 +76,7 @@ const FeaturedAthletes: React.FC = () => {
   }
 
   return (
-    <section className="section">
+    <section className="section-gradient py-20 md:py-24 relative pb-10 md:pb-10">
       <div className="container-custom">
         <div className="flex flex-col md:flex-row md:items-end md:justify-between mb-12">
           <div>
@@ -161,6 +161,8 @@ const FeaturedAthletes: React.FC = () => {
       </div>
     </section>
   );
+  
+  // Reduced bottom spacing
 };
 
 export default FeaturedAthletes;
