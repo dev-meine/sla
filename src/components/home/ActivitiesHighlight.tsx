@@ -80,7 +80,7 @@ const ActivitiesHighlight: React.FC = () => {
   }
 
   return (
-    <section className="section bg-gradient-to-b from-white to-gray-50">
+    <section className="section bg-gradient-to-b from-white to-gray-50 pt-5 md:pt-4">
       <div className="container-custom">
         <div className="text-center mb-12">
           <h2 className="mb-4">Our Activities</h2>

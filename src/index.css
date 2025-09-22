@@ -7,10 +7,25 @@
 @layer base {
   html {
     @apply scroll-smooth;
+    scroll-behavior: smooth;
   }
   
   body {
     @apply font-sans text-gray-800 bg-white;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* Optimize scrolling performance */
+  * {
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+  }
+  
+  /* Improve scrolling on all sections */
+  section {
+    will-change: transform;
+    transform: translateZ(0);
   }
   
   h1, h2, h3, h4, h5, h6 {
@@ -64,7 +79,23 @@
   }
   
   .section {
-    @apply py-12 md:py-20;
+    @apply py-20 md:py-32 relative overflow-hidden;
+  }
+  
+  .section-gradient {
+    @apply bg-gradient-to-br from-blue-50/30 via-white to-blue-50/50 relative;
+  }
+  
+  .section-dark {
+    @apply bg-gradient-to-br from-blue-900 via-blue-800 to-blue-950 text-white relative;
+  }
+  
+  .section-title {
+    @apply text-3xl md:text-4xl font-bold mb-6 relative;
+  }
+  
+  .section-title::after {
+    @apply content-[''] absolute -bottom-3 left-0 w-16 h-1 bg-blue-500 rounded-full;
   }
   
   .card {
@@ -82,6 +113,23 @@
 
 /* Custom utilities */
 .text-gradient {
+  background: linear-gradient(135deg, #3b82f6, #06b6d4, #3b82f6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  33% { transform: translateY(-10px) rotate(1deg); }
+  66% { transform: translateY(5px) rotate(-1deg); }
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+.text-gradient-tailwind {
   @apply bg-clip-text text-transparent bg-gradient-to-r from-primary-600 to-secondary-500;
 }
 

@@ -73,10 +73,15 @@ const AthletesPage: React.FC = () => {
           description="Meet the talented athletes representing Sierra Leone in swimming, diving, and water polo competitions."
           image="https://images.pexels.com/photos/1263349/pexels-photo-1263349.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
         />
-        <section className="section">
+        <section className="section section-gradient">
           <div className="container-custom">
             <div className="text-center">
-              <div className="animate-spin rounded-full h-12 w-12 border-4 border-primary-600 border-t-transparent mx-auto"></div>
+              <motion.div 
+                className="animate-spin rounded-full h-12 w-12 border-4 border-primary-600 border-t-transparent mx-auto"
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.5 }}
+              />
             </div>
           </div>
         </section>
@@ -92,16 +97,36 @@ const AthletesPage: React.FC = () => {
         image="https://images.pexels.com/photos/1263349/pexels-photo-1263349.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
       />
 
-      <section className="section">
+      <section className="section section-gradient">
         <div className="container-custom">
           {sports.length === 0 ? (
-            <div className="text-center py-12">
+            <motion.div 
+              className="text-center py-12"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+            >
               <p className="text-gray-600">No athletes available.</p>
-            </div>
+            </motion.div>
           ) : (
             sports.map((sport) => (
-              <div key={sport} className="mb-20">
-                <h2 className="mb-8 capitalize">{sport.replace('-', ' ')} Athletes</h2>
+              <motion.div 
+                key={sport} 
+                className="mb-20"
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-50px" }}
+                transition={{ duration: 0.7 }}
+              >
+                <motion.h2 
+                  className="mb-8 capitalize"
+                  initial={{ opacity: 0, x: -20 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.6, delay: 0.2 }}
+                >
+                  {sport.replace('-', ' ')} Athletes
+                </motion.h2>
 
                 <motion.div 
                   className="grid grid-cols-1 lg:grid-cols-2 gap-8"
@@ -208,7 +233,7 @@ const AthletesPage: React.FC = () => {
                     </motion.div>
                   ))}
                 </motion.div>
-              </div>
+              </motion.div>
             ))
           )}
         </div>
