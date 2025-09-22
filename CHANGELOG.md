@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - Modern UI animations and transitions using Framer Motion
+- Gradient overlays and decorative elements for visual depth
 - "Watch Video" call-to-action in hero section
 - Community counter showing athlete participation
 - Featured image with glass morphism effect in hero section

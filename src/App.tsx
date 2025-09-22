@@ -36,6 +36,7 @@ function App() {
         {/* Public Routes */}
         <Route path="/" element={<Layout><HomePage /></Layout>} />
         <Route path="/athletes" element={<Layout><AthletesPage /></Layout>} />
+        <Route path="/athletes/:id" element={<Layout><AthletesPage /></Layout>} />
         <Route path="/board" element={<Layout><BoardPage /></Layout>} />
         <Route path="/activities" element={<Layout><ActivitiesPage /></Layout>} />
         <Route path="/gallery" element={<Layout><GalleryPage /></Layout>} />
