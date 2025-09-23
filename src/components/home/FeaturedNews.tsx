@@ -118,15 +118,7 @@ const FeaturedNews: React.FC = () => {
             </span>
           </motion.h2>
           
-          <motion.p 
-            className="text-gray-600 text-lg max-w-2xl text-center leading-relaxed"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-          >
-            Stay updated with the latest news, events, and achievements from the Sierra Leone Aquatics community.
-          </motion.p>
+          
         </motion.div>
 
         <motion.div 

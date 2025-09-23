@@ -102,11 +102,11 @@ const Footer: React.FC = () => {
           {/* Newsletter */}
           <div className="lg:col-span-2">
             <h3 className="text-lg font-heading font-semibold mb-5 text-white relative inline-block after:content-[''] after:absolute after:-bottom-2 after:left-0 after:w-10 after:h-1 after:bg-blue-400 after:rounded-full">Newsletter</h3>
-            <p className="text-blue-100 mb-5 mt-6">Stay updated with our latest news and events.</p>
+            
             <form className="relative">
               <input 
                 type="email" 
-                placeholder="Your email address" 
+                placeholder="Email address" 
                 className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder:text-blue-200/70 focus:outline-none focus:ring-2 focus:ring-blue-400/50 transition-all duration-300"
               />
               <button 
