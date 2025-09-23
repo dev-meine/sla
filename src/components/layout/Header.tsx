@@ -52,7 +52,7 @@ const Header: React.FC = () => {
               <div className="absolute inset-0 bg-blue-500/10 opacity-0 group-hover:opacity-100 rounded-full transition-opacity duration-300"></div>
             </div>
             <div className="ml-3">
-              <span className="font-heading font-bold text-xl text-blue-600 block leading-tight tracking-tight">SLA</span>
+              
               <span className="text-xs text-gray-600 block leading-tight tracking-wide">Sierra Leone Aquatics</span>
             </div>
           </Link>
