@@ -100,7 +100,7 @@ const FeaturedAthletes: React.FC = () => {
         >
           {athletes.map((athlete) => (
             <motion.div key={athlete.id} className="card group" variants={item}>
-              <div className="relative h-[400px] overflow-hidden">
+              <div className="relative h-[400px] overflow-hidden rounded-lg shadow-lg backdrop-filter backdrop-blur-lg bg-white bg-opacity-10 border border-gray-200 border-opacity-20">
                 <img 
                   src={athlete.image || "https://images.pexels.com/photos/863988/pexels-photo-863988.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"}
                   alt={athlete.name}
@@ -112,7 +112,7 @@ const FeaturedAthletes: React.FC = () => {
                   <p className="text-gray-200 capitalize">{athlete.sport?.replace('-', ' ') || 'Athlete'}</p>
                 </div>
               </div>
-              <div className="p-6">
+              <div className="p-6 rounded-b-lg backdrop-filter backdrop-blur-lg bg-white bg-opacity-10 border border-gray-200 border-opacity-20 border-t-0">
                 {athlete.specialties.length > 0 && (
                   <div className="flex items-start mb-4">
                     <Medal size={18} className="text-yellow-500 mr-2 mt-1" />

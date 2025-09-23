@@ -91,12 +91,9 @@ const SwimmingPackages: React.FC = () => {
               <div className="absolute inset-0 bg-gradient-to-br from-primary-100/30 to-primary-300/10 opacity-50 z-0"></div>
               <div className="absolute -inset-0.5 bg-gradient-to-r from-primary-300/20 to-blue-300/20 rounded-xl blur opacity-30 group-hover:opacity-60 transition duration-300"></div>
               
-              <div className="relative p-8 z-10">
-                <div className="absolute top-0 right-0 w-24 h-24 bg-primary-300/20 rounded-full blur-2xl -mr-10 -mt-10"></div>
-                <div className="absolute bottom-0 left-0 w-24 h-24 bg-blue-300/20 rounded-full blur-2xl -ml-10 -mb-10"></div>
-                
+              <div className="relative p-8 z-10 flex flex-col h-full">
                 <h3 className="text-2xl font-semibold mb-4 text-gray-800">{pkg.name}</h3>
-                <p className="text-gray-700 mb-6">{pkg.description}</p>
+                <p className="text-gray-700 mb-6 flex-grow">{pkg.description}</p>
                 <div className="space-y-4 mb-8">
                   <div className="flex items-center text-gray-700 bg-white/40 p-2 rounded-lg backdrop-blur-sm">
                     <Medal className="w-5 h-5 mr-3 text-primary-600" />
@@ -111,7 +108,7 @@ const SwimmingPackages: React.FC = () => {
                     <span>Small group sizes</span>
                   </div>
                 </div>
-                <div className="flex items-end justify-between">
+                <div className="flex items-end justify-between mt-auto">
                   <div>
                     <p className="text-sm text-gray-600">Starting from</p>
                     <p className="text-3xl font-bold text-primary-600">

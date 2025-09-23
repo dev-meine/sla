@@ -40,7 +40,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Modified team image in Hero section to display in square format for better visual consistency
 
 ### Fixed
-- Resolved `ReferenceError: ChevronDown is not defined` in `AthletesPage.tsx` by importing `ChevronDown` and `ChevronUp` from `lucide-react`.
+
+- Ensured "Register Now" button on swimming lesson cards in `SwimmingPackages.tsx` is responsive and consistently aligned.
+- Applied liquid glass effect to athlete cards in `FeaturedAthletes.tsx`. across all price cards.
 - Reduced excessive spacing between Athletes and Activities sections on homepage
 - Improved accessibility with better contrast ratios
 - Enhanced mobile navigation usability
