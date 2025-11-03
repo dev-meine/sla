@@ -34,9 +34,9 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
       return;
     }
 
-    // Validate file size (5MB limit)
-    if (file.size > 5 * 1024 * 1024) {
-      setError('Image size should be less than 5MB');
+    // Validate file size (7MB limit)
+    if (file.size > 7 * 1024 * 1024) {
+      setError('Image size should be less than 7MB');
       return;
     }
 
@@ -138,7 +138,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
               {isUploading ? 'Uploading...' : 'Click to upload image'}
             </span>
             <span className="text-xs text-gray-400">
-              PNG, JPG up to 5MB
+              PNG, JPG up to 7MB
             </span>
           </label>
         </div>

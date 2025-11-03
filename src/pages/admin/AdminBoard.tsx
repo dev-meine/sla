@@ -266,7 +266,7 @@ const AdminBoard: React.FC = () => {
                   <img
                     src={member.image || 'https://via.placeholder.com/400x300'}
                     alt={member.name}
-                    className="w-full h-full object-cover object-top"
+                    className="w-full h-full object-cover object-center"
                     onError={(e) => {
                       const target = e.target as HTMLImageElement;
                       target.src = 'https://via.placeholder.com/400x300';

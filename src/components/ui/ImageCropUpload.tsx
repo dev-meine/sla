@@ -33,6 +33,9 @@ const ImageCropUpload: React.FC<ImageCropUploadProps> = ({
   const [crop, setCrop] = useState<Crop>();
   const [completedCrop, setCompletedCrop] = useState<PixelCrop>();
   const [originalFile, setOriginalFile] = useState<File | null>(null);
+  // Add drag-and-drop state
+  const [isDragOver, setIsDragOver] = useState(false);
+  const [dragCounter, setDragCounter] = useState(0);
   
   const imgRef = useRef<HTMLImageElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -47,36 +50,43 @@ const ImageCropUpload: React.FC<ImageCropUploadProps> = ({
   const onImageLoad = useCallback((e: React.SyntheticEvent<HTMLImageElement>) => {
     if (aspectRatio) {
       const { width, height } = e.currentTarget;
-      setCrop(centerCrop(
-        makeAspectCrop(
-          {
-            unit: '%',
-            width: 90,
-          },
-          aspectRatio,
-          width,
-          height,
-        ),
+      const baseCrop = makeAspectCrop(
+        {
+          unit: '%',
+          width: 90,
+        },
+        aspectRatio,
         width,
         height,
-      ));
+      );
+      
+      // For portrait images (aspect ratio 1 or close to it), position crop towards upper portion
+      // to better capture faces/heads in executive photos
+      if (aspectRatio === 1) {
+        setCrop({
+          ...baseCrop,
+          x: (100 - baseCrop.width) / 2, // Center horizontally
+          y: Math.max(0, (100 - baseCrop.height) / 4), // Position in upper 25% instead of center
+        });
+      } else {
+        // For other aspect ratios, use center crop
+        setCrop(centerCrop(baseCrop, width, height));
+      }
     }
     setImageLoaded(true);
   }, [aspectRatio]);
 
-  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
+  // Validate and process file
+  const processFile = async (file: File) => {
     // Validate file type
     if (!file.type.startsWith('image/')) {
       setError('Please upload an image file');
       return;
     }
 
-    // Validate file size (5MB limit)
-    if (file.size > 5 * 1024 * 1024) {
-      setError('Image size should be less than 5MB');
+    // Validate file size (7MB limit)
+    if (file.size > 7 * 1024 * 1024) {
+      setError('Image size should be less than 7MB');
       return;
     }
 
@@ -91,6 +101,51 @@ const ImageCropUpload: React.FC<ImageCropUploadProps> = ({
       setIsCropping(true);
     };
     reader.readAsDataURL(file);
+  };
+
+  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    await processFile(file);
+  };
+
+  // Drag and drop event handlers
+  const handleDragEnter = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragCounter(prev => prev + 1);
+    if (e.dataTransfer.items && e.dataTransfer.items.length > 0) {
+      setIsDragOver(true);
+    }
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragCounter(prev => prev - 1);
+    if (dragCounter === 1) {
+      setIsDragOver(false);
+    }
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
+  const handleDrop = async (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragOver(false);
+    setDragCounter(0);
+
+    if (isUploading) return;
+
+    const files = e.dataTransfer.files;
+    if (files && files.length > 0) {
+      const file = files[0];
+      await processFile(file);
+    }
   };
 
   const getCroppedImg = useCallback(
@@ -281,7 +336,17 @@ const ImageCropUpload: React.FC<ImageCropUploadProps> = ({
           )}
         </div>
       ) : (
-        <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
+        <div 
+          className={`border-2 border-dashed rounded-lg p-6 text-center transition-all duration-200 ${
+            isDragOver 
+              ? 'border-primary-500 bg-primary-50 scale-105' 
+              : 'border-gray-300 hover:border-gray-400'
+          } ${isUploading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+          onDragEnter={handleDragEnter}
+          onDragLeave={handleDragLeave}
+          onDragOver={handleDragOver}
+          onDrop={handleDrop}
+        >
           <input
             type="file"
             accept="image/*"
@@ -294,12 +359,21 @@ const ImageCropUpload: React.FC<ImageCropUploadProps> = ({
             htmlFor="image-crop-upload"
             className="cursor-pointer flex flex-col items-center justify-center space-y-2"
           >
-            <Upload className="w-8 h-8 text-gray-400" />
-            <span className="text-sm text-gray-500">
-              {isUploading ? 'Processing...' : 'Click to upload image'}
+            <Upload className={`w-8 h-8 transition-colors duration-200 ${
+              isDragOver ? 'text-primary-600' : 'text-gray-400'
+            }`} />
+            <span className={`text-sm transition-colors duration-200 ${
+              isDragOver ? 'text-primary-700' : 'text-gray-500'
+            }`}>
+              {isUploading 
+                ? 'Processing...' 
+                : isDragOver 
+                  ? 'Drop image here' 
+                  : 'Click to upload or drag & drop image'
+              }
             </span>
             <span className="text-xs text-gray-400">
-              PNG, JPG up to 5MB • Will be cropped to {aspectRatio === 1 ? 'square' : 'custom ratio'}
+              PNG, JPG up to 7MB • Will be cropped to {aspectRatio === 1 ? 'square' : 'custom ratio'}
             </span>
           </label>
         </div>

@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Advanced section styling with gradient backgrounds and motion effects
 - Smooth scrolling implementation with performance optimizations
 - Liquid glass style for swimming lessons cards with modern hover effects
+- Mission and Vision section on About page with modern card design and hover effects
 
 ### Changed
 - Added `width` and `height` attributes to image tag in `PageHeader.tsx` to prevent layout shifts.
@@ -47,3 +48,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Improved accessibility with better contrast ratios
 - Enhanced mobile navigation usability
 - Fixed syntax error in Footer component causing build failure
+- Fixed Mission and Vision cards height inconsistency on About page to ensure equal heights
+- Reduced spacing between "Our Story" and "Mission & Vision" sections on About page

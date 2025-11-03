@@ -19,7 +19,7 @@ const AboutPage: React.FC = () => {
         
         <div className="container-custom relative z-10">
           <motion.div 
-            className="text-center mb-16"
+            className="text-center mb-5"
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -58,7 +58,7 @@ const AboutPage: React.FC = () => {
                 viewport={{ once: true }}
               >
                 <span className="font-semibold text-blue-600">FOUNDED IN FREETOWN – 10TH JUNE 1979</span> as
-                The Sierra Leone Swimming, Diving & Water Polo Association, now known as the Sierra Leone Swimming Federation, is the national governing body for all Aquatic sports in Sierra Leone.
+                The Sierra Leone Swimming, Diving & Water Polo Association, now known as the Sierra Leone Aquatics, is the national governing body for all Aquatic sports in Sierra Leone.
               </motion.p>
               <motion.p 
                 className="text-gray-700 mb-6 text-lg leading-relaxed"
@@ -104,6 +104,104 @@ const AboutPage: React.FC = () => {
                 alt="Swimming competition" 
                 className="w-full h-full object-cover"
               />
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* Mission & Vision Section */}
+      <section className="py-12 md:py-24 section-gradient relative overflow-hidden">
+        {/* Enhanced background decorative elements */}
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-50/30 via-white to-cyan-50/40"></div>
+        <div className="absolute top-20 right-20 w-96 h-96 bg-gradient-to-br from-blue-400/15 to-cyan-300/15 rounded-full blur-3xl animate-float"></div>
+        <div className="absolute bottom-20 left-20 w-80 h-80 bg-gradient-to-tr from-cyan-400/10 to-blue-300/10 rounded-full blur-3xl"></div>
+        
+        <div className="container-custom relative z-10">
+          <motion.div 
+            className="text-center mb-12"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+          >
+            <motion.h2 
+              className="section-title mb-6 inline-block relative"
+              initial={{ opacity: 0, scale: 0.9 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.7, delay: 0.2 }}
+            >
+              Mission & Vision
+              <motion.span 
+                className="absolute -bottom-4 left-1/2 transform -translate-x-1/2 w-32 h-1.5 bg-gradient-to-r from-blue-500 via-cyan-400 to-blue-500 rounded-full"
+                initial={{ width: 0 }}
+                whileInView={{ width: "8rem" }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.8, delay: 0.5 }}
+              />
+            </motion.h2>
+          </motion.div>
+          
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-6xl mx-auto">
+            {/* Vision Card */}
+            <motion.div
+              className="relative group"
+              initial={{ opacity: 0, x: -30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.7, ease: "easeOut" }}
+              viewport={{ once: true }}
+            >
+              <div className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border border-blue-100 h-full flex flex-col">
+                <div className="absolute -top-4 -left-4 w-20 h-20 bg-gradient-to-br from-blue-500 to-cyan-400 rounded-full opacity-20 blur-xl group-hover:opacity-30 transition-opacity duration-300"></div>
+                <div className="relative z-10 flex flex-col flex-grow">
+                  <div className="flex items-center mb-6">
+                    <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-cyan-400 rounded-xl flex items-center justify-center mr-4 shadow-lg flex-shrink-0">
+                      <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                      </svg>
+                    </div>
+                    <h3 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent">
+                      Vision
+                    </h3>
+                  </div>
+                  <div className="flex-grow flex items-center">
+                    <p className="text-gray-700 text-lg leading-relaxed">
+                      To be recognized as the country's leading sport discipline in the development of youth athletes
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+
+            {/* Mission Card */}
+            <motion.div
+              className="relative group"
+              initial={{ opacity: 0, x: 30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.7, ease: "easeOut" }}
+              viewport={{ once: true }}
+            >
+              <div className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border border-cyan-100 h-full flex flex-col">
+                <div className="absolute -top-4 -right-4 w-20 h-20 bg-gradient-to-br from-cyan-500 to-blue-400 rounded-full opacity-20 blur-xl group-hover:opacity-30 transition-opacity duration-300"></div>
+                <div className="relative z-10 flex flex-col flex-grow">
+                  <div className="flex items-center mb-6">
+                    <div className="w-16 h-16 bg-gradient-to-br from-cyan-500 to-blue-400 rounded-xl flex items-center justify-center mr-4 shadow-lg flex-shrink-0">
+                      <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                      </svg>
+                    </div>
+                    <h3 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-cyan-600 to-blue-500 bg-clip-text text-transparent">
+                      Our Mission
+                    </h3>
+                  </div>
+                  <div className="flex-grow flex items-center">
+                    <p className="text-gray-700 text-lg leading-relaxed">
+                      To develop champions in aquatic sports and life
+                    </p>
+                  </div>
+                </div>
+              </div>
             </motion.div>
           </div>
         </div>

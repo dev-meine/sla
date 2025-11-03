@@ -13,10 +13,10 @@ export async function uploadImage(file: File, bucket: string = 'images'): Promis
       throw new Error('Invalid file type. Only JPEG, PNG, GIF and WebP are allowed.');
     }
 
-    // Validate file size (5MB limit)
-    const MAX_SIZE = 5 * 1024 * 1024; // 5MB
+    // Validate file size (7MB limit)
+    const MAX_SIZE = 7 * 1024 * 1024; // 7MB
     if (file.size > MAX_SIZE) {
-      throw new Error('File size too large. Maximum size is 5MB.');
+      throw new Error('File size too large. Maximum size is 7MB.');
     }
 
     // Generate unique filename with original extension
