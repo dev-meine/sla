@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Calendar, ArrowRight } from 'lucide-react';
+import { ArrowRight, ArrowUpRight } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { supabase, cachedQuery } from '../../lib/supabase';
 import { Database } from '../../types/supabase';
@@ -10,7 +10,6 @@ type Event = Database['public']['Tables']['events']['Row'];
 const ActivitiesHighlight: React.FC = () => {
   const [events, setEvents] = React.useState<Event[]>([]);
   const [isLoading, setIsLoading] = React.useState(true);
-  const [imageError, setImageError] = React.useState<Record<string, boolean>>({});
 
   React.useEffect(() => {
     fetchEvents();
@@ -24,7 +23,7 @@ const ActivitiesHighlight: React.FC = () => {
           .from('events')
           .select('*')
           .order('date', { ascending: true })
-          .limit(6)
+          .limit(4) // Limiting to 4 for a cleaner list
       );
       
       if (error) throw error;
@@ -42,37 +41,21 @@ const ActivitiesHighlight: React.FC = () => {
     }
   };
 
-  // Group events by category
-  const categorizedEvents = events.reduce((acc, event) => {
-    if (!event.category) return acc;
-    if (!acc[event.category]) {
-      acc[event.category] = [];
-    }
-    acc[event.category].push(event);
-    return acc;
-  }, {} as Record<string, Event[]>);
-
-  const categories = Object.keys(categorizedEvents);
-
   const formatDate = (dateString: string | null) => {
-    if (!dateString) return '';
-    const options: Intl.DateTimeFormatOptions = { year: 'numeric', month: 'long', day: 'numeric' };
-    return new Date(dateString).toLocaleDateString('en-US', options);
-  };
-
-  const handleImageError = (eventId: string) => {
-    setImageError(prev => ({
-      ...prev,
-      [eventId]: true
-    }));
+    if (!dateString) return { day: '', month: '' };
+    const date = new Date(dateString);
+    return {
+      day: date.toLocaleDateString('en-US', { day: '2-digit' }),
+      month: date.toLocaleDateString('en-US', { month: 'short' }).toUpperCase()
+    };
   };
 
   if (isLoading) {
     return (
-      <section className="section bg-gradient-to-b from-white to-gray-50">
-        <div className="container-custom">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-4 border-primary-600 border-t-transparent mx-auto"></div>
+      <section className="bg-white py-24">
+        <div className="container mx-auto px-6 lg:px-12">
+          <div className="flex justify-center items-center h-32">
+            <div className="animate-spin rounded-full h-8 w-8 border-2 border-primary-600 border-t-transparent mx-auto"></div>
           </div>
         </div>
       </section>
@@ -80,91 +63,152 @@ const ActivitiesHighlight: React.FC = () => {
   }
 
   return (
-    <section className="section bg-gradient-to-b from-white to-gray-50 pt-5 md:pt-4">
-      <div className="container-custom">
-        <div className="text-center mb-12">
-          <h2 className="mb-4">Our Activities</h2>
-          <p className="text-lg text-gray-600 max-w-3xl mx-auto">
-            We organize various activities throughout the year to promote swimming, diving, and water polo in Sierra Leone.
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-          {/* Image */}
+    <section className="bg-slate-50 py-24 md:py-32 relative overflow-hidden">
+      <div className="container mx-auto px-6 lg:px-12 relative z-10">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-20 items-start">
+          
+          {/* Left Column: Image & Intro */}
           <motion.div 
-            className="rounded-lg overflow-hidden shadow-lg h-96"
-            initial={{ opacity: 0, x: -20 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.5 }}
+            className="lg:col-span-5 flex flex-col"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
             viewport={{ once: true }}
           >
-            <img 
-              src={events[0]?.image || "https://images.pexels.com/photos/863988/pexels-photo-863988.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"}
-              alt="Featured Activity"
-              className="w-full h-full object-cover"
-              onError={(e) => {
-                const target = e.target as HTMLImageElement;
-                target.src = "https://images.pexels.com/photos/863988/pexels-photo-863988.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1";
-              }}
-            />
-          </motion.div>
-
-          {/* Activities tabs */}
-          <div>
-            <div className="flex overflow-x-auto space-x-2 mb-6 pb-2">
-              {categories.map((category) => (
-                <motion.div 
-                  key={category}
-                  className="bg-white shadow-md rounded-lg p-6 flex-1 min-w-[220px]"
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.3 }}
-                  viewport={{ once: true }}
-                >
-                  <h3 className="capitalize text-xl mb-4">{category.replace('-', ' ')}s</h3>
-                  <ul className="space-y-4">
-                    {categorizedEvents[category].map((event) => (
-                      <li key={event.id} className="border-l-2 border-primary-600 pl-4">
-                        <div className="flex items-center mb-2">
-                          {event.image && !imageError[event.id] && (
-                            <img
-                              src={event.image}
-                              alt={event.title}
-                              className="w-12 h-12 rounded object-cover mr-3"
-                              onError={() => handleImageError(event.id)}
-                            />
-                          )}
-                          <div>
-                            <h4 className="font-medium text-primary-700">{event.title}</h4>
-                            <div className="flex items-center text-sm text-gray-500 mt-1">
-                              <Calendar size={14} className="mr-1" />
-                              <span>{formatDate(event.date)}</span>
-                            </div>
-                          </div>
-                        </div>
-                        {event.description && (
-                          <p className="text-sm text-gray-600 mt-1">{event.description}</p>
-                        )}
-                      </li>
-                    ))}
-                  </ul>
-                </motion.div>
-              ))}
+            <motion.span 
+              initial={{ opacity: 0, x: -20 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              className="inline-block px-3 py-1 bg-white text-secondary-600 rounded-full font-sans tracking-widest text-xs uppercase font-bold mb-4 shadow-sm self-start"
+            >
+              Calendar
+            </motion.span>
+            <h2 className="font-heading text-4xl md:text-5xl font-bold text-slate-900 mb-6 relative inline-block">
+              Core Activities
+              <span className="absolute -bottom-2 right-1/4 w-1/4 h-1 bg-secondary-400 rounded-full"></span>
+            </h2>
+            <p className="font-sans text-slate-600 text-lg font-medium leading-relaxed mb-10">
+              We organize various activities throughout the year to promote swimming, diving, and water polo in Sierra Leone, fostering community and athletic excellence.
+            </p>
+            
+            <div className="relative">
+              {/* Vibrant offset shadow block */}
+              <motion.div 
+                className="absolute inset-0 bg-gradient-to-tr from-primary-400 to-secondary-400 rounded-2xl transform translate-x-4 translate-y-4"
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.8, delay: 0.3 }}
+              ></motion.div>
+              
+              <motion.div 
+                className="w-full aspect-[4/5] bg-slate-100 overflow-hidden mb-8 rounded-2xl shadow-xl relative z-10"
+                whileHover={{ scale: 1.02, rotate: -1 }}
+                transition={{ type: "spring", stiffness: 300, damping: 20 }}
+              >
+                <img 
+                  src={events[0]?.image || "https://images.pexels.com/photos/863988/pexels-photo-863988.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"}
+                  alt="Featured Activity"
+                  className="w-full h-full object-cover filter saturate-110 contrast-110 hover:scale-110 transition-transform duration-[2s] ease-out"
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    target.src = "https://images.pexels.com/photos/863988/pexels-photo-863988.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1";
+                  }}
+                />
+              </motion.div>
             </div>
             
-            <motion.div
-              className="text-right"
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              transition={{ delay: 0.3 }}
-              viewport={{ once: true }}
-            >
-              <Link to="/activities" className="btn btn-primary">
-                Explore All Activities
-                <ArrowRight size={16} className="ml-1" />
+            <div className="hidden lg:block mt-8">
+              <Link 
+                to="/activities" 
+                className="group inline-flex items-center px-8 py-4 bg-white text-primary-700 font-sans font-bold shadow-md hover:shadow-lg rounded-full transition-all uppercase tracking-wider text-sm ring-1 ring-slate-200"
+              >
+                View Full Calendar
+                <motion.span 
+                  initial={{ x: 0 }}
+                  whileHover={{ x: 4 }}
+                  transition={{ type: "spring", stiffness: 400 }}
+                >
+                  <ArrowRight size={18} className="ml-3 text-primary-500" />
+                </motion.span>
               </Link>
-            </motion.div>
-          </div>
+            </div>
+          </motion.div>
+
+          {/* Right Column: List of Activities */}
+          <motion.div 
+            className="lg:col-span-7 flex flex-col pt-4 lg:pt-24 relative"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            viewport={{ once: true }}
+          >
+            {events.map((event, i) => {
+              const date = formatDate(event.date);
+              return (
+                <motion.article 
+                  key={event.id} 
+                  className="group relative bg-white rounded-2xl p-6 mb-6 shadow-sm border border-slate-100 hover:shadow-[0_20px_50px_rgba(37,99,235,0.08)] transition-all duration-300 transform"
+                  whileHover={{ y: -5, scale: 1.01 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                >
+                  <div className="flex flex-col md:flex-row gap-6 items-center md:items-start text-center md:text-left">
+                    
+                    {/* Date Box */}
+                    <div className="flex-shrink-0 w-24 h-24 flex flex-col justify-center items-center rounded-2xl bg-primary-50 text-primary-600 border-2 border-primary-100 group-hover:bg-gradient-to-br group-hover:from-primary-600 group-hover:to-blue-500 group-hover:text-white group-hover:border-transparent transition-all duration-300 shadow-sm">
+                      <span className="font-sans font-bold tracking-widest text-xs uppercase mb-1 drop-shadow-sm">
+                        {date.month}
+                      </span>
+                      <span className="font-heading text-4xl font-bold leading-none drop-shadow-sm">
+                        {date.day}
+                      </span>
+                    </div>
+                    
+                    {/* Content */}
+                    <div className="flex-grow md:pr-8">
+                      <span className="inline-block px-3 py-1 bg-white border border-slate-200 shadow-sm text-secondary-600 text-[10px] tracking-widest uppercase font-bold mb-3 rounded-full">
+                        {event.category?.replace('-', ' ') || 'General'}
+                      </span>
+                      <h3 className="font-heading text-2xl md:text-3xl font-bold text-slate-900 mb-3 group-hover:text-primary-600 transition-colors">
+                        {event.title}
+                      </h3>
+                      {event.description && (
+                        <p className="font-sans text-slate-500 font-medium leading-relaxed mb-4 line-clamp-2">
+                          {event.description}
+                        </p>
+                      )}
+                    </div>
+                    
+                    {/* Arrow (Desktop) */}
+                    <div className="hidden md:flex flex-shrink-0 items-center justify-center w-12 h-12 rounded-full border-2 border-slate-100 group-hover:border-transparent group-hover:bg-primary-600 group-hover:text-white transition-all duration-300 shadow-sm self-center">
+                      <motion.div
+                        initial={{ x: 0, y: 0 }}
+                        whileHover={{ x: 3, y: -3 }}
+                        transition={{ type: "spring", stiffness: 400 }}
+                      >
+                        <ArrowUpRight size={20} />
+                      </motion.div>
+                    </div>
+                  </div>
+                  
+                  {/* Clickable Overlay */}
+                  <Link to="/activities" className="absolute inset-0 z-10">
+                    <span className="sr-only">View Activity: {event.title}</span>
+                  </Link>
+                </motion.article>
+              );
+            })}
+            
+            <div className="mt-8 lg:hidden">
+              <Link 
+                to="/activities" 
+                className="w-full flex justify-center items-center bg-white text-primary-700 font-sans font-bold shadow-md rounded-full transition-all uppercase tracking-wider text-sm ring-1 ring-slate-200 py-4 active:scale-95"
+              >
+                View Full Calendar
+              </Link>
+            </div>
+          </motion.div>
+
         </div>
       </div>
     </section>

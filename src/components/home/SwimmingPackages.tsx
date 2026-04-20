@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowRight, Medal, Clock, Users } from 'lucide-react';
+import { ArrowRight, Check } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { Database } from '../../types/supabase';
 
@@ -35,23 +35,21 @@ const SwimmingPackages: React.FC = () => {
     hidden: { opacity: 0 },
     show: {
       opacity: 1,
-      transition: {
-        staggerChildren: 0.1
-      }
+      transition: { staggerChildren: 0.15 }
     }
   };
 
   const item = {
-    hidden: { opacity: 0, y: 20 },
-    show: { opacity: 1, y: 0 }
+    hidden: { opacity: 0, y: 50, scale: 0.95 },
+    show: { opacity: 1, y: 0, scale: 1, transition: { type: "spring", stiffness: 100, damping: 20 } }
   };
 
   if (isLoading) {
     return (
-      <section className="section bg-gray-50">
-        <div className="container-custom">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-4 border-primary-600 border-t-transparent mx-auto"></div>
+      <section className="bg-gradient-to-b from-slate-50 to-white py-24 relative overflow-hidden">
+        <div className="container mx-auto px-6 lg:px-12 relative z-10">
+          <div className="flex justify-center items-center h-32">
+            <div className="animate-spin rounded-full h-8 w-8 border-2 border-primary-600 border-t-transparent mx-auto"></div>
           </div>
         </div>
       </section>
@@ -59,76 +57,120 @@ const SwimmingPackages: React.FC = () => {
   }
 
   return (
-    <section className="section relative overflow-hidden bg-gradient-to-b from-blue-50 to-gray-50">
-      <div className="absolute inset-0 bg-[url('/images/wave-pattern.svg')] opacity-5"></div>
-      <div className="absolute top-0 left-0 w-full h-64 bg-gradient-to-br from-primary-100/30 to-blue-100/20 blur-3xl"></div>
-      <div className="container-custom relative z-10">
-        <div className="text-center mb-12">
-          <h2 className="mb-4">Swimming Lessons</h2>
-          <p className="text-lg text-gray-600 max-w-3xl mx-auto">
-            Join our swimming programs and learn from experienced instructors in a safe and supportive environment.
-          </p>
+    <section className="bg-gradient-to-b from-slate-50 to-white py-24 md:py-32 relative overflow-hidden border-t border-slate-100">
+
+      <div className="container mx-auto px-6 lg:px-12 relative z-10">
+        <div className="flex flex-col items-center text-center mb-16 md:mb-24">
+          <motion.span 
+            initial={{ opacity: 0, y: -10 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="inline-block px-4 py-1 bg-primary-100 text-primary-700 rounded-full font-sans tracking-widest text-xs uppercase font-bold mb-4 shadow-sm"
+          >
+            Training
+          </motion.span>
+          <motion.h2 
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.1 }}
+            className="font-heading text-4xl md:text-5xl font-bold text-slate-900 mb-6 relative"
+          >
+            Swimming Lessons
+            <span className="absolute -bottom-3 left-1/4 w-1/2 h-1.5 bg-secondary-400 rounded-full"></span>
+          </motion.h2>
+          <motion.p 
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.2 }}
+            className="font-sans text-slate-600 text-lg font-medium leading-relaxed max-w-2xl mx-auto mt-4"
+          >
+            Join our expert-led swimming programs. Master your technique in a supportive environment, structured for all skill levels.
+          </motion.p>
         </div>
 
         <motion.div 
-          className="grid grid-cols-1 md:grid-cols-3 gap-8"
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 xl:gap-12 relative"
           variants={container}
           initial="hidden"
           whileInView="show"
-          viewport={{ once: true, margin: "-100px" }}
+          viewport={{ once: true, margin: "-50px" }}
         >
-          {packages.map((pkg) => (
-            <motion.div 
-              key={pkg.id} 
-              className="relative backdrop-blur-sm bg-white/30 rounded-xl overflow-hidden group transition-all duration-300 hover:scale-[1.02] border border-white/20"
-              variants={item}
-              style={{
-                background: 'linear-gradient(135deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0.1) 100%)',
-                boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.15)',
-                backdropFilter: 'blur(10px)',
-              }}
-            >
-              <div className="absolute inset-0 bg-gradient-to-br from-primary-100/30 to-primary-300/10 opacity-50 z-0"></div>
-              <div className="absolute -inset-0.5 bg-gradient-to-r from-primary-300/20 to-blue-300/20 rounded-xl blur opacity-30 group-hover:opacity-60 transition duration-300"></div>
-              
-              <div className="relative p-8 z-10 flex flex-col h-full">
-                <h3 className="text-2xl font-semibold mb-4 text-gray-800">{pkg.name}</h3>
-                <p className="text-gray-700 mb-6 flex-grow">{pkg.description}</p>
-                <div className="space-y-4 mb-8">
-                  <div className="flex items-center text-gray-700 bg-white/40 p-2 rounded-lg backdrop-blur-sm">
-                    <Medal className="w-5 h-5 mr-3 text-primary-600" />
-                    <span>Professional instruction</span>
-                  </div>
-                  <div className="flex items-center text-gray-700 bg-white/40 p-2 rounded-lg backdrop-blur-sm">
-                    <Clock className="w-5 h-5 mr-3 text-primary-600" />
-                    <span>Flexible scheduling</span>
-                  </div>
-                  <div className="flex items-center text-gray-700 bg-white/40 p-2 rounded-lg backdrop-blur-sm">
-                    <Users className="w-5 h-5 mr-3 text-primary-600" />
-                    <span>Small group sizes</span>
+          {packages.map((pkg, index) => {
+            const isFeatured = index === 1; // Highlight the middle package usually
+            
+            return (
+              <motion.div 
+                key={pkg.id} 
+                className={`bg-white rounded-[2rem] flex flex-col p-8 lg:p-10 relative overflow-hidden group shadow-lg ring-1 ${
+                  isFeatured 
+                    ? 'ring-primary-400 shadow-[0_20px_60px_rgba(37,99,235,0.2)] md:-translate-y-4' 
+                    : 'ring-slate-100 shadow-[0_10px_40px_rgba(0,0,0,0.04)] '
+                } hover:shadow-[0_25px_60px_rgba(37,99,235,0.15)] transition-all duration-500`}
+                variants={item}
+                whileHover={{ y: isFeatured ? -24 : -12 }}
+              >
+                
+                {/* Ribbon removed per user request */}
+
+                <div className="mb-8 relative z-10 pt-4">
+                  <h3 className="font-heading text-2xl font-bold text-slate-900 mb-4">{pkg.name}</h3>
+                  <p className="font-sans text-slate-500 font-medium text-sm h-16 line-clamp-3">
+                    {pkg.description}
+                  </p>
+                </div>
+
+                <div className="mb-8 pb-8 border-b border-slate-100 relative z-10">
+                  <span className="block text-slate-400 font-sans text-xs uppercase tracking-widest mb-2 font-bold">Starting at</span>
+                  <div className="flex items-baseline text-primary-600">
+                    <span className="font-heading text-4xl md:text-5xl font-bold relative inline-block">
+                      Le {pkg.price.toLocaleString()}
+                      {isFeatured && <div className="absolute -bottom-1 left-0 w-full h-1/3 bg-secondary-200/40 -z-10 rounded"></div>}
+                    </span>
                   </div>
                 </div>
-                <div className="flex items-end justify-between mt-auto">
-                  <div>
-                    <p className="text-sm text-gray-600">Starting from</p>
-                    <p className="text-3xl font-bold text-primary-600">
-                      Le {pkg.price.toLocaleString()}
-                    </p>
+
+                <div className="space-y-4 mb-10 flex-grow relative z-10">
+                  <div className="flex items-start">
+                     <span className="flex-shrink-0 w-6 h-6 rounded-full bg-primary-100 flex items-center justify-center mr-3 mt-0.5">
+                      <Check className="w-3.5 h-3.5 text-primary-600" />
+                    </span>
+                    <span className="font-sans text-slate-700 font-medium text-sm">Professional instruction</span>
                   </div>
+                  <div className="flex items-start">
+                     <span className="flex-shrink-0 w-6 h-6 rounded-full bg-primary-100 flex items-center justify-center mr-3 mt-0.5">
+                      <Check className="w-3.5 h-3.5 text-primary-600" />
+                    </span>
+                    <span className="font-sans text-slate-700 font-medium text-sm">Flexible scheduling options</span>
+                  </div>
+                  <div className="flex items-start">
+                     <span className="flex-shrink-0 w-6 h-6 rounded-full bg-primary-100 flex items-center justify-center mr-3 mt-0.5">
+                      <Check className="w-3.5 h-3.5 text-primary-600" />
+                    </span>
+                    <span className="font-sans text-slate-700 font-medium text-sm">Small group sizes for focus</span>
+                  </div>
+                </div>
+                
+                <div className="mt-auto relative z-10">
                   <Link 
                     to="/register" 
-                    className="relative btn btn-primary bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 border-0 overflow-hidden group"
+                    className={`w-full flex items-center justify-center font-sans font-bold py-4 px-6 rounded-2xl transition-all duration-300 group overflow-hidden relative shadow-md active:scale-95 ${
+                      isFeatured 
+                        ? 'bg-gradient-to-r from-primary-600 to-blue-500 text-white shadow-[0_10px_25px_rgba(37,99,235,0.3)] hover:shadow-[0_15px_35px_rgba(37,99,235,0.4)]' 
+                        : 'bg-white text-primary-700 ring-2 ring-primary-100 hover:ring-primary-500 hover:bg-primary-50'
+                    }`}
                   >
-                    <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-primary-400/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
-                    <span className="relative flex items-center">
-                      Register Now
-                      <ArrowRight size={16} className="ml-2" />
-                    </span>
+                    <span className="uppercase tracking-widest text-xs relative z-10">Register Now</span>
+                    <ArrowRight size={16} className={`ml-3 relative z-10 transition-transform group-hover:translate-x-1 ${isFeatured ? 'text-secondary-300' : 'text-primary-500'}`} />
+                    {isFeatured && (
+                      <div className="absolute inset-0 bg-white/20 transform -skew-x-12 -translate-x-full group-hover:animate-[shine_1s_ease-in-out] z-0"></div>
+                    )}
                   </Link>
                 </div>
-              </div>
-            </motion.div>
-          ))}
+              </motion.div>
+            );
+          })}
         </motion.div>
       </div>
     </section>

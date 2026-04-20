@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- **2026-04-20**: Applied the "Tactile Grain & Minimalist Solid" design system strictly to all internal pages (`About`, `Activities`, `Athletes`, `Board`, `Contact`, `Registration`, `Gallery`). Removed legacy floating gradient orbs, blurred backgrounds, and complex section-gradient utilities. Redesigned `PageHeader` from a heavy blue block to a clean, dark cinematic image overlay (`bg-slate-950/80`) to maximize text contrast and editorial feel.
+- **2026-04-20**: Adopted a premium "Tactile Grain / Noise" aesthetic across the application. Removed all decorative gradient background orbs (`bg-primary-*` blurs) from components (`HeroSection`, `FeaturedAthletes`, `FeaturedNews`, `ActivitiesHighlight`, `SwimmingPackages`, `Footer`) to eliminate visual noise. Added a global fixed SVG grain overlay in `Layout.tsx` and `index.css` to add physical, high-end texture while maintaining solid, minimalist background colors.
+- **2026-04-20**: Redesigned the homepage to adopt a vibrant, kinetic, and modern aesthetic. Removed grayscale filters and introduced dynamic Framer Motion animations across `HeroSection`, `FeaturedAthletes`, `FeaturedNews`, `ActivitiesHighlight`, `SwimmingPackages`, `Header`, and `Footer`. Enhanced components with rich primary blue colors, glassmorphic overlays, and spring-loaded interactive elements.
+- **2026-04-20**: Redesigned the homepage and layout components to adopt a clean, minimalistic editorial style. Removed legacy glassmorphism (heavy gradients, backdrop-blurs, glowing shadows) and complex SVG animations across `HeroSection`, `FeaturedAthletes`, `FeaturedNews`, `ActivitiesHighlight`, `SwimmingPackages`, `Header`, and `Footer`. Adopted sharp grid layouts, clear typography, and a simplified color palette matching Awwwards/Godly aesthetics.
+
+
 ### Added
 - Modern UI animations and transitions using Framer Motion
 - Gradient overlays and decorative elements for visual depth

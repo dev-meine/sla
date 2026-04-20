@@ -1,188 +1,158 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { ArrowRight, Play, ChevronDown } from 'lucide-react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { Link } from 'react-router-dom';
 
 const HeroSection: React.FC = () => {
-  // Parallax scroll effect
   const { scrollY } = useScroll();
-  const y1 = useTransform(scrollY, [0, 500], [0, 150]);
-  const y2 = useTransform(scrollY, [0, 500], [0, 50]); // Changed from negative to positive value
-  const opacity = useTransform(scrollY, [0, 300], [1, 0.5]);
-  
+  const y1 = useTransform(scrollY, [0, 500], [0, -100]);
+  const y2 = useTransform(scrollY, [0, 500], [0, -50]);
+
   return (
-    <section className="relative min-h-[100vh] overflow-hidden">
-      {/* Background with modern gradient overlay */}
-      <motion.div 
-        style={{ opacity }}
-        className="absolute inset-0 bg-gradient-to-r from-blue-900/90 via-blue-800/85 to-blue-900/80 z-10"
-      ></motion.div>
-      
-      {/* Animated wave background with parallax */}
-      <motion.div 
-        className="absolute inset-0 z-0"
-        style={{ y: y1 }}
-      >
-        <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-blue-900/30 to-transparent"></div>
-        <svg className="absolute bottom-0 left-0 w-full" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320">
-          <motion.path 
-            initial={{ opacity: 0.05 }}
-            animate={{ opacity: 0.08 }}
-            transition={{ duration: 3, repeat: Infinity, repeatType: "reverse" }}
-            fill="#ffffff" 
-            d="M0,192L48,176C96,160,192,128,288,122.7C384,117,480,139,576,165.3C672,192,768,224,864,213.3C960,203,1056,149,1152,138.7C1248,128,1344,160,1392,176L1440,192L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"
-          ></motion.path>
-        </svg>
-        <svg className="absolute bottom-0 left-0 w-full" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320">
-          <motion.path 
-            initial={{ opacity: 0.03 }}
-            animate={{ opacity: 0.05 }}
-            transition={{ duration: 4, repeat: Infinity, repeatType: "reverse", delay: 0.5 }}
-            fill="#ffffff" 
-            d="M0,96L48,112C96,128,192,160,288,186.7C384,213,480,235,576,224C672,213,768,171,864,165.3C960,160,1056,192,1152,197.3C1248,203,1344,181,1392,170.7L1440,160L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"
-          ></motion.path>
-        </svg>
-      </motion.div>
-      
-      {/* Hero image with parallax effect */}
-      <motion.div 
-        className="absolute inset-0 z-0"
-        style={{ y: y2 }}
-      >
-        <img 
-          src="https://i.ibb.co/9kDWFfBB/Screenshot-2025-05-14-at-2-02-57-AM-min.png"
-          alt="Professional swimmers in competition" 
-          className="w-full h-full object-cover"
-        />
-      </motion.div>
-      
-      {/* Content */}
-      <article className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-20 h-full flex flex-col justify-center pt-32 pb-24">
-        <section className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-          <header>
-            <motion.span 
-              className="inline-block px-4 py-1.5 mb-6 bg-blue-500/20 text-blue-200 rounded-full text-sm font-medium tracking-wider"
-              initial={{ opacity: 0, y: 20 }}
+    <section className="relative min-h-[100vh] bg-transparent overflow-hidden flex items-center pt-24 pb-12">
+
+      <article className="container mx-auto px-6 lg:px-12 relative z-10 w-full">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
+          
+          <header className="lg:col-span-6 flex flex-col justify-center mt-12 md:mt-20 lg:mt-0">
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4 }}
+              transition={{ duration: 0.8, ease: "easeOut" }}
             >
-              SIERRA LEONE AQUATICS
-            </motion.span>
-            
-            <motion.h1 
-              className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6 leading-tight"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.1 }}
-            >
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-300 to-cyan-200">Diving Into</span> Excellence
-            </motion.h1>
-            
-            <motion.span 
-              className="block text-blue-100 text-lg md:text-xl mb-8 max-w-xl leading-relaxed"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-            >
-              Empowering athletes, building champions, and promoting aquatic sports across Sierra Leone through world-class programs and competitions.
-            </motion.span>
-            
-            <motion.nav 
-              className="flex flex-wrap gap-4 items-center"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.3 }}
-            >
-              <Link 
-                to="/activities" 
-                className="group px-6 py-3 bg-gradient-to-r from-blue-600 to-cyan-500 text-white font-medium rounded-full hover:shadow-lg hover:shadow-blue-500/25 transition-all duration-300 transform hover:-translate-y-1"
+              <h1 className="font-heading text-5xl md:text-7xl lg:text-8xl font-bold text-slate-900 leading-[1.05] tracking-tight mb-8">
+                <motion.span 
+                  initial={{ opacity: 0, y: 50, rotate: -2 }}
+                  animate={{ opacity: 1, y: 0, rotate: 0 }}
+                  transition={{ type: "spring", stiffness: 200, damping: 20, delay: 0.1 }}
+                  className="inline-block"
+                >Diving</motion.span>{" "}
+                <motion.span 
+                  initial={{ opacity: 0, y: 50, rotate: 2 }}
+                  animate={{ opacity: 1, y: 0, rotate: 0 }}
+                  transition={{ type: "spring", stiffness: 200, damping: 20, delay: 0.2 }}
+                  className="inline-block"
+                >Into</motion.span> <br />
+                <motion.span 
+                  initial={{ opacity: 0, y: 50 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ type: "spring", stiffness: 200, damping: 20, delay: 0.3 }}
+                  className="text-primary-600 relative inline-block drop-shadow-[0_0_15px_rgba(37,99,235,0.2)]"
+                >
+                  Excellence
+                  {/* Energetic underline accent */}
+                  <motion.span 
+                    initial={{ scaleX: 0 }}
+                    animate={{ scaleX: 1 }}
+                    transition={{ duration: 0.8, delay: 0.8, ease: "circOut" }}
+                    className="absolute bottom-2 left-0 w-full h-4 bg-secondary-400/40 -z-10 origin-left rounded-r-full" 
+                  />
+                </motion.span>
+              </h1>
+              
+              <motion.p 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.8, delay: 0.5 }}
+                className="font-sans text-slate-600 text-lg md:text-xl md:leading-relaxed max-w-lg mb-10 font-medium"
               >
-                <span className="flex items-center">
+                Empowering athletes, building champions, and promoting aquatic sports across Sierra Leone through world-class programs and competitions.
+              </motion.p>
+              
+              <motion.div 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.6 }}
+                className="flex flex-wrap gap-6 items-center"
+              >
+                <Link 
+                  to="/activities" 
+                  className="group px-8 py-4 bg-gradient-to-r from-primary-600 to-blue-500 text-white font-sans font-bold uppercase tracking-wider text-sm rounded-full shadow-[0_0_20px_rgba(37,99,235,0.3)] hover:shadow-[0_0_25px_rgba(37,99,235,0.5)] transition-all duration-300 flex items-center transform hover:scale-105 active:scale-95"
+                >
                   Our Programs
                   <motion.span 
                     initial={{ x: 0 }}
-                    whileHover={{ x: 4 }}
+                    whileHover={{ x: 6 }}
                     transition={{ type: "spring", stiffness: 400 }}
                   >
-                    <ArrowRight size={16} className="ml-2" />
+                    <ArrowRight size={18} className="ml-3" />
                   </motion.span>
-                </span>
-              </Link>
-              <Link 
-                to="/athletes" 
-                className="group px-6 py-3 bg-white/10 backdrop-blur-sm border border-white/20 text-white hover:bg-white/20 rounded-full transition-all duration-300 flex items-center"
-              >
-                Meet Our Athletes
-                <motion.span 
-                  initial={{ x: 0 }}
-                  whileHover={{ x: 4 }}
-                  transition={{ type: "spring", stiffness: 400 }}
+                </Link>
+
+                <a 
+                  href="#watch-video" 
+                  className="group flex items-center text-slate-800 hover:text-primary-600 transition-colors duration-300"
                 >
-                  <ArrowRight size={16} className="ml-2" />
-                </motion.span>
-              </Link>
-              <a 
-                href="#watch-video" 
-                className="flex items-center text-blue-100 hover:text-white transition-colors ml-2 group"
-              >
-                <motion.span 
-                  className="w-10 h-10 rounded-full bg-blue-500/20 flex items-center justify-center mr-2"
-                  whileHover={{ scale: 1.1 }}
-                  transition={{ type: "spring", stiffness: 400 }}
-                >
-                  <Play size={14} fill="currentColor" />
-                </motion.span>
-                <span>Watch Video</span>
-              </a>
-            </motion.nav>
-            
-            <motion.aside
-              className="mt-12 flex items-center space-x-4"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.8, delay: 0.5 }}
-            >
-             
-            </motion.aside>
+                  <motion.span 
+                    whileHover={{ scale: 1.1, rotate: 90 }}
+                    whileTap={{ scale: 0.9 }}
+                    className="w-12 h-12 rounded-full border border-slate-200 shadow-md flex items-center justify-center mr-4 group-hover:border-primary-200 group-hover:bg-primary-50 transition-all duration-300 relative overflow-hidden"
+                  >
+                    <div className="absolute inset-0 bg-primary-100 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-full mix-blend-overlay"></div>
+                    <Play size={16} className="text-primary-600 fill-current ml-1 relative z-10" />
+                  </motion.span>
+                  <span className="font-sans font-bold uppercase tracking-wider text-xs">Watch Video</span>
+                </a>
+              </motion.div>
+            </motion.div>
           </header>
           
-          <motion.figure 
-            className="hidden lg:block"
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.8, delay: 0.4 }}
-          >
-            <section className="relative">
-              <span className="absolute -inset-0.5 bg-gradient-to-r from-blue-500 to-cyan-300 rounded-2xl blur opacity-30"></span>
-              <figure className="relative bg-blue-900/40 backdrop-blur-sm p-1 rounded-2xl border border-white/10 overflow-hidden shadow-xl">
+          <div className="lg:col-span-6 relative h-[50vh] lg:h-[80vh] w-full mt-12 lg:mt-0">
+            <motion.div 
+              className="absolute top-[10%] right-0 w-[85%] h-[75%] lg:w-[90%] lg:h-[80%] z-0 rounded-2xl overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.15)] ring-1 ring-white/50"
+              style={{ y: y1 }}
+              initial={{ opacity: 0, scale: 0.95, rotate: 2 }}
+              animate={{ opacity: 1, scale: 1, rotate: 0 }}
+              transition={{ type: "spring", stiffness: 100, damping: 20, delay: 0.2 }}
+            >
+              <div className="w-full h-full bg-slate-200 overflow-hidden relative group">
                 <img 
-                  src="https://i.ibb.co/K3VFCBD/20240801-112429-min.jpg" 
-                  alt="Sierra Leone swimming team" 
-                  className="rounded-xl w-full h-full aspect-square object-cover"
+                  src="https://i.ibb.co/9kDWFfBB/Screenshot-2025-05-14-at-2-02-57-AM-min.png"
+                  alt="Professional swimmers in competition" 
+                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-[2000ms] ease-out filter contrast-125 saturate-110"
                 />
-              </figure>
-              <span className="absolute -bottom-4 -right-4 w-24 h-24 bg-blue-500/30 rounded-full blur-2xl"></span>
-              <span className="absolute -top-4 -left-4 w-32 h-32 bg-cyan-300/20 rounded-full blur-2xl"></span>
-            </section>
-          </motion.figure>
-        </section>
+                <div className="absolute inset-0 bg-gradient-to-tr from-primary-900/20 to-transparent mix-blend-overlay"></div>
+              </div>
+            </motion.div>
+
+            <motion.div 
+              className="absolute bottom-0 left-0 w-[55%] h-[45%] lg:w-2/3 lg:h-[50%] z-10 rounded-2xl overflow-hidden shadow-[0_30px_60px_rgba(0,0,0,0.2)] ring-4 ring-white"
+              style={{ y: y2 }}
+              initial={{ opacity: 0, x: -30, rotate: -5 }}
+              animate={{ opacity: 1, x: 0, rotate: 0 }}
+              transition={{ type: "spring", stiffness: 100, damping: 20, delay: 0.5 }}
+            >
+              <div className="w-full h-full bg-white relative group">
+                <div className="w-full h-full overflow-hidden relative">
+                  <img 
+                    src="https://i.ibb.co/K3VFCBD/20240801-112429-min.jpg" 
+                    alt="Sierra Leone swimming team" 
+                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-[2000ms] ease-out filter contrast-110 saturate-110"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent mix-blend-overlay opacity-50"></div>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+          
+        </div>
       </article>
-        
-        {/* Scroll indicator */}
-        <motion.footer 
-          className="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex flex-col items-center"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1, duration: 1 }}
+
+      {/* Clean scroll indicator */}
+      <motion.div 
+        className="absolute bottom-8 left-12 flex items-center space-x-3 hidden md:flex"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 1.2, duration: 1 }}
+      >
+        <span className="text-slate-400 font-sans text-xs tracking-widest uppercase font-bold">Scroll</span>
+        <motion.div
+          animate={{ y: [0, 8, 0] }}
+          transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
         >
-          <span className="text-blue-200 text-sm mb-2">Scroll to explore</span>
-          <motion.span
-            animate={{ y: [0, 10, 0] }}
-            transition={{ duration: 1.5, repeat: Infinity, repeatType: "loop" }}
-          >
-            <ChevronDown className="text-blue-200" size={24} />
-          </motion.span>
-        </motion.footer>
+          <div className="w-0.5 h-10 bg-gradient-to-b from-primary-500 to-transparent rounded-full" />
+        </motion.div>
+      </motion.div>
     </section>
   );
 };

@@ -11,12 +11,7 @@ const AboutPage: React.FC = () => {
         image="https://i.ibb.co/DPc6MhdS/20240430-165712-11zon.jpg"
       />
 
-      <section className="section section-gradient relative overflow-hidden">
-        {/* Enhanced background decorative elements */}
-        <div className="absolute top-0 right-0 w-80 h-80 bg-gradient-to-br from-blue-400 to-cyan-300 rounded-full opacity-20 blur-3xl -translate-y-1/2 translate-x-1/4 animate-pulse"></div>
-        <div className="absolute bottom-0 left-0 w-96 h-96 bg-gradient-to-tr from-cyan-400 to-blue-300 rounded-full opacity-15 blur-3xl translate-y-1/2 -translate-x-1/4"></div>
-        <div className="absolute top-1/2 left-1/2 w-64 h-64 bg-gradient-to-r from-blue-200 to-cyan-200 rounded-full opacity-10 blur-2xl transform -translate-x-1/2 -translate-y-1/2"></div>
-        
+      <section className="section bg-slate-50 relative overflow-hidden">
         <div className="container-custom relative z-10">
           <motion.div 
             className="text-center mb-5"
@@ -110,12 +105,7 @@ const AboutPage: React.FC = () => {
       </section>
 
       {/* Mission & Vision Section */}
-      <section className="py-12 md:py-24 section-gradient relative overflow-hidden">
-        {/* Enhanced background decorative elements */}
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-50/30 via-white to-cyan-50/40"></div>
-        <div className="absolute top-20 right-20 w-96 h-96 bg-gradient-to-br from-blue-400/15 to-cyan-300/15 rounded-full blur-3xl animate-float"></div>
-        <div className="absolute bottom-20 left-20 w-80 h-80 bg-gradient-to-tr from-cyan-400/10 to-blue-300/10 rounded-full blur-3xl"></div>
-        
+      <section className="py-12 md:py-24 bg-white relative overflow-hidden flex flex-col items-center">
         <div className="container-custom relative z-10">
           <motion.div 
             className="text-center mb-12"
@@ -151,8 +141,7 @@ const AboutPage: React.FC = () => {
               transition={{ duration: 0.7, ease: "easeOut" }}
               viewport={{ once: true }}
             >
-              <div className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border border-blue-100 h-full flex flex-col">
-                <div className="absolute -top-4 -left-4 w-20 h-20 bg-gradient-to-br from-blue-500 to-cyan-400 rounded-full opacity-20 blur-xl group-hover:opacity-30 transition-opacity duration-300"></div>
+              <div className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl ring-1 ring-slate-100 transition-all duration-300 transform hover:-translate-y-2 h-full flex flex-col">
                 <div className="relative z-10 flex flex-col flex-grow">
                   <div className="flex items-center mb-6">
                     <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-cyan-400 rounded-xl flex items-center justify-center mr-4 shadow-lg flex-shrink-0">
@@ -182,8 +171,7 @@ const AboutPage: React.FC = () => {
               transition={{ duration: 0.7, ease: "easeOut" }}
               viewport={{ once: true }}
             >
-              <div className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border border-cyan-100 h-full flex flex-col">
-                <div className="absolute -top-4 -right-4 w-20 h-20 bg-gradient-to-br from-cyan-500 to-blue-400 rounded-full opacity-20 blur-xl group-hover:opacity-30 transition-opacity duration-300"></div>
+              <div className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl ring-1 ring-slate-100 transition-all duration-300 transform hover:-translate-y-2 h-full flex flex-col">
                 <div className="relative z-10 flex flex-col flex-grow">
                   <div className="flex items-center mb-6">
                     <div className="w-16 h-16 bg-gradient-to-br from-cyan-500 to-blue-400 rounded-xl flex items-center justify-center mr-4 shadow-lg flex-shrink-0">
@@ -207,12 +195,7 @@ const AboutPage: React.FC = () => {
         </div>
       </section>
 
-      <section className="section section-gradient relative overflow-hidden">
-        {/* Modern background elements */}
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-50/40 via-white to-cyan-50/30"></div>
-        <div className="absolute top-10 right-10 w-72 h-72 bg-gradient-to-br from-blue-300/20 to-cyan-200/20 rounded-full blur-3xl animate-float"></div>
-        <div className="absolute bottom-10 left-10 w-80 h-80 bg-gradient-to-tr from-cyan-300/15 to-blue-200/15 rounded-full blur-3xl"></div>
-        
+      <section className="section bg-slate-50 relative overflow-hidden">
         <div className="container-custom relative z-10">
           <motion.div 
             className="text-center max-w-4xl mx-auto mb-16"

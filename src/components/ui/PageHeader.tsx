@@ -13,12 +13,7 @@ const PageHeader: React.FC<PageHeaderProps> = ({
   image = "https://images.pexels.com/photos/863988/pexels-photo-863988.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
 }) => {
   return (
-    <section className="relative py-24 md:py-32 overflow-hidden bg-primary-600">
-      {/* Background decoration */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -top-40 -right-40 w-96 h-96 bg-secondary-500 rounded-full opacity-20 blur-3xl"></div>
-        <div className="absolute top-1/3 -left-20 w-64 h-64 bg-secondary-300 rounded-full opacity-20 blur-3xl"></div>
-      </div>
+    <section className="relative py-32 md:py-40 overflow-hidden bg-slate-950">
       
       {/* Content */}
       <div className="container-custom relative z-10">
@@ -45,15 +40,16 @@ const PageHeader: React.FC<PageHeaderProps> = ({
         </div>
       </div>
       
-      {/* Background image with overlay */}
+      {/* Background image with cinematic overlay */}
       <div className="absolute inset-0 z-0">
         <img 
           src={image} 
           alt={title}
-          className="w-full h-full object-cover opacity-20"
+          className="w-full h-full object-cover opacity-30"
           width="1280" 
           height="720"
         />
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent to-slate-950/80 pointer-events-none"></div>
       </div>
       
      
