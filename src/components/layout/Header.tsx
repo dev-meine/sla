@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, ChevronDown } from 'lucide-react';
+import { Menu, X } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { navItems } from '../../data/navItems';
 import { NavItem } from '../../types';
 import Logo from '../ui/Logo';
@@ -9,7 +10,6 @@ const Header: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
-  const [hoveredItem, setHoveredItem] = useState<string | null>(null);
 
   const toggleMenu = () => setIsOpen(!isOpen);
   const closeMenu = () => setIsOpen(false);
@@ -33,13 +33,13 @@ const Header: React.FC = () => {
 
   return (
     <header
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
         scrolled
-          ? 'bg-white/95 backdrop-blur-sm shadow-sm py-2'
-          : 'bg-transparent py-4'
+          ? 'bg-white/80 backdrop-blur-xl shadow-[0_4px_30px_rgba(0,0,0,0.03)] border-b border-primary-500/10 py-4'
+          : 'bg-transparent py-6'
       }`}
     >
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="container mx-auto px-6 lg:px-12">
         <div className="flex items-center justify-between">
           {/* Logo */}
           <Link 
@@ -47,87 +47,99 @@ const Header: React.FC = () => {
             className="flex items-center group" 
             onClick={closeMenu}
           >
-            <div className="relative overflow-hidden">
-              <Logo size={44} className="transition-transform duration-300 group-hover:scale-110" />
-              <div className="absolute inset-0 bg-blue-500/10 opacity-0 group-hover:opacity-100 rounded-full transition-opacity duration-300"></div>
-            </div>
-            <div className="ml-3">
-              
-              <span className="text-xs text-gray-600 block leading-tight tracking-wide">Sierra Leone Aquatics</span>
+            <motion.div 
+              className="relative overflow-hidden"
+              whileHover={{ scale: 1.05, rotate: 2 }}
+              transition={{ type: "spring", stiffness: 400 }}
+            >
+              <Logo size={40} className="text-primary-600" />
+            </motion.div>
+            <div className="ml-4">
+              <span className="font-heading font-bold text-slate-900 block leading-none group-hover:text-primary-600 transition-colors duration-300">SLA</span>
             </div>
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-1 lg:space-x-2">
+          <nav className="hidden md:flex items-center space-x-8">
             {navItems.map((item: NavItem) => (
               <Link
                 key={item.label}
                 to={item.href}
-                className={`relative px-3 py-2 rounded-full text-sm font-medium transition-all duration-200 ease-in-out
+                className={`relative font-sans text-xs uppercase tracking-widest font-bold transition-colors duration-300
                   ${isActive(item.href) 
-                    ? 'text-blue-600 bg-blue-50' 
-                    : 'text-gray-700 hover:text-blue-600 hover:bg-blue-50/50'
+                    ? 'text-primary-600' 
+                    : 'text-slate-500 hover:text-primary-600'
                   }
-                  after:content-[''] after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2 
-                  after:w-0 after:h-0.5 after:bg-blue-500 after:transition-all after:duration-300
-                  ${isActive(item.href) ? 'after:w-1/2' : 'hover:after:w-1/3'}
                 `}
-                onMouseEnter={() => setHoveredItem(item.label)}
-                onMouseLeave={() => setHoveredItem(null)}
               >
                 {item.label}
               </Link>
             ))}
-            <Link
-              to="/admin"
-              className="ml-2 inline-flex items-center justify-center rounded-full bg-gradient-to-r from-blue-600 to-blue-500 px-5 py-2.5 text-sm font-medium text-white shadow-sm transition-all duration-300 hover:from-blue-700 hover:to-blue-600 hover:shadow-md focus:ring-2 focus:ring-blue-400 focus:ring-offset-2"
+            
+            <motion.div
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              transition={{ type: "spring", stiffness: 400, damping: 10 }}
             >
-              Admin Login
-            </Link>
+              <Link
+                to="/admin"
+                className="ml-4 inline-flex items-center justify-center bg-gradient-to-r from-primary-600 to-blue-500 text-white px-6 py-3 rounded-full shadow-[0_0_20px_rgba(37,99,235,0.3)] font-sans text-xs uppercase tracking-widest font-semibold transition-all duration-300 hover:shadow-[0_0_25px_rgba(37,99,235,0.5)]"
+              >
+                Admin Login
+              </Link>
+            </motion.div>
           </nav>
 
           {/* Mobile Menu Button */}
-          <button
-            className="md:hidden flex items-center justify-center w-10 h-10 rounded-full bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors duration-200"
+          <motion.button
+            whileTap={{ scale: 0.9 }}
+            className="md:hidden flex items-center justify-center p-2 text-slate-900 hover:text-primary-600 transition-colors"
             onClick={toggleMenu}
             aria-label="Toggle menu"
           >
-            {isOpen ? <X size={20} /> : <Menu size={20} />}
-          </button>
+            {isOpen ? <X size={24} /> : <Menu size={24} />}
+          </motion.button>
         </div>
       </div>
 
       {/* Mobile Navigation */}
-      {isOpen && (
-        <div className="md:hidden bg-white/95 backdrop-blur-sm shadow-lg absolute top-full left-0 right-0 border-t border-gray-100">
-          <nav className="container mx-auto px-4 py-4 flex flex-col space-y-1">
-            {navItems.map((item) => (
-              <Link
-                key={item.label}
-                to={item.href}
-                className={`py-3 px-4 ${
-                  isActive(item.href)
-                    ? 'bg-blue-50 text-blue-600 rounded-xl font-medium'
-                    : 'text-gray-700 hover:bg-gray-50 hover:text-blue-500 rounded-xl'
-                } transition-all duration-200 flex items-center justify-between`}
-                onClick={closeMenu}
-              >
-                <span>{item.label}</span>
-                <ChevronDown size={16} className={`transition-transform duration-200 ${isActive(item.href) ? 'rotate-180 text-blue-500' : ''}`} />
-              </Link>
-            ))}
-            <div className="pt-3 border-t border-gray-100">
-              <Link
-                to="/admin"
-                className="block w-full py-2 px-4 text-center bg-primary-600 text-white rounded-md"
-                onClick={closeMenu}
-              >
-                Admin Login
-              </Link>
-            </div>
-          </nav>
-        </div>
-      )}
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div 
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.3, ease: "easeInOut" }}
+            className="md:hidden absolute top-full left-0 right-0 overflow-hidden bg-white/95 backdrop-blur-xl border-b border-primary-500/10 shadow-xl"
+          >
+            <nav className="flex flex-col py-6 px-6 space-y-6">
+              {navItems.map((item) => (
+                <Link
+                  key={item.label}
+                  to={item.href}
+                  className={`font-heading text-2xl font-bold transition-colors duration-300 ${
+                    isActive(item.href)
+                      ? 'text-primary-600'
+                      : 'text-slate-900 hover:text-primary-600'
+                  }`}
+                  onClick={closeMenu}
+                >
+                  {item.label}
+                </Link>
+              ))}
+              <div className="pt-6 border-t border-slate-100">
+                <Link
+                  to="/admin"
+                  className="w-full inline-flex items-center justify-center bg-gradient-to-r from-primary-600 to-blue-500 text-white px-6 py-4 rounded-xl shadow-[0_0_20px_rgba(37,99,235,0.3)] font-sans text-sm uppercase tracking-widest font-semibold transition-colors duration-300"
+                  onClick={closeMenu}
+                >
+                  Admin Login
+                </Link>
+              </div>
+            </nav>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </header>
   );
 };
