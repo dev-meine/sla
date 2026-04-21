@@ -63,7 +63,7 @@ const AboutPage: React.FC = () => {
         </div>
       </section>
 
-      {/* Mission & Vision */}
+      {/* Mission, Vision & Values — Bento Grid */}
       <section className="section bg-slate-50">
         <div className="container-custom">
           <motion.div 
@@ -73,72 +73,56 @@ const AboutPage: React.FC = () => {
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
           >
-            <h2 className="text-slate-900 mb-4">Mission & Vision</h2>
+            <h2 className="text-slate-900 mb-4">What Drives Us</h2>
+            <p className="text-lg text-slate-600 max-w-2xl mx-auto">Our mission, vision, and core values guide everything we do.</p>
           </motion.div>
           
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-4xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {/* Vision — spans 2 cols */}
             <motion.div
-              className="bg-white rounded-2xl p-10 border border-slate-100"
+              className="bg-white rounded-2xl p-10 border border-slate-100 md:col-span-2 flex flex-col justify-center"
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
               viewport={{ once: true }}
             >
-              <h3 className="text-2xl font-bold text-slate-900 mb-4">Vision</h3>
-              <p className="text-slate-600 text-lg leading-relaxed">
+              <span className="text-xs font-bold uppercase tracking-widest text-primary-600 mb-3">Vision</span>
+              <p className="text-2xl font-semibold text-slate-900 leading-snug">
                 To be recognized as the country's leading sport discipline in the development of youth athletes.
               </p>
             </motion.div>
 
+            {/* Mission — spans 2 cols */}
             <motion.div
-              className="bg-white rounded-2xl p-10 border border-slate-100"
+              className="bg-slate-900 text-white rounded-2xl p-10 border border-slate-800 md:col-span-2 flex flex-col justify-center"
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.1 }}
               viewport={{ once: true }}
             >
-              <h3 className="text-2xl font-bold text-slate-900 mb-4">Our Mission</h3>
-              <p className="text-slate-600 text-lg leading-relaxed">
+              <span className="text-xs font-bold uppercase tracking-widest text-primary-400 mb-3">Mission</span>
+              <p className="text-2xl font-semibold leading-snug">
                 To develop champions in aquatic sports and life.
               </p>
             </motion.div>
-          </div>
-        </div>
-      </section>
 
-      {/* Our Values */}
-      <section className="section bg-white">
-        <div className="container-custom">
-          <motion.div 
-            className="text-center max-w-3xl mx-auto mb-16"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-          >
-            <h2 className="text-slate-900 mb-4">Our Values</h2>
-            <p className="text-lg text-slate-600 leading-relaxed">
-              Our core values guide everything we do at Sierra Leone Aquatics.
-            </p>
-          </motion.div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {/* Values — 4 individual cards */}
             {[
-              { title: 'Excellence', text: 'We strive for excellence in all aspects of our operations, from athlete development to event organization.' },
-              { title: 'Inclusion', text: 'We believe aquatic sports should be accessible to all Sierra Leoneans regardless of background or ability.' },
-              { title: 'Integrity', text: 'We uphold the highest standards of fairness, transparency, and ethical conduct in all our activities.' },
-              { title: 'Community', text: 'We foster a supportive community that encourages growth, collaboration, and national pride.' },
+              { title: 'Excellence', text: 'We strive for excellence in all aspects, from athlete development to event organization.' },
+              { title: 'Inclusion', text: 'Aquatic sports should be accessible to all Sierra Leoneans regardless of background.' },
+              { title: 'Integrity', text: 'We uphold the highest standards of fairness, transparency, and ethical conduct.' },
+              { title: 'Community', text: 'We foster a supportive community that encourages growth and national pride.' },
             ].map((value, i) => (
               <motion.div 
                 key={value.title}
-                className="bg-slate-50 p-8 rounded-2xl border border-slate-100"
+                className="bg-white p-8 rounded-2xl border border-slate-100"
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4, delay: i * 0.1 }}
+                transition={{ duration: 0.4, delay: 0.1 + i * 0.08 }}
                 viewport={{ once: true }}
               >
-                <h3 className="text-xl font-semibold text-slate-900 mb-3">{value.title}</h3>
-                <p className="text-slate-600 leading-relaxed">{value.text}</p>
+                <h3 className="text-lg font-semibold text-slate-900 mb-2">{value.title}</h3>
+                <p className="text-slate-600 text-sm leading-relaxed">{value.text}</p>
               </motion.div>
             ))}
           </div>
