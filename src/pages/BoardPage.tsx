@@ -128,23 +128,17 @@ const BoardPage: React.FC = () => {
             </p>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               <div className="bg-white p-8 rounded-2xl border border-slate-100">
-                <div className="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center mb-4 mx-auto">
-                  <span className="text-lg font-bold text-blue-600">D</span>
-                </div>
+
                 <h3 className="text-xl mb-3 text-slate-900">Development</h3>
                 <p className="text-slate-600">Creating pathways for athletes from grassroots to elite levels</p>
               </div>
               <div className="bg-white p-8 rounded-2xl border border-slate-100">
-                <div className="w-12 h-12 bg-amber-50 rounded-xl flex items-center justify-center mb-4 mx-auto">
-                  <span className="text-lg font-bold text-amber-600">R</span>
-                </div>
+
                 <h3 className="text-xl mb-3 text-slate-900">Representation</h3>
                 <p className="text-slate-600">Representing Sierra Leone on the global aquatics stage</p>
               </div>
               <div className="bg-white p-8 rounded-2xl border border-slate-100">
-                <div className="w-12 h-12 bg-green-50 rounded-xl flex items-center justify-center mb-4 mx-auto">
-                  <span className="text-lg font-bold text-green-600">C</span>
-                </div>
+
                 <h3 className="text-xl mb-3 text-slate-900">Community</h3>
                 <p className="text-slate-600">Promoting water safety and aquatic education nationwide</p>
               </div>

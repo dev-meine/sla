@@ -157,23 +157,17 @@ const ActivitiesPage: React.FC = () => {
             <h2 className="mb-6 text-slate-900">Get Involved</h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               <div className="bg-white p-8 rounded-2xl border border-slate-100">
-                <div className="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center mb-4 mx-auto">
-                  <span className="text-lg font-bold text-blue-600">A</span>
-                </div>
+
                 <h3 className="text-xl mb-3 text-slate-900">Athletes</h3>
                 <p className="text-slate-600 mb-4">Join training programs and compete in local and international events</p>
               </div>
               <div className="bg-white p-8 rounded-2xl border border-slate-100">
-                <div className="w-12 h-12 bg-amber-50 rounded-xl flex items-center justify-center mb-4 mx-auto">
-                  <span className="text-lg font-bold text-amber-600">C</span>
-                </div>
+
                 <h3 className="text-xl mb-3 text-slate-900">Coaches</h3>
                 <p className="text-slate-600 mb-4">Get certified and help develop the next generation of athletes</p>
               </div>
               <div className="bg-white p-8 rounded-2xl border border-slate-100">
-                <div className="w-12 h-12 bg-green-50 rounded-xl flex items-center justify-center mb-4 mx-auto">
-                  <span className="text-lg font-bold text-green-600">V</span>
-                </div>
+
                 <h3 className="text-xl mb-3 text-slate-900">Volunteers</h3>
                 <p className="text-slate-600 mb-4">Support our events and programs through volunteering</p>
               </div>
