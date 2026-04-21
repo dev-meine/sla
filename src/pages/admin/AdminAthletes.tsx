@@ -39,6 +39,44 @@ const AdminAthletes: React.FC = () => {
     }
   };
 
+  const uploadImage = async (file: File): Promise<string | null> => {
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Math.random()}.${fileExt}`;
+      const filePath = `athletes/${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('images')
+        .upload(filePath, file);
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('images')
+        .getPublicUrl(filePath);
+
+      return publicUrl;
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      return null;
+    }
+  };
+
+  const deleteImage = async (imageUrl: string) => {
+    try {
+      const path = imageUrl.split('/').pop();
+      if (!path) return;
+
+      const { error } = await supabase.storage
+        .from('images')
+        .remove([`athletes/${path}`]);
+
+      if (error) throw error;
+    } catch (error) {
+      console.error('Error deleting image:', error);
+    }
+  };
+
   const sanitizeText = (text: string | null): string | null => {
     if (!text) return null;
     // Remove any potential null bytes and invalid characters
@@ -196,7 +234,10 @@ const AdminAthletes: React.FC = () => {
                   <label className="block text-sm font-medium text-gray-700 mb-1">Image</label>
                   <ImageUpload
                     currentImage={editingAthlete?.image}
-                    onImageUpload={(url) => setValue('image', url)}
+                    onImageUpload={async (file) => {
+                      const url = await uploadImage(file);
+                      if (url) setValue('image', url);
+                    }}
                     onImageRemove={() => setValue('image', null)}
                   />
                 </div>
@@ -338,6 +379,18 @@ const AdminAthletes: React.FC = () => {
                   Enter each cap on a new line in the format: Year Competition - Location
                 </p>
               </div>
+
+              {Object.keys(errors).length > 0 && (
+                <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                  <p className="text-red-700 font-medium text-sm">Please fix the following errors:</p>
+                  <ul className="text-red-600 text-sm mt-1 list-disc list-inside">
+                    {errors.name && <li>{errors.name.message}</li>}
+                    {errors.sport && <li>{errors.sport.message}</li>}
+                    {errors.height_meters && <li>{errors.height_meters.message}</li>}
+                    {errors.weight_kg && <li>{errors.weight_kg.message}</li>}
+                  </ul>
+                </div>
+              )}
 
               <div className="flex justify-end gap-4">
                 <button
