@@ -83,7 +83,7 @@ const NewsPage: React.FC = () => {
         image="https://images.pexels.com/photos/863988/pexels-photo-863988.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
       />
 
-      <section className="section">
+      <section className="section bg-white">
         <div className="container-custom">
           {/* Category filters */}
           <div className="flex flex-wrap gap-3 mb-12 justify-center">
@@ -93,8 +93,8 @@ const NewsPage: React.FC = () => {
                 onClick={() => setActiveCategory(category)}
                 className={`px-5 py-2 rounded-full text-sm font-medium capitalize transition-colors ${
                   activeCategory === category
-                    ? 'bg-primary-600 text-white'
-                    : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
+                    ? 'bg-slate-900 text-white'
+                    : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
                 }`}
               >
                 {category === 'all' ? 'All News' : category}
@@ -112,7 +112,7 @@ const NewsPage: React.FC = () => {
             key={activeCategory}
           >
             {filteredPosts.map((post) => (
-              <motion.div key={post.id} className="card group" variants={item}>
+              <motion.div key={post.id} className="bg-white rounded-2xl border border-slate-100 overflow-hidden group" variants={item}>
                 <div className="h-48 overflow-hidden">
                   <img 
                     src={post.image_url || "https://images.pexels.com/photos/863988/pexels-photo-863988.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"}
@@ -121,7 +121,7 @@ const NewsPage: React.FC = () => {
                   />
                 </div>
                 <div className="p-6">
-                  <div className="flex items-center text-sm text-gray-500 mb-3">
+                  <div className="flex items-center text-sm text-slate-500 mb-3">
                     <Calendar size={14} className="mr-1" />
                     <span>{new Date(post.created_at).toLocaleDateString()}</span>
                     {post.category && (
@@ -131,8 +131,8 @@ const NewsPage: React.FC = () => {
                       </>
                     )}
                   </div>
-                  <h3 className="text-xl mb-3">{post.title}</h3>
-                  <p className="text-gray-600 mb-4">{post.excerpt}</p>
+                  <h3 className="text-xl mb-3 text-slate-900">{post.title}</h3>
+                  <p className="text-slate-600 mb-4">{post.excerpt}</p>
                   <Link to={`/news/${post.id}`} className="inline-flex items-center font-medium text-primary-600 hover:text-primary-700">
                     Read More
                     <ArrowRight size={16} className="ml-1" />
@@ -144,7 +144,7 @@ const NewsPage: React.FC = () => {
 
           {filteredPosts.length === 0 && (
             <div className="text-center py-12">
-              <p className="text-lg text-gray-600">No news posts found in this category.</p>
+              <p className="text-lg text-slate-600">No news posts found in this category.</p>
             </div>
           )}
         </div>
