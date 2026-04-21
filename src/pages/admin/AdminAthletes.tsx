@@ -90,21 +90,23 @@ const AdminAthletes: React.FC = () => {
       const athleteData = {
         name: sanitizeText(data.name),
         nickname: sanitizeText(data.nickname),
-        image: data.image,
+        image: data.image || null,
         sport: sanitizeText(data.sport),
         bio: sanitizeText(data.bio),
         nationality: sanitizeText(data.nationality),
-        date_of_birth: data.date_of_birth,
+        date_of_birth: data.date_of_birth || null,
         club: sanitizeText(data.club),
         coach: sanitizeText(data.coach),
         training_base: sanitizeText(data.training_base),
-        height_meters: data.height_meters,
-        weight_kg: data.weight_kg,
+        height_meters: data.height_meters ? Number(data.height_meters) : null,
+        weight_kg: data.weight_kg ? Number(data.weight_kg) : null,
         place_of_birth: sanitizeText(data.place_of_birth),
         personal_bests: sanitizeText(data.personal_bests),
         specialties: sanitizeText(data.specialties),
         caps: sanitizeText(data.caps)
       };
+
+      console.log('Submitting athlete data:', athleteData);
 
       if (editingAthlete) {
         const { error } = await supabase
@@ -112,13 +114,21 @@ const AdminAthletes: React.FC = () => {
           .update(athleteData)
           .eq('id', editingAthlete.id);
           
-        if (error) throw error;
+        if (error) {
+          console.error('Supabase update error:', error);
+          alert(`Error updating athlete: ${error.message}`);
+          return;
+        }
       } else {
         const { error } = await supabase
           .from('athletes')
           .insert([athleteData]);
           
-        if (error) throw error;
+        if (error) {
+          console.error('Supabase insert error:', error);
+          alert(`Error saving athlete: ${error.message}`);
+          return;
+        }
       }
 
       reset();
@@ -127,6 +137,7 @@ const AdminAthletes: React.FC = () => {
       fetchAthletes();
     } catch (error) {
       console.error('Error saving athlete:', error);
+      alert(`Unexpected error: ${error}`);
     } finally {
       setIsLoading(false);
     }

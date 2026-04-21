@@ -45,6 +45,7 @@ const ContactPage: React.FC = () => {
                   <div>
                     <h3 className="text-lg font-medium mb-1">Phone Numbers</h3>
                     <p className="text-gray-600">Main Office: +232 79 905047</p>
+                    <p className="text-gray-600">Office Line: +232 25 259848</p>
                   </div>
                 </div>
                 

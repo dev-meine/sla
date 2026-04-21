@@ -109,6 +109,8 @@ const Footer: React.FC = () => {
                   <Phone size={14} className="text-slate-400 group-hover:text-primary-400 transition-colors" />
                 </div>
                 <span className="text-slate-300 font-medium">+232 79 905047</span>
+                <span className="text-slate-400 mx-1">|</span>
+                <span className="text-slate-300 font-medium">+232 25 259848</span>
               </li>
               <li className="flex items-center group">
                 <div className="w-8 h-8 rounded-full bg-slate-800/50 flex items-center justify-center mr-4 flex-shrink-0 group-hover:bg-primary-900/50 group-hover:text-primary-400 transition-colors">
