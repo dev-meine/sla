@@ -69,7 +69,7 @@ const ActivitiesPage: React.FC = () => {
           description="Explore our programs, competitions, development initiatives, and training camps."
           image="https://i.ibb.co/zzN3ygJ/Screenshot-2025-05-22-at-10-27-22-PM.png"
         />
-        <section className="section">
+        <section className="section bg-white">
           <div className="container-custom">
             <div className="text-center">
               <div className="animate-spin rounded-full h-12 w-12 border-4 border-primary-600 border-t-transparent mx-auto"></div>
@@ -88,7 +88,7 @@ const ActivitiesPage: React.FC = () => {
         image="https://i.ibb.co/zzN3ygJ/Screenshot-2025-05-22-at-10-27-22-PM.png"
       />
 
-      <section className="section">
+      <section className="section bg-white">
         <div className="container-custom">
           {/* Category filters */}
           <div className="flex flex-wrap gap-3 mb-12 justify-center">
@@ -98,8 +98,8 @@ const ActivitiesPage: React.FC = () => {
                 onClick={() => setActiveCategory(category)}
                 className={`px-5 py-2 rounded-full text-sm font-medium capitalize transition-colors ${
                   activeCategory === category
-                    ? 'bg-primary-600 text-white'
-                    : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
+                    ? 'bg-slate-900 text-white'
+                    : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
                 }`}
               >
                 {category === 'all' ? 'All Activities' : `${category}s`}
@@ -117,7 +117,7 @@ const ActivitiesPage: React.FC = () => {
             key={activeCategory}
           >
             {filteredEvents.map((event) => (
-              <motion.div key={event.id} className="card group" variants={item}>
+              <motion.div key={event.id} className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden group" variants={item}>
                 <div className="h-56 overflow-hidden">
                   <img 
                     src={event.image || "https://images.pexels.com/photos/863988/pexels-photo-863988.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"}
@@ -126,7 +126,7 @@ const ActivitiesPage: React.FC = () => {
                   />
                 </div>
                 <div className="p-6">
-                  <div className="flex items-center text-sm text-gray-500 mb-3">
+                  <div className="flex items-center text-sm text-slate-500 mb-3">
                     <Calendar size={14} className="mr-1" />
                     <span>{formatDate(event.date)}</span>
                     {event.category && (
@@ -136,12 +136,8 @@ const ActivitiesPage: React.FC = () => {
                       </>
                     )}
                   </div>
-                  <h3 className="text-xl mb-3">{event.title}</h3>
-                  <p className="text-gray-600 mb-4">{event.description}</p>
-                  <a href="#" className="inline-flex items-center font-medium text-primary-600 hover:text-primary-700">
-                    Learn More
-                    <ArrowRight size={16} className="ml-1" />
-                  </a>
+                  <h3 className="text-xl mb-3 text-slate-900">{event.title}</h3>
+                  <p className="text-slate-600 mb-4">{event.description}</p>
                 </div>
               </motion.div>
             ))}
@@ -149,31 +145,31 @@ const ActivitiesPage: React.FC = () => {
 
           {filteredEvents.length === 0 && (
             <div className="text-center py-12">
-              <p className="text-lg text-gray-600">No activities found in this category.</p>
+              <p className="text-lg text-slate-600">No activities found in this category.</p>
             </div>
           )}
         </div>
       </section>
 
-      <section className="section bg-gray-50">
+      <section className="section bg-slate-50">
         <div className="container-custom">
           <div className="max-w-3xl mx-auto text-center">
-            <h2 className="mb-6">Get Involved</h2>
+            <h2 className="mb-6 text-slate-900">Get Involved</h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              <div className="bg-white p-6 rounded-lg shadow-md">
-                <h3 className="text-xl mb-3">Athletes</h3>
-                <p className="text-gray-600 mb-4">Join training programs and compete in local and international events</p>
-                <a href="#" className="text-primary-600 hover:text-primary-700 font-medium">Learn More →</a>
+              <div className="bg-white p-8 rounded-2xl border border-slate-100">
+
+                <h3 className="text-xl mb-3 text-slate-900">Athletes</h3>
+                <p className="text-slate-600 mb-4">Join training programs and compete in local and international events</p>
               </div>
-              <div className="bg-white p-6 rounded-lg shadow-md">
-                <h3 className="text-xl mb-3">Coaches</h3>
-                <p className="text-gray-600 mb-4">Get certified and help develop the next generation of athletes</p>
-                <a href="#" className="text-primary-600 hover:text-primary-700 font-medium">Learn More →</a>
+              <div className="bg-white p-8 rounded-2xl border border-slate-100">
+
+                <h3 className="text-xl mb-3 text-slate-900">Coaches</h3>
+                <p className="text-slate-600 mb-4">Get certified and help develop the next generation of athletes</p>
               </div>
-              <div className="bg-white p-6 rounded-lg shadow-md">
-                <h3 className="text-xl mb-3">Volunteers</h3>
-                <p className="text-gray-600 mb-4">Support our events and programs through volunteering</p>
-                <a href="#" className="text-primary-600 hover:text-primary-700 font-medium">Learn More →</a>
+              <div className="bg-white p-8 rounded-2xl border border-slate-100">
+
+                <h3 className="text-xl mb-3 text-slate-900">Volunteers</h3>
+                <p className="text-slate-600 mb-4">Support our events and programs through volunteering</p>
               </div>
             </div>
           </div>

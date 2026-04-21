@@ -4,7 +4,7 @@ import { supabase } from '../../lib/supabase';
 import { PlusCircle, Edit2, Trash2 } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { Database } from '../../types/supabase';
-import ImageUpload from '../../components/ui/ImageUpload';
+import ImageCropUpload from '../../components/ui/ImageCropUpload';
 import Modal from '../../components/ui/Modal';
 
 type NewsPost = Database['public']['Tables']['news_posts']['Row'];
@@ -229,13 +229,14 @@ const AdminPosts: React.FC = () => {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Featured Image</label>
-                  <ImageUpload
+                  <ImageCropUpload
                     currentImage={editingPost?.image_url}
                     onImageUpload={async (file) => {
                       const url = await uploadImage(file);
                       if (url) setValue('image_url', url);
                     }}
                     onImageRemove={() => setValue('image_url', null)}
+                    aspectRatio={1}
                   />
                 </div>
               </div>

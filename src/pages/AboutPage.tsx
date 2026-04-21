@@ -28,13 +28,6 @@ const AboutPage: React.FC = () => {
               transition={{ duration: 0.7, delay: 0.2 }}
             >
               Our Story
-              <motion.span 
-                className="absolute -bottom-4 left-1/2 transform -translate-x-1/2 w-32 h-1.5 bg-gradient-to-r from-blue-500 via-cyan-400 to-blue-500 rounded-full"
-                initial={{ width: 0 }}
-                whileInView={{ width: "8rem" }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.8, delay: 0.5 }}
-              />
             </motion.h2>
           </motion.div>
           
@@ -86,14 +79,13 @@ const AboutPage: React.FC = () => {
             </motion.div>
             
             <motion.div
-              className="rounded-xl overflow-hidden shadow-2xl relative"
+              className="rounded-xl overflow-hidden shadow-sm border border-slate-100 relative"
               initial={{ opacity: 0, x: 30 }}
               whileInView={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.7, ease: "easeOut" }}
               viewport={{ once: true }}
               whileHover={{ scale: 1.02, transition: { duration: 0.3 } }}
             >
-              <div className="absolute inset-0 bg-gradient-to-t from-blue-900/30 to-transparent z-10"></div>
               <img 
                 src="https://i.ibb.co/9kDWFfBB/Screenshot-2025-05-14-at-2-02-57-AM-min.png" 
                 alt="Swimming competition" 
@@ -122,13 +114,6 @@ const AboutPage: React.FC = () => {
               transition={{ duration: 0.7, delay: 0.2 }}
             >
               Mission & Vision
-              <motion.span 
-                className="absolute -bottom-4 left-1/2 transform -translate-x-1/2 w-32 h-1.5 bg-gradient-to-r from-blue-500 via-cyan-400 to-blue-500 rounded-full"
-                initial={{ width: 0 }}
-                whileInView={{ width: "8rem" }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.8, delay: 0.5 }}
-              />
             </motion.h2>
           </motion.div>
           
@@ -144,13 +129,13 @@ const AboutPage: React.FC = () => {
               <div className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl ring-1 ring-slate-100 transition-all duration-300 transform hover:-translate-y-2 h-full flex flex-col">
                 <div className="relative z-10 flex flex-col flex-grow">
                   <div className="flex items-center mb-6">
-                    <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-cyan-400 rounded-xl flex items-center justify-center mr-4 shadow-lg flex-shrink-0">
+                    <div className="w-16 h-16 bg-blue-600 rounded-xl flex items-center justify-center mr-4 shadow-sm flex-shrink-0">
                       <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                       </svg>
                     </div>
-                    <h3 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent">
+                    <h3 className="text-2xl md:text-3xl font-bold text-gray-900">
                       Vision
                     </h3>
                   </div>
@@ -174,12 +159,12 @@ const AboutPage: React.FC = () => {
               <div className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl ring-1 ring-slate-100 transition-all duration-300 transform hover:-translate-y-2 h-full flex flex-col">
                 <div className="relative z-10 flex flex-col flex-grow">
                   <div className="flex items-center mb-6">
-                    <div className="w-16 h-16 bg-gradient-to-br from-cyan-500 to-blue-400 rounded-xl flex items-center justify-center mr-4 shadow-lg flex-shrink-0">
+                    <div className="w-16 h-16 bg-blue-600 rounded-xl flex items-center justify-center mr-4 shadow-sm flex-shrink-0">
                       <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                       </svg>
                     </div>
-                    <h3 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-cyan-600 to-blue-500 bg-clip-text text-transparent">
+                    <h3 className="text-2xl md:text-3xl font-bold text-gray-900">
                       Our Mission
                     </h3>
                   </div>
@@ -205,7 +190,7 @@ const AboutPage: React.FC = () => {
             transition={{ duration: 0.8 }}
           >
             <motion.h2 
-              className="mb-8 text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-600 via-cyan-500 to-blue-600 bg-clip-text text-transparent"
+              className="mb-8 text-4xl md:text-5xl font-bold text-gray-900"
               initial={{ opacity: 0, scale: 0.9 }}
               whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true }}

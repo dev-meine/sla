@@ -7,6 +7,7 @@ import AthletesPage from './pages/AthletesPage';
 import BoardPage from './pages/BoardPage';
 import ActivitiesPage from './pages/ActivitiesPage';
 import GalleryPage from './pages/GalleryPage';
+import NewsArticlePage from './pages/NewsArticlePage';
 import AboutPage from './pages/AboutPage';
 import ContactPage from './pages/ContactPage';
 import NewsPage from './pages/NewsPage';
@@ -43,6 +44,7 @@ function App() {
         <Route path="/about" element={<Layout><AboutPage /></Layout>} />
         <Route path="/contact" element={<Layout><ContactPage /></Layout>} />
         <Route path="/news" element={<Layout><NewsPage /></Layout>} />
+        <Route path="/news/:id" element={<Layout><NewsArticlePage /></Layout>} />
         <Route path="/register" element={<Layout><RegistrationPage /></Layout>} />
         
         {/* Admin Routes */}

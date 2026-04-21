@@ -39,6 +39,44 @@ const AdminAthletes: React.FC = () => {
     }
   };
 
+  const uploadImage = async (file: File): Promise<string | null> => {
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Math.random()}.${fileExt}`;
+      const filePath = `athletes/${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('images')
+        .upload(filePath, file);
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('images')
+        .getPublicUrl(filePath);
+
+      return publicUrl;
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      return null;
+    }
+  };
+
+  const deleteImage = async (imageUrl: string) => {
+    try {
+      const path = imageUrl.split('/').pop();
+      if (!path) return;
+
+      const { error } = await supabase.storage
+        .from('images')
+        .remove([`athletes/${path}`]);
+
+      if (error) throw error;
+    } catch (error) {
+      console.error('Error deleting image:', error);
+    }
+  };
+
   const sanitizeText = (text: string | null): string | null => {
     if (!text) return null;
     // Remove any potential null bytes and invalid characters
@@ -52,21 +90,23 @@ const AdminAthletes: React.FC = () => {
       const athleteData = {
         name: sanitizeText(data.name),
         nickname: sanitizeText(data.nickname),
-        image: data.image,
+        image: data.image || null,
         sport: sanitizeText(data.sport),
         bio: sanitizeText(data.bio),
         nationality: sanitizeText(data.nationality),
-        date_of_birth: data.date_of_birth,
+        date_of_birth: data.date_of_birth || null,
         club: sanitizeText(data.club),
         coach: sanitizeText(data.coach),
         training_base: sanitizeText(data.training_base),
-        height_meters: data.height_meters,
-        weight_kg: data.weight_kg,
+        height_meters: data.height_meters ? Number(data.height_meters) : null,
+        weight_kg: data.weight_kg ? Number(data.weight_kg) : null,
         place_of_birth: sanitizeText(data.place_of_birth),
         personal_bests: sanitizeText(data.personal_bests),
         specialties: sanitizeText(data.specialties),
         caps: sanitizeText(data.caps)
       };
+
+      console.log('Submitting athlete data:', athleteData);
 
       if (editingAthlete) {
         const { error } = await supabase
@@ -74,13 +114,21 @@ const AdminAthletes: React.FC = () => {
           .update(athleteData)
           .eq('id', editingAthlete.id);
           
-        if (error) throw error;
+        if (error) {
+          console.error('Supabase update error:', error);
+          alert(`Error updating athlete: ${error.message}`);
+          return;
+        }
       } else {
         const { error } = await supabase
           .from('athletes')
           .insert([athleteData]);
           
-        if (error) throw error;
+        if (error) {
+          console.error('Supabase insert error:', error);
+          alert(`Error saving athlete: ${error.message}`);
+          return;
+        }
       }
 
       reset();
@@ -89,6 +137,7 @@ const AdminAthletes: React.FC = () => {
       fetchAthletes();
     } catch (error) {
       console.error('Error saving athlete:', error);
+      alert(`Unexpected error: ${error}`);
     } finally {
       setIsLoading(false);
     }
@@ -196,7 +245,10 @@ const AdminAthletes: React.FC = () => {
                   <label className="block text-sm font-medium text-gray-700 mb-1">Image</label>
                   <ImageUpload
                     currentImage={editingAthlete?.image}
-                    onImageUpload={(url) => setValue('image', url)}
+                    onImageUpload={async (file) => {
+                      const url = await uploadImage(file);
+                      if (url) setValue('image', url);
+                    }}
                     onImageRemove={() => setValue('image', null)}
                   />
                 </div>
@@ -338,6 +390,18 @@ const AdminAthletes: React.FC = () => {
                   Enter each cap on a new line in the format: Year Competition - Location
                 </p>
               </div>
+
+              {Object.keys(errors).length > 0 && (
+                <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                  <p className="text-red-700 font-medium text-sm">Please fix the following errors:</p>
+                  <ul className="text-red-600 text-sm mt-1 list-disc list-inside">
+                    {errors.name && <li>{errors.name.message}</li>}
+                    {errors.sport && <li>{errors.sport.message}</li>}
+                    {errors.height_meters && <li>{errors.height_meters.message}</li>}
+                    {errors.weight_kg && <li>{errors.weight_kg.message}</li>}
+                  </ul>
+                </div>
+              )}
 
               <div className="flex justify-end gap-4">
                 <button
