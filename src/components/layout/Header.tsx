@@ -62,18 +62,24 @@ const Header: React.FC = () => {
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
             {navItems.map((item: NavItem) => (
-              <Link
+              <motion.div
                 key={item.label}
-                to={item.href}
-                className={`relative font-sans text-xs uppercase tracking-widest font-bold transition-colors duration-300
-                  ${isActive(item.href) 
-                    ? 'text-primary-600' 
-                    : 'text-slate-500 hover:text-primary-600'
-                  }
-                `}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                transition={{ type: "spring", stiffness: 400, damping: 17 }}
               >
-                {item.label}
-              </Link>
+                <Link
+                  to={item.href}
+                  className={`relative font-sans text-xs uppercase tracking-widest font-bold transition-colors duration-300
+                    ${isActive(item.href) 
+                      ? 'text-primary-600' 
+                      : 'text-slate-500 hover:text-primary-600'
+                    }
+                  `}
+                >
+                  {item.label}
+                </Link>
+              </motion.div>
             ))}
             
             <motion.div
@@ -114,18 +120,23 @@ const Header: React.FC = () => {
           >
             <nav className="flex flex-col py-6 px-6 space-y-6">
               {navItems.map((item) => (
-                <Link
+                <motion.div
                   key={item.label}
-                  to={item.href}
-                  className={`font-heading text-2xl font-bold transition-colors duration-300 ${
-                    isActive(item.href)
-                      ? 'text-primary-600'
-                      : 'text-slate-900 hover:text-primary-600'
-                  }`}
-                  onClick={closeMenu}
+                  whileTap={{ scale: 0.95, x: 10 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 17 }}
                 >
-                  {item.label}
-                </Link>
+                  <Link
+                    to={item.href}
+                    className={`font-heading text-2xl font-bold transition-colors duration-300 flex ${
+                      isActive(item.href)
+                        ? 'text-primary-600'
+                        : 'text-slate-900 hover:text-primary-600'
+                    }`}
+                    onClick={closeMenu}
+                  >
+                    {item.label}
+                  </Link>
+                </motion.div>
               ))}
               <div className="pt-6 border-t border-slate-100">
                 <Link

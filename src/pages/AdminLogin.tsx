@@ -24,7 +24,7 @@ const AdminLogin: React.FC = () => {
       setIsLoading(true);
       setError(null);
       
-      const { error } = await supabase.auth.signInWithPassword({
+      const { data: authData, error } = await supabase.auth.signInWithPassword({
         email: data.email,
         password: data.password,
       });
@@ -35,6 +35,13 @@ const AdminLogin: React.FC = () => {
         } else {
           setError(error.message);
         }
+        return;
+      }
+
+      // Check if user is admin
+      if (authData.session?.user?.user_metadata?.role !== 'admin') {
+        await supabase.auth.signOut();
+        setError('Unauthorized: Admin access required.');
         return;
       }
 

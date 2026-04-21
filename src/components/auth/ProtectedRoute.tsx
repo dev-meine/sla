@@ -15,8 +15,9 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
       try {
         const { data: { session } } = await supabase.auth.getSession();
         
-        if (!session) {
+        if (!session || session.user?.user_metadata?.role !== 'admin') {
           setIsAuthenticated(false);
+          if (session) await supabase.auth.signOut();
           return;
         }
 
@@ -53,7 +54,12 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
       if (event === 'SIGNED_OUT' || event === 'USER_DELETED') {
         setIsAuthenticated(false);
       } else if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
-        setIsAuthenticated(!!session);
+        if (session && session.user?.user_metadata?.role === 'admin') {
+          setIsAuthenticated(true);
+        } else {
+          setIsAuthenticated(false);
+          if (session) await supabase.auth.signOut();
+        }
       }
     });
 
