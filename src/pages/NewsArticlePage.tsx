@@ -127,12 +127,12 @@ const NewsArticlePage: React.FC = () => {
                 )}
               </div>
 
-              {/* Main Image Banner */}
-              <div className="w-full aspect-video rounded-2xl overflow-hidden mb-12 shadow-md">
+              {/* Main Image Banner — Medium/LinkedIn style: max-height capped, minimal crop */}
+              <div className="w-full max-h-[480px] rounded-2xl overflow-hidden mb-12 shadow-md bg-slate-100">
                  <img 
                     src={post.image_url || "https://images.unsplash.com/photo-1519315901367-f34ff9154487?auto=format&fit=crop&w=1470&q=80"}
                     alt={post.title}
-                    className="w-full h-full object-cover"
+                    className="w-full h-full max-h-[480px] object-cover"
                  />
               </div>
 
