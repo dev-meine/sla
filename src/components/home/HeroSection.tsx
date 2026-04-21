@@ -1,5 +1,5 @@
 import React from 'react';
-import { ArrowRight, Play, ChevronDown } from 'lucide-react';
+import { ArrowRight, ChevronDown } from 'lucide-react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { Link } from 'react-router-dom';
 
@@ -78,21 +78,6 @@ const HeroSection: React.FC = () => {
                     <ArrowRight size={18} className="ml-3" />
                   </motion.span>
                 </Link>
-
-                <a 
-                  href="#watch-video" 
-                  className="group flex items-center text-slate-800 hover:text-primary-600 transition-colors duration-300"
-                >
-                  <motion.span 
-                    whileHover={{ scale: 1.1, rotate: 90 }}
-                    whileTap={{ scale: 0.9 }}
-                    className="w-12 h-12 rounded-full border border-slate-200 shadow-md flex items-center justify-center mr-4 group-hover:border-primary-200 group-hover:bg-primary-50 transition-all duration-300 relative overflow-hidden"
-                  >
-                    <div className="absolute inset-0 bg-primary-100 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-full mix-blend-overlay"></div>
-                    <Play size={16} className="text-primary-600 fill-current ml-1 relative z-10" />
-                  </motion.span>
-                  <span className="font-sans font-bold uppercase tracking-wider text-xs">Watch Video</span>
-                </a>
               </motion.div>
             </motion.div>
           </header>

@@ -16,7 +16,6 @@ const AthletesPage: React.FC = () => {
   const [currentAthlete, setCurrentAthlete] = useState<Athlete | null>(null);
 
   useEffect(() => {
-    console.log('useEffect triggered, id:', id);
     if (id) {
       fetchAthlete(id);
     } else {
@@ -42,7 +41,6 @@ const AthletesPage: React.FC = () => {
   };
 
   const fetchAthletes = async () => {
-    console.log('Fetching all athletes...');
     try {
       const { data, error } = await supabase
         .from('athletes')
@@ -50,7 +48,6 @@ const AthletesPage: React.FC = () => {
         .order('name');
       
       if (error) throw error;
-      console.log('Fetched athletes:', data);
       setAthletes(data || []);
     } catch (error) {
       console.error('Error fetching athletes:', error);
@@ -100,15 +97,10 @@ const AthletesPage: React.FC = () => {
           description={id ? "Loading athlete profile..." : "Meet the talented athletes representing Sierra Leone in swimming, diving, and water polo competitions."}
           image="https://images.pexels.com/photos/1263349/pexels-photo-1263349.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
         />
-        <section className="section section-gradient">
+        <section className="section bg-white">
           <div className="container-custom">
             <div className="text-center">
-              <motion.div 
-                className="animate-spin rounded-full h-12 w-12 border-4 border-primary-600 border-t-transparent mx-auto"
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.5 }}
-              />
+              <div className="animate-spin rounded-full h-12 w-12 border-4 border-primary-600 border-t-transparent mx-auto" />
             </div>
           </div>
         </section>
@@ -124,7 +116,7 @@ const AthletesPage: React.FC = () => {
           description="The athlete you are looking for does not exist."
           image="https://images.pexels.com/photos/1263349/pexels-photo-1263349.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
         />
-        <section className="section section-gradient">
+        <section className="section bg-white">
           <div className="container-custom">
             <div className="text-center py-12">
               <p className="text-gray-600">No athlete found with the provided ID.</p>
@@ -143,14 +135,14 @@ const AthletesPage: React.FC = () => {
         image="https://images.pexels.com/photos/1263349/pexels-photo-1263349.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
       />
 
-      <section className="section section-gradient">
+      <section className="section bg-white">
         <div className="container-custom">
           {id && currentAthlete ? (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
-              className="bg-white rounded-lg shadow-lg overflow-hidden lg:grid lg:grid-cols-2"
+              className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden lg:grid lg:grid-cols-2"
             >
               <div className="relative h-[400px] lg:h-auto">
                 <img
@@ -158,10 +150,10 @@ const AthletesPage: React.FC = () => {
                   alt={currentAthlete.name}
                   className="absolute inset-0 w-full h-full object-cover object-top"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
+                <div className="absolute inset-0 bg-slate-900/50"></div>
                 <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
                   <h3 className="text-2xl font-semibold mb-1 text-white">{currentAthlete.name}</h3>
-                  <p className="text-gray-200 capitalize">
+                  <p className="text-slate-200 capitalize">
                     <Trophy size={16} className="inline mr-2" />
                     {currentAthlete.sport?.replace('-', ' ') || 'Athlete'}
                   </p>
@@ -189,7 +181,7 @@ const AthletesPage: React.FC = () => {
                       {currentAthlete.specialties.split('\n').map((specialty, index) => (
                         <span
                           key={index}
-                          className="bg-primary-50 text-primary-700 px-3 py-1 rounded-full text-sm"
+                          className="bg-slate-100 text-slate-700 px-3 py-1 rounded-full text-sm font-medium"
                         >
                           {specialty}
                         </span>
@@ -203,7 +195,7 @@ const AthletesPage: React.FC = () => {
                     <h4 className="font-semibold text-lg mb-2">Personal Bests</h4>
                     <div className="space-y-2">
                       {currentAthlete.personal_bests.split('\n').map((pb, index) => (
-                        <div key={index} className="bg-gray-50 p-3 rounded-lg">
+                        <div key={index} className="bg-slate-50 p-3 rounded-lg">
                           <div className="flex items-center justify-between">
                             <span className="text-sm font-medium">{pb.split(' - ')[0]}</span>
                             <span className="text-sm text-primary-600 flex items-center">
@@ -217,10 +209,10 @@ const AthletesPage: React.FC = () => {
                   </div>
                 )}
 
-                {currentAthlete.biography && (
+                {currentAthlete.bio && (
                   <div>
                     <h4 className="font-semibold text-lg mb-2">Biography</h4>
-                    <p className="text-gray-700 text-sm leading-relaxed">{currentAthlete.biography}</p>
+                    <p className="text-gray-700 text-sm leading-relaxed">{currentAthlete.bio}</p>
                   </div>
                 )}
               </div>
@@ -246,7 +238,7 @@ const AthletesPage: React.FC = () => {
                   transition={{ duration: 0.7 }}
                 >
                   <motion.h2 
-                    className="mb-8 capitalize"
+                    className="mb-8 capitalize text-slate-900"
                     initial={{ opacity: 0, x: -20 }}
                     whileInView={{ opacity: 1, x: 0 }}
                     viewport={{ once: true }}
@@ -265,7 +257,7 @@ const AthletesPage: React.FC = () => {
                     {athletesByType[sport].map((athlete) => (
                       <motion.div 
                         key={athlete.id} 
-                        className={`bg-white rounded-lg shadow-lg overflow-hidden transition-all duration-300 ${
+                        className={`bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden transition-all duration-300 ${
                           selectedAthlete === athlete.id ? 'lg:col-span-2' : ''
                         }`}
                         variants={item}
@@ -277,10 +269,10 @@ const AthletesPage: React.FC = () => {
                               alt={athlete.name}
                               className="absolute inset-0 w-full h-full object-cover object-top"
                             />
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
+                            <div className="absolute inset-0 bg-slate-900/50"></div>
                             <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
                               <h3 className="text-2xl font-semibold mb-1 text-white">{athlete.name}</h3>
-                              <p className="text-gray-200 capitalize">
+                              <p className="text-slate-200 capitalize">
                                 <Trophy size={16} className="inline mr-2" />
                                 {athlete.sport?.replace('-', ' ') || 'Athlete'}
                               </p>
@@ -306,7 +298,7 @@ const AthletesPage: React.FC = () => {
                                     {athlete.specialties.split('\n').map((specialty, index) => (
                                       <span 
                                         key={index}
-                                        className="bg-primary-50 text-primary-700 px-3 py-1 rounded-full text-sm"
+                                        className="bg-slate-100 text-slate-700 px-3 py-1 rounded-full text-sm font-medium"
                                       >
                                         {specialty}
                                       </span>
@@ -320,7 +312,7 @@ const AthletesPage: React.FC = () => {
                                   <h4 className="font-semibold mb-2">Personal Bests</h4>
                                   <div className="space-y-2">
                                     {athlete.personal_bests.split('\n').map((pb, index) => (
-                                      <div key={index} className="bg-gray-50 p-3 rounded-lg">
+                                      <div key={index} className="bg-slate-50 p-3 rounded-lg">
                                         <div className="flex items-center justify-between">
                                           <span className="text-sm font-medium">{pb.split(' - ')[0]}</span>
                                           <span className="text-sm text-primary-600 flex items-center">
@@ -347,7 +339,7 @@ const AthletesPage: React.FC = () => {
                                 </button>
                               </div>
 
-                              {selectedAthlete === athlete.id && athlete.biography && (
+                              {selectedAthlete === athlete.id && athlete.bio && (
                                 <motion.div
                                   initial={{ opacity: 0, height: 0 }}
                                   animate={{ opacity: 1, height: 'auto' }}
@@ -356,7 +348,7 @@ const AthletesPage: React.FC = () => {
                                   className="mt-4 text-gray-700 text-sm leading-relaxed"
                                 >
                                   <h4 className="font-semibold mb-2">Biography</h4>
-                                  <p>{athlete.biography}</p>
+                                  <p>{athlete.bio}</p>
                                 </motion.div>
                               )}
                             </div>

@@ -79,14 +79,13 @@ const AboutPage: React.FC = () => {
             </motion.div>
             
             <motion.div
-              className="rounded-xl overflow-hidden shadow-2xl relative"
+              className="rounded-xl overflow-hidden shadow-sm border border-slate-100 relative"
               initial={{ opacity: 0, x: 30 }}
               whileInView={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.7, ease: "easeOut" }}
               viewport={{ once: true }}
               whileHover={{ scale: 1.02, transition: { duration: 0.3 } }}
             >
-              <div className="absolute inset-0 bg-gradient-to-t from-blue-900/30 to-transparent z-10"></div>
               <img 
                 src="https://i.ibb.co/9kDWFfBB/Screenshot-2025-05-14-at-2-02-57-AM-min.png" 
                 alt="Swimming competition" 
