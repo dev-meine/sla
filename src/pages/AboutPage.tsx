@@ -11,80 +11,47 @@ const AboutPage: React.FC = () => {
         image="https://i.ibb.co/DPc6MhdS/20240430-165712-11zon.jpg"
       />
 
-      <section className="section bg-slate-50 relative overflow-hidden">
-        <div className="container-custom relative z-10">
+      {/* Our Story */}
+      <section className="section bg-white">
+        <div className="container-custom">
           <motion.div 
-            className="text-center mb-5"
-            initial={{ opacity: 0, y: 30 }}
+            className="text-center mb-12"
+            initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
+            transition={{ duration: 0.6 }}
           >
-            <motion.h2 
-              className="section-title mb-6 inline-block relative"
-              initial={{ opacity: 0, scale: 0.9 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.7, delay: 0.2 }}
-            >
-              Our Story
-            </motion.h2>
+            <h2 className="text-slate-900 mb-4">Our Story</h2>
           </motion.div>
           
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
             <motion.div
-              initial={{ opacity: 0, x: -30 }}
+              initial={{ opacity: 0, x: -20 }}
               whileInView={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.7, ease: "easeOut" }}
+              transition={{ duration: 0.6 }}
               viewport={{ once: true }}
+              className="space-y-6"
             >
-              <motion.p 
-                className="text-gray-700 mb-6 text-lg leading-relaxed"
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.2 }}
-                viewport={{ once: true }}
-              >
-                <span className="font-semibold text-blue-600">FOUNDED IN FREETOWN – 10TH JUNE 1979</span> as
-                The Sierra Leone Swimming, Diving & Water Polo Association, now known as the Sierra Leone Aquatics, is the national governing body for all Aquatic sports in Sierra Leone.
-              </motion.p>
-              <motion.p 
-                className="text-gray-700 mb-6 text-lg leading-relaxed"
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.3 }}
-                viewport={{ once: true }}
-              >
-                This includes but is not limited to Open Water Swimming, Surfing, Water Polo and Diving.
-                The Federation has sole rights for the organization, development, growth and promotion of these sports at all levels locally and internationally.
-              </motion.p>
-              <motion.p 
-                className="text-gray-700 mb-6 text-lg leading-relaxed"
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.4 }}
-                viewport={{ once: true }}
-              >
+              <p className="text-slate-600 text-lg leading-relaxed">
+                <span className="font-semibold text-slate-900">Founded in Freetown on 10th June 1979</span>, the Sierra Leone Swimming, Diving & Water Polo Association, now known as Sierra Leone Aquatics, is the national governing body for all aquatic sports in Sierra Leone.
+              </p>
+              <p className="text-slate-600 text-lg leading-relaxed">
+                This includes but is not limited to Open Water Swimming, Surfing, Water Polo and Diving. The Federation has sole rights for the organization, development, growth and promotion of these sports at all levels locally and internationally.
+              </p>
+              <p className="text-slate-600 text-lg leading-relaxed">
                 We organize national championships, development programs, and represent Sierra Leone in international competitions.
-              </motion.p>
-              <motion.p 
-                className="text-gray-700 text-lg leading-relaxed"
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.5 }}
-                viewport={{ once: true }}
-              >
+              </p>
+              <p className="text-slate-600 text-lg leading-relaxed">
                 Our mission is to make aquatic sports accessible to all Sierra Leoneans, develop world-class athletes, and promote water safety throughout the country.
-              </motion.p>
+              </p>
             </motion.div>
             
             <motion.div
-              className="rounded-xl overflow-hidden shadow-sm border border-slate-100 relative"
-              initial={{ opacity: 0, x: 30 }}
+              className="rounded-2xl overflow-hidden border border-slate-100"
+              initial={{ opacity: 0, x: 20 }}
               whileInView={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.7, ease: "easeOut" }}
+              transition={{ duration: 0.6 }}
               viewport={{ once: true }}
-              whileHover={{ scale: 1.02, transition: { duration: 0.3 } }}
             >
               <img 
                 src="https://i.ibb.co/9kDWFfBB/Screenshot-2025-05-14-at-2-02-57-AM-min.png" 
@@ -96,216 +63,118 @@ const AboutPage: React.FC = () => {
         </div>
       </section>
 
-      {/* Mission & Vision Section */}
-      <section className="py-12 md:py-24 bg-white relative overflow-hidden flex flex-col items-center">
-        <div className="container-custom relative z-10">
+      {/* Mission & Vision */}
+      <section className="section bg-slate-50">
+        <div className="container-custom">
           <motion.div 
             className="text-center mb-12"
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
+            transition={{ duration: 0.6 }}
           >
-            <motion.h2 
-              className="section-title mb-6 inline-block relative"
-              initial={{ opacity: 0, scale: 0.9 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.7, delay: 0.2 }}
-            >
-              Mission & Vision
-            </motion.h2>
+            <h2 className="text-slate-900 mb-4">Mission & Vision</h2>
           </motion.div>
           
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-6xl mx-auto">
-            {/* Vision Card */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-4xl mx-auto">
             <motion.div
-              className="relative group"
-              initial={{ opacity: 0, x: -30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.7, ease: "easeOut" }}
+              className="bg-white rounded-2xl p-10 border border-slate-100"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
               viewport={{ once: true }}
             >
-              <div className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl ring-1 ring-slate-100 transition-all duration-300 transform hover:-translate-y-2 h-full flex flex-col">
-                <div className="relative z-10 flex flex-col flex-grow">
-                  <div className="flex items-center mb-6">
-                    <div className="w-16 h-16 bg-blue-600 rounded-xl flex items-center justify-center mr-4 shadow-sm flex-shrink-0">
-                      <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                      </svg>
-                    </div>
-                    <h3 className="text-2xl md:text-3xl font-bold text-gray-900">
-                      Vision
-                    </h3>
-                  </div>
-                  <div className="flex-grow flex items-center">
-                    <p className="text-gray-700 text-lg leading-relaxed">
-                      To be recognized as the country's leading sport discipline in the development of youth athletes
-                    </p>
-                  </div>
-                </div>
-              </div>
+              <h3 className="text-2xl font-bold text-slate-900 mb-4">Vision</h3>
+              <p className="text-slate-600 text-lg leading-relaxed">
+                To be recognized as the country's leading sport discipline in the development of youth athletes.
+              </p>
             </motion.div>
 
-            {/* Mission Card */}
             <motion.div
-              className="relative group"
-              initial={{ opacity: 0, x: 30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.7, ease: "easeOut" }}
+              className="bg-white rounded-2xl p-10 border border-slate-100"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.1 }}
               viewport={{ once: true }}
             >
-              <div className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl ring-1 ring-slate-100 transition-all duration-300 transform hover:-translate-y-2 h-full flex flex-col">
-                <div className="relative z-10 flex flex-col flex-grow">
-                  <div className="flex items-center mb-6">
-                    <div className="w-16 h-16 bg-blue-600 rounded-xl flex items-center justify-center mr-4 shadow-sm flex-shrink-0">
-                      <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                      </svg>
-                    </div>
-                    <h3 className="text-2xl md:text-3xl font-bold text-gray-900">
-                      Our Mission
-                    </h3>
-                  </div>
-                  <div className="flex-grow flex items-center">
-                    <p className="text-gray-700 text-lg leading-relaxed">
-                      To develop champions in aquatic sports and life
-                    </p>
-                  </div>
-                </div>
-              </div>
+              <h3 className="text-2xl font-bold text-slate-900 mb-4">Our Mission</h3>
+              <p className="text-slate-600 text-lg leading-relaxed">
+                To develop champions in aquatic sports and life.
+              </p>
             </motion.div>
           </div>
         </div>
       </section>
 
-      <section className="section bg-slate-50 relative overflow-hidden">
-        <div className="container-custom relative z-10">
+      {/* Our Values */}
+      <section className="section bg-white">
+        <div className="container-custom">
           <motion.div 
-            className="text-center max-w-4xl mx-auto mb-16"
-            initial={{ opacity: 0, y: 30 }}
+            className="text-center max-w-3xl mx-auto mb-16"
+            initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
+            transition={{ duration: 0.6 }}
           >
-            <motion.h2 
-              className="mb-8 text-4xl md:text-5xl font-bold text-gray-900"
-              initial={{ opacity: 0, scale: 0.9 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.7, delay: 0.2 }}
-            >
-              Our Values
-            </motion.h2>
-            <motion.p 
-              className="text-xl text-gray-700 leading-relaxed"
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: 0.4 }}
-            >
-              Our core values guide everything we do at the Sierra Leone Aquatics.
-            </motion.p>
+            <h2 className="text-slate-900 mb-4">Our Values</h2>
+            <p className="text-lg text-slate-600 leading-relaxed">
+              Our core values guide everything we do at Sierra Leone Aquatics.
+            </p>
           </motion.div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            <motion.div 
-              className="bg-white p-6 rounded-lg shadow-md"
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3 }}
-              viewport={{ once: true }}
-            >
-              <div className="w-12 h-12 bg-primary-100 text-primary-600 rounded-full flex items-center justify-center mb-4">
-                <span className="text-2xl font-bold">1</span>
-              </div>
-              <h3 className="text-xl mb-3">Excellence</h3>
-              <p className="text-gray-600">
-                We strive for excellence in all aspects of our operations, from athlete development to event organization.
-              </p>
-            </motion.div>
-
-            <motion.div 
-              className="bg-white p-6 rounded-lg shadow-md"
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3, delay: 0.1 }}
-              viewport={{ once: true }}
-            >
-              <div className="w-12 h-12 bg-secondary-100 text-secondary-600 rounded-full flex items-center justify-center mb-4">
-                <span className="text-2xl font-bold">2</span>
-              </div>
-              <h3 className="text-xl mb-3">Inclusion</h3>
-              <p className="text-gray-600">
-                We believe aquatic sports should be accessible to all Sierra Leoneans regardless of background or ability.
-              </p>
-            </motion.div>
-
-            <motion.div 
-              className="bg-white p-6 rounded-lg shadow-md"
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3, delay: 0.2 }}
-              viewport={{ once: true }}
-            >
-              <div className="w-12 h-12 bg-accent-100 text-accent-600 rounded-full flex items-center justify-center mb-4">
-                <span className="text-2xl font-bold">3</span>
-              </div>
-              <h3 className="text-xl mb-3">Integrity</h3>
-              <p className="text-gray-600">
-                We uphold the highest standards of fairness, transparency, and ethical conduct in all our activities.
-              </p>
-            </motion.div>
-
-            <motion.div 
-              className="bg-white p-6 rounded-lg shadow-md"
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3, delay: 0.3 }}
-              viewport={{ once: true }}
-            >
-              <div className="w-12 h-12 bg-gray-100 text-gray-600 rounded-full flex items-center justify-center mb-4">
-                <span className="text-2xl font-bold">4</span>
-              </div>
-              <h3 className="text-xl mb-3">Community</h3>
-              <p className="text-gray-600">
-                We foster a supportive community that encourages growth, collaboration, and national pride.
-              </p>
-            </motion.div>
+            {[
+              { title: 'Excellence', text: 'We strive for excellence in all aspects of our operations, from athlete development to event organization.' },
+              { title: 'Inclusion', text: 'We believe aquatic sports should be accessible to all Sierra Leoneans regardless of background or ability.' },
+              { title: 'Integrity', text: 'We uphold the highest standards of fairness, transparency, and ethical conduct in all our activities.' },
+              { title: 'Community', text: 'We foster a supportive community that encourages growth, collaboration, and national pride.' },
+            ].map((value, i) => (
+              <motion.div 
+                key={value.title}
+                className="bg-slate-50 p-8 rounded-2xl border border-slate-100"
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4, delay: i * 0.1 }}
+                viewport={{ once: true }}
+              >
+                <h3 className="text-xl font-semibold text-slate-900 mb-3">{value.title}</h3>
+                <p className="text-slate-600 leading-relaxed">{value.text}</p>
+              </motion.div>
+            ))}
           </div>
         </div>
       </section>
 
-      <section className="section">
+      {/* Affiliations */}
+      <section className="section bg-slate-50">
         <div className="container-custom">
-          <div className="text-center max-w-3xl mx-auto">
-            <h2 className="mb-6">Our Affiliations</h2>
-            <p className="text-lg text-gray-600 mb-12">
-              We are proud to be affiliated with the following organizations:
+          <div className="text-center max-w-3xl mx-auto mb-12">
+            <h2 className="text-slate-900 mb-4">Our Affiliations</h2>
+            <p className="text-lg text-slate-600">
+              We are proud to be affiliated with the following organizations.
             </p>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
+            <div className="bg-white p-8 border border-slate-100 rounded-2xl">
+              <h3 className="text-xl font-semibold text-slate-900 mb-3">World Aquatics</h3>
+              <p className="text-slate-600">
+                Officially recognized member federation of the international governing body for aquatics sports.
+              </p>
+            </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              <div className="p-6 border border-gray-200 rounded-lg">
-                <h3 className="text-xl mb-3">World Aquatics</h3>
-                <p className="text-gray-600">
-                  Officially recognized member federation of the international governing body for aquatics sports
-                </p>
-              </div>
-              
-              <div className="p-6 border border-gray-200 rounded-lg">
-                <h3 className="text-xl mb-3">African Aquatics</h3>
-                <p className="text-gray-600">
-                  Active member of the continental governing body for aquatics in Africa
-                </p>
-              </div>
-              
-              <div className="p-6 border border-gray-200 rounded-lg">
-                <h3 className="text-xl mb-3">Sierra Leone National Olympic Committee</h3>
-                <p className="text-gray-600">
-                  National Olympic Committee member responsible for Olympic qualification
-                </p>
-              </div>
+            <div className="bg-white p-8 border border-slate-100 rounded-2xl">
+              <h3 className="text-xl font-semibold text-slate-900 mb-3">African Aquatics</h3>
+              <p className="text-slate-600">
+                Active member of the continental governing body for aquatics in Africa.
+              </p>
+            </div>
+            
+            <div className="bg-white p-8 border border-slate-100 rounded-2xl">
+              <h3 className="text-xl font-semibold text-slate-900 mb-3">Sierra Leone NOC</h3>
+              <p className="text-slate-600">
+                National Olympic Committee member responsible for Olympic qualification.
+              </p>
             </div>
           </div>
         </div>
