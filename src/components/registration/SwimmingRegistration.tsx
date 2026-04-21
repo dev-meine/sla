@@ -82,14 +82,14 @@ const SwimmingRegistration: React.FC = () => {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="text-center py-12"
+        className="text-center py-16"
       >
         <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
-        <h3 className="text-2xl font-semibold text-gray-900 mb-2">Thank You for Registering!</h3>
-        <p className="text-gray-600 mb-6">A representative will contact you soon.</p>
+        <h3 className="text-2xl font-semibold text-slate-900 mb-2">Thank You for Registering!</h3>
+        <p className="text-slate-600 mb-6">A representative will contact you soon.</p>
         <button
           onClick={() => setSubmitSuccess(false)}
-          className="btn btn-primary"
+          className="px-6 py-3 bg-primary-600 text-white rounded-full font-medium hover:bg-primary-700 transition-colors"
         >
           Register Another Student
         </button>
@@ -98,19 +98,19 @@ const SwimmingRegistration: React.FC = () => {
   }
 
   return (
-    <div className="max-w-3xl mx-auto p-6">
-      <h2 className="text-2xl font-semibold mb-6">Swimming Lesson Registration</h2>
+    <div className="max-w-3xl mx-auto">
+      <h2 className="text-2xl font-semibold text-slate-900 mb-8">Swimming Lesson Registration</h2>
 
       {submitError && (
-        <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-center">
-          <AlertCircle className="w-5 h-5 text-red-500 mr-2" />
-          <p className="text-red-700">{submitError}</p>
+        <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl flex items-center">
+          <AlertCircle className="w-5 h-5 text-red-500 mr-2 flex-shrink-0" />
+          <p className="text-red-700 text-sm">{submitError}</p>
         </div>
       )}
 
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-slate-700 mb-3">
             Select Package
           </label>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -125,10 +125,10 @@ const SwimmingRegistration: React.FC = () => {
                   value={pkg.id}
                   className="peer sr-only"
                 />
-                <div className="p-4 rounded-lg border-2 peer-checked:border-primary-600 peer-checked:bg-primary-50 hover:bg-gray-50 transition-colors">
-                  <h3 className="font-semibold text-gray-900">{pkg.name}</h3>
-                  <p className="text-sm text-gray-600 mt-1">{pkg.description}</p>
-                  <p className="text-lg font-semibold text-primary-600 mt-2">
+                <div className="p-5 rounded-2xl border-2 border-slate-100 peer-checked:border-primary-600 peer-checked:bg-primary-50 hover:bg-slate-50 transition-all">
+                  <h3 className="font-semibold text-slate-900">{pkg.name}</h3>
+                  <p className="text-sm text-slate-500 mt-1 leading-relaxed">{pkg.description}</p>
+                  <p className="text-lg font-semibold text-primary-600 mt-3">
                     Le {pkg.price.toLocaleString()}
                   </p>
                 </div>
@@ -136,19 +136,20 @@ const SwimmingRegistration: React.FC = () => {
             ))}
           </div>
           {errors.package_id && (
-            <p className="mt-1 text-sm text-red-600">{errors.package_id.message}</p>
+            <p className="mt-2 text-sm text-red-600">{errors.package_id.message}</p>
           )}
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-slate-700 mb-1.5">
               Full Name
             </label>
             <input
               type="text"
               {...register('name', { required: 'Name is required' })}
-              className="w-full px-3 py-2 border rounded-md focus:ring-primary-500 focus:border-primary-500"
+              className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all bg-white text-slate-900 placeholder:text-slate-400"
+              placeholder="Enter your full name"
             />
             {errors.name && (
               <p className="mt-1 text-sm text-red-600">{errors.name.message}</p>
@@ -156,7 +157,7 @@ const SwimmingRegistration: React.FC = () => {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-slate-700 mb-1.5">
               Email (Optional)
             </label>
             <input
@@ -167,7 +168,8 @@ const SwimmingRegistration: React.FC = () => {
                   message: 'Invalid email address'
                 }
               })}
-              className="w-full px-3 py-2 border rounded-md focus:ring-primary-500 focus:border-primary-500"
+              className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all bg-white text-slate-900 placeholder:text-slate-400"
+              placeholder="your@email.com"
             />
             {errors.email && (
               <p className="mt-1 text-sm text-red-600">{errors.email.message}</p>
@@ -175,24 +177,26 @@ const SwimmingRegistration: React.FC = () => {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-slate-700 mb-1.5">
               Phone Number (Optional)
             </label>
             <input
               type="tel"
               {...register('phone')}
-              className="w-full px-3 py-2 border rounded-md focus:ring-primary-500 focus:border-primary-500"
+              className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all bg-white text-slate-900 placeholder:text-slate-400"
+              placeholder="+232 XX XXXXXX"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-slate-700 mb-1.5">
               Orange Money / Afri Money Transaction ID
             </label>
             <input
               type="text"
               {...register('transaction_id', { required: 'Transaction ID is required' })}
-              className="w-full px-3 py-2 border rounded-md focus:ring-primary-500 focus:border-primary-500"
+              className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all bg-white text-slate-900 placeholder:text-slate-400"
+              placeholder="Enter your transaction ID"
             />
             {errors.transaction_id && (
               <p className="mt-1 text-sm text-red-600">{errors.transaction_id.message}</p>
@@ -200,11 +204,11 @@ const SwimmingRegistration: React.FC = () => {
           </div>
         </div>
 
-        <div className="flex justify-end">
+        <div className="flex justify-end pt-4">
           <button
             type="submit"
             disabled={isSubmitting}
-            className="btn btn-primary w-full md:w-auto"
+            className="px-8 py-3 bg-primary-600 text-white rounded-full font-medium hover:bg-primary-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isSubmitting ? 'Submitting...' : 'Submit Registration'}
           </button>

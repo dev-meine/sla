@@ -121,7 +121,7 @@ const RegistrationStatusChecker: React.FC = () => {
 
   return (
     <div className="max-w-2xl mx-auto p-6">
-      <h2 className="text-2xl font-semibold mb-6 text-center">Check Registration Status</h2>
+      <h2 className="text-2xl font-semibold text-slate-900 mb-8 text-center">Check Registration Status</h2>
       
       <form onSubmit={handleSubmit(onSubmit)} className="mb-8">
         <div className="flex gap-4">
@@ -139,7 +139,7 @@ const RegistrationStatusChecker: React.FC = () => {
                 }
               })}
               placeholder="your@email.com or +1234567890"
-              className="w-full px-3 py-2 border rounded-md focus:ring-primary-500 focus:border-primary-500"
+              className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all bg-white text-slate-900 placeholder:text-slate-400"
             />
             {errors.contact && (
               <p className="mt-1 text-sm text-red-600">{errors.contact.message}</p>
@@ -149,7 +149,7 @@ const RegistrationStatusChecker: React.FC = () => {
             <button
               type="submit"
               disabled={isLoading}
-              className="btn btn-primary flex items-center gap-2"
+              className="px-6 py-3 bg-primary-600 text-white rounded-full font-medium hover:bg-primary-700 transition-colors flex items-center gap-2"
             >
               {isLoading ? (
                 <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" />
@@ -166,7 +166,7 @@ const RegistrationStatusChecker: React.FC = () => {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-center"
+          className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl flex items-center"
         >
           <AlertCircle className="w-5 h-5 text-red-500 mr-2" />
           <p className="text-red-700">{error}</p>
@@ -188,7 +188,7 @@ const RegistrationStatusChecker: React.FC = () => {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-white border rounded-lg shadow-sm overflow-hidden"
+          className="bg-white border border-slate-100 rounded-2xl shadow-sm overflow-hidden"
         >
           <div className="p-6">
             <div className="flex items-center justify-between mb-4">

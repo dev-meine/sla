@@ -13,27 +13,27 @@ const RegistrationPage: React.FC = () => {
         description="Register for our swimming programs or check your registration status."
         image="https://images.pexels.com/photos/863988/pexels-photo-863988.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
       />
-      <section className="section">
+      <section className="section bg-white">
         <div className="container-custom">
           {/* Tab Navigation */}
-          <div className="mb-8">
-            <div className="flex space-x-1 bg-gray-100 p-1 rounded-lg max-w-md mx-auto">
+          <div className="mb-12">
+            <div className="flex space-x-1 bg-slate-100 p-1 rounded-full max-w-md mx-auto">
               <button
                 onClick={() => setActiveTab('register')}
-                className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
+                className={`flex-1 py-3 px-4 rounded-full text-sm font-medium transition-all ${
                   activeTab === 'register'
-                    ? 'bg-white text-primary-600 shadow-sm'
-                    : 'text-gray-600 hover:text-gray-900'
+                    ? 'bg-white text-slate-900 shadow-sm'
+                    : 'text-slate-500 hover:text-slate-700'
                 }`}
               >
                 New Registration
               </button>
               <button
                 onClick={() => setActiveTab('status')}
-                className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
+                className={`flex-1 py-3 px-4 rounded-full text-sm font-medium transition-all ${
                   activeTab === 'status'
-                    ? 'bg-white text-primary-600 shadow-sm'
-                    : 'text-gray-600 hover:text-gray-900'
+                    ? 'bg-white text-slate-900 shadow-sm'
+                    : 'text-slate-500 hover:text-slate-700'
                 }`}
               >
                 Check Status
