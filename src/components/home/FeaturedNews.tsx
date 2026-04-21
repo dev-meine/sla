@@ -69,7 +69,7 @@ const FeaturedNews: React.FC = () => {
   }
 
   return (
-    <section className="py-24 md:py-32 bg-gradient-to-b from-white to-slate-50 border-t border-slate-100 relative overflow-hidden">
+    <section className="py-24 md:py-32 bg-white border-t border-slate-100 relative overflow-hidden">
       <div className="container mx-auto px-6 lg:px-12 relative z-10">
         <motion.div 
           className="flex flex-col md:flex-row md:items-end justify-between mb-16"
@@ -138,7 +138,7 @@ const FeaturedNews: React.FC = () => {
                         target.src = "https://images.unsplash.com/photo-1519315901367-f34ff9154487?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80";
                       }}
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-primary-900/40 via-primary-900/0 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
+
                   </motion.div>
                   
                   <div className="flex flex-col flex-grow px-2">

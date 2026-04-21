@@ -122,16 +122,15 @@ const FeaturedAthletes: React.FC = () => {
             <motion.article key={athlete.id} className="group cursor-pointer" variants={item}>
               <Link to={`/athletes/${athlete.id}`} className="block">
                 <motion.div 
-                  className="w-full aspect-[3/4] rounded-2xl overflow-hidden mb-6 bg-slate-200 relative shadow-md group-hover:shadow-[0_20px_50px_rgba(37,99,235,0.2)] transition-shadow duration-500 ring-1 ring-white/50"
+                  className="w-full aspect-[3/4] rounded-2xl overflow-hidden mb-6 bg-slate-200 relative shadow-sm border border-slate-100 transition-shadow duration-500 group-hover:shadow-md"
                   whileHover={{ y: -8, scale: 1.02 }}
                   transition={{ type: "spring", stiffness: 300, damping: 20 }}
                 >
                   <img 
                     src={athlete.image || "https://images.pexels.com/photos/863988/pexels-photo-863988.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"}
                     alt={athlete.name}
-                    className="w-full h-full object-cover object-top filter saturate-110 contrast-110 transition-transform duration-[1.5s] ease-out transform group-hover:scale-110"
+                    className="w-full h-full object-cover object-top transition-transform duration-[1.5s] ease-out transform group-hover:scale-110"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-primary-900/60 via-primary-900/0 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
                 </motion.div>
                 
                 <div className="flex justify-between items-start mb-4 px-2">

@@ -91,32 +91,21 @@ const ActivitiesHighlight: React.FC = () => {
               We organize various activities throughout the year to promote swimming, diving, and water polo in Sierra Leone, fostering community and athletic excellence.
             </p>
             
-            <div className="relative">
-              {/* Vibrant offset shadow block */}
-              <motion.div 
-                className="absolute inset-0 bg-gradient-to-tr from-primary-400 to-secondary-400 rounded-2xl transform translate-x-4 translate-y-4"
-                initial={{ opacity: 0 }}
-                whileInView={{ opacity: 1 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.8, delay: 0.3 }}
-              ></motion.div>
-              
-              <motion.div 
-                className="w-full aspect-[4/5] bg-slate-100 overflow-hidden mb-8 rounded-2xl shadow-xl relative z-10"
-                whileHover={{ scale: 1.02, rotate: -1 }}
+            <motion.div 
+                className="w-full aspect-[4/5] bg-slate-100 overflow-hidden mb-8 rounded-2xl shadow-sm border border-slate-100 relative"
+                whileHover={{ scale: 1.02 }}
                 transition={{ type: "spring", stiffness: 300, damping: 20 }}
               >
                 <img 
                   src={events[0]?.image || "https://images.pexels.com/photos/863988/pexels-photo-863988.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"}
                   alt="Featured Activity"
-                  className="w-full h-full object-cover filter saturate-110 contrast-110 hover:scale-110 transition-transform duration-[2s] ease-out"
+                  className="w-full h-full object-cover hover:scale-110 transition-transform duration-[2s] ease-out"
                   onError={(e) => {
                     const target = e.target as HTMLImageElement;
                     target.src = "https://images.pexels.com/photos/863988/pexels-photo-863988.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1";
                   }}
                 />
               </motion.div>
-            </div>
             
             <div className="hidden lg:block mt-8">
               <Link 
@@ -155,7 +144,7 @@ const ActivitiesHighlight: React.FC = () => {
                   <div className="flex flex-col md:flex-row gap-6 items-center md:items-start text-center md:text-left">
                     
                     {/* Date Box */}
-                    <div className="flex-shrink-0 w-24 h-24 flex flex-col justify-center items-center rounded-2xl bg-primary-50 text-primary-600 border-2 border-primary-100 group-hover:bg-gradient-to-br group-hover:from-primary-600 group-hover:to-blue-500 group-hover:text-white group-hover:border-transparent transition-all duration-300 shadow-sm">
+                    <div className="flex-shrink-0 w-24 h-24 flex flex-col justify-center items-center rounded-2xl bg-primary-50 text-primary-600 border-2 border-primary-100 group-hover:bg-primary-600 group-hover:text-white group-hover:border-transparent transition-all duration-300">
                       <span className="font-sans font-bold tracking-widest text-xs uppercase mb-1 drop-shadow-sm">
                         {date.month}
                       </span>
