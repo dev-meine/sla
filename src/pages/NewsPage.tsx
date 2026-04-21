@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import PageHeader from '../components/ui/PageHeader';
 import { motion } from 'framer-motion';
 import { Calendar, ArrowRight } from 'lucide-react';
@@ -132,10 +133,10 @@ const NewsPage: React.FC = () => {
                   </div>
                   <h3 className="text-xl mb-3">{post.title}</h3>
                   <p className="text-gray-600 mb-4">{post.excerpt}</p>
-                  <a href="#" className="inline-flex items-center font-medium text-primary-600 hover:text-primary-700">
+                  <Link to={`/news/${post.id}`} className="inline-flex items-center font-medium text-primary-600 hover:text-primary-700">
                     Read More
                     <ArrowRight size={16} className="ml-1" />
-                  </a>
+                  </Link>
                 </div>
               </motion.div>
             ))}
