@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+- **2026-04-22**: Updated office address to "66 Kroo Town Road Facing Berwick Street, Freetown, Sierra Leone" across ContactPage, Footer, and ContactSection.
+- **2026-04-22**: Updated hero section description to include the official identity of Sierra Leone Aquatics as the national governing body for all aquatic sports in Sierra Leone.
+- **2026-04-21**: Complete "Minimalist Solid" redesign pass across all public-facing pages and homepage components. Removed all gradient backgrounds, blur orbs, heavy shadows, and generic icons. Flattened cards to rounded-2xl with slate borders. Unified color palette to slate/primary. Updated HeroSection (removed Watch Video), ActivitiesPage, AthletesPage, BoardPage, AboutPage, ContactPage, NewsPage, RegistrationPage, and all homepage sections (FeaturedAthletes, FeaturedNews, ActivitiesHighlight, SwimmingPackages, ContactSection).
+- **2026-04-21**: Added `vercel.json` with SPA rewrite rule to fix 404 errors on page refresh when hosted on Vercel.
 - **2026-04-21**: Fixed "Save Athlete" doing nothing in Admin Athletes. The image upload was not wired to Supabase Storage, causing silent failures. Added proper `uploadImage`/`deleteImage` functions and a visible validation error summary so admins can see what fields are missing.
 - **2026-04-21**: Added image cropping support to Admin Posts. Admins can now visually crop featured article images to a 16:9 ratio before upload, ensuring consistent hero image presentation across the news section.
 - **2026-04-21**: Fixed an issue where clicking "Read Story" on individual news articles navigated to a blank page. Created the missing `NewsArticlePage` component and registered the `/news/:id` route in `App.tsx`. Updated `NewsPage.tsx` to ensure all "Read More" links connect properly to the individual articles.

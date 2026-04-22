@@ -102,7 +102,7 @@ const Footer: React.FC = () => {
                 <div className="w-8 h-8 rounded-full bg-slate-800/50 flex items-center justify-center mr-4 flex-shrink-0 group-hover:bg-primary-900/50 group-hover:text-primary-400 transition-colors">
                   <MapPin size={14} className="text-slate-400 group-hover:text-primary-400 transition-colors" />
                 </div>
-                <span className="text-slate-300 font-medium leading-relaxed pt-1">National Stadium, Freetown, Sierra Leone</span>
+                <span className="text-slate-300 font-medium leading-relaxed pt-1">66 Kroo Town Road Facing Berwick Street, Freetown, Sierra Leone</span>
               </li>
               <li className="flex items-center group">
                 <div className="w-8 h-8 rounded-full bg-slate-800/50 flex items-center justify-center mr-4 flex-shrink-0 group-hover:bg-primary-900/50 group-hover:text-primary-400 transition-colors">

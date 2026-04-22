@@ -46,7 +46,7 @@ const SwimmingPackages: React.FC = () => {
 
   if (isLoading) {
     return (
-      <section className="bg-gradient-to-b from-slate-50 to-white py-24 relative overflow-hidden">
+      <section className="bg-white py-24 relative overflow-hidden">
         <div className="container mx-auto px-6 lg:px-12 relative z-10">
           <div className="flex justify-center items-center h-32">
             <div className="animate-spin rounded-full h-8 w-8 border-2 border-primary-600 border-t-transparent mx-auto"></div>
@@ -57,7 +57,7 @@ const SwimmingPackages: React.FC = () => {
   }
 
   return (
-    <section className="bg-gradient-to-b from-slate-50 to-white py-24 md:py-32 relative overflow-hidden border-t border-slate-100">
+    <section className="bg-white py-24 md:py-32 relative overflow-hidden border-t border-slate-100">
 
       <div className="container mx-auto px-6 lg:px-12 relative z-10">
         <div className="flex flex-col items-center text-center mb-16 md:mb-24">
@@ -103,11 +103,11 @@ const SwimmingPackages: React.FC = () => {
             return (
               <motion.div 
                 key={pkg.id} 
-                className={`bg-white rounded-[2rem] flex flex-col p-8 lg:p-10 relative overflow-hidden group shadow-lg ring-1 ${
+                className={`bg-white rounded-[2rem] flex flex-col p-8 lg:p-10 relative overflow-hidden group ring-1 ${
                   isFeatured 
-                    ? 'ring-primary-400 shadow-[0_20px_60px_rgba(37,99,235,0.2)] md:-translate-y-4' 
-                    : 'ring-slate-100 shadow-[0_10px_40px_rgba(0,0,0,0.04)] '
-                } hover:shadow-[0_25px_60px_rgba(37,99,235,0.15)] transition-all duration-500`}
+                    ? 'ring-primary-400 shadow-md md:-translate-y-4' 
+                    : 'ring-slate-100 shadow-sm'
+                } hover:shadow-lg transition-all duration-500`}
                 variants={item}
                 whileHover={{ y: isFeatured ? -24 : -12 }}
               >
@@ -155,17 +155,14 @@ const SwimmingPackages: React.FC = () => {
                 <div className="mt-auto relative z-10">
                   <Link 
                     to="/register" 
-                    className={`w-full flex items-center justify-center font-sans font-bold py-4 px-6 rounded-2xl transition-all duration-300 group overflow-hidden relative shadow-md active:scale-95 ${
+                    className={`w-full flex items-center justify-center font-sans font-bold py-4 px-6 rounded-2xl transition-all duration-300 group overflow-hidden relative active:scale-95 ${
                       isFeatured 
-                        ? 'bg-gradient-to-r from-primary-600 to-blue-500 text-white shadow-[0_10px_25px_rgba(37,99,235,0.3)] hover:shadow-[0_15px_35px_rgba(37,99,235,0.4)]' 
+                        ? 'bg-primary-600 text-white hover:bg-primary-700' 
                         : 'bg-white text-primary-700 ring-2 ring-primary-100 hover:ring-primary-500 hover:bg-primary-50'
                     }`}
                   >
                     <span className="uppercase tracking-widest text-xs relative z-10">Register Now</span>
-                    <ArrowRight size={16} className={`ml-3 relative z-10 transition-transform group-hover:translate-x-1 ${isFeatured ? 'text-secondary-300' : 'text-primary-500'}`} />
-                    {isFeatured && (
-                      <div className="absolute inset-0 bg-white/20 transform -skew-x-12 -translate-x-full group-hover:animate-[shine_1s_ease-in-out] z-0"></div>
-                    )}
+                    <ArrowRight size={16} className={`ml-3 relative z-10 transition-transform group-hover:translate-x-1 ${isFeatured ? 'text-white/70' : 'text-primary-500'}`} />
                   </Link>
                 </div>
               </motion.div>

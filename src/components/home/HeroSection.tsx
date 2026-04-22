@@ -56,7 +56,7 @@ const HeroSection: React.FC = () => {
                 transition={{ duration: 0.8, delay: 0.5 }}
                 className="font-sans text-slate-600 text-lg md:text-xl md:leading-relaxed max-w-lg mb-10 font-medium"
               >
-                Empowering athletes, building champions, and promoting aquatic sports across Sierra Leone through world-class programs and competitions.
+                The Sierra Leone Swimming, Diving & Water Polo Association, now known as Sierra Leone Aquatics, is the national governing body for all aquatic sports in Sierra Leone. Empowering athletes, building champions, and promoting aquatic sports across Sierra Leone through world-class programs and competitions.
               </motion.p>
               
               <motion.div 
@@ -67,7 +67,7 @@ const HeroSection: React.FC = () => {
               >
                 <Link 
                   to="/activities" 
-                  className="group px-8 py-4 bg-gradient-to-r from-primary-600 to-blue-500 text-white font-sans font-bold uppercase tracking-wider text-sm rounded-full shadow-[0_0_20px_rgba(37,99,235,0.3)] hover:shadow-[0_0_25px_rgba(37,99,235,0.5)] transition-all duration-300 flex items-center transform hover:scale-105 active:scale-95"
+                  className="group px-8 py-4 bg-primary-600 hover:bg-primary-700 text-white font-sans font-bold uppercase tracking-wider text-sm rounded-full transition-all duration-300 flex items-center transform hover:scale-105 active:scale-95"
                 >
                   Our Programs
                   <motion.span 
@@ -96,7 +96,7 @@ const HeroSection: React.FC = () => {
                   alt="Professional swimmers in competition" 
                   className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-[2000ms] ease-out filter contrast-125 saturate-110"
                 />
-                <div className="absolute inset-0 bg-gradient-to-tr from-primary-900/20 to-transparent mix-blend-overlay"></div>
+
               </div>
             </motion.div>
 
@@ -114,7 +114,7 @@ const HeroSection: React.FC = () => {
                     alt="Sierra Leone swimming team" 
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-[2000ms] ease-out filter contrast-110 saturate-110"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent mix-blend-overlay opacity-50"></div>
+
                 </div>
               </div>
             </motion.div>
