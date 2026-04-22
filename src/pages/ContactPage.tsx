@@ -33,8 +33,8 @@ const ContactPage: React.FC = () => {
                   <div>
                     <h3 className="text-lg font-medium text-slate-900 mb-1">Our Location</h3>
                     <p className="text-slate-600">Top floor</p>
-                    <p className="text-slate-600">66 Kroo Town Road</p>
-                    <p className="text-slate-600">Freetown</p>
+                    <p className="text-slate-600">66 Kroo Town Road Facing Berwick Street</p>
+                    <p className="text-slate-600">Freetown, Sierra Leone</p>
                   </div>
                 </div>
                 

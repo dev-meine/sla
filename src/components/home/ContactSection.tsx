@@ -56,7 +56,7 @@ const ContactSection: React.FC = () => {
               <MapPin size={24} />
             </div>
             <h3 className="text-xl font-semibold mb-3 text-white">Our Location</h3>
-            <p className="text-slate-400">National Stadium, Freetown, Sierra Leone</p>
+            <p className="text-slate-400">66 Kroo Town Road Facing Berwick Street, Freetown, Sierra Leone</p>
             <a href="https://maps.google.com" target="_blank" rel="noopener noreferrer" className="inline-flex items-center text-slate-300 mt-4 hover:text-white transition-colors">
               View on map <ExternalLink size={14} className="ml-1" />
             </a>
