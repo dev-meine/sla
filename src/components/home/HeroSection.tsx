@@ -56,7 +56,7 @@ const HeroSection: React.FC = () => {
                 transition={{ duration: 0.8, delay: 0.5 }}
                 className="font-sans text-slate-600 text-lg md:text-xl md:leading-relaxed max-w-lg mb-10 font-medium"
               >
-                Empowering athletes, building champions, and promoting aquatic sports across Sierra Leone through world-class programs and competitions.
+                The Sierra Leone Swimming, Diving & Water Polo Association, now known as Sierra Leone Aquatics, is the national governing body for all aquatic sports in Sierra Leone. Empowering athletes, building champions, and promoting aquatic sports across Sierra Leone through world-class programs and competitions.
               </motion.p>
               
               <motion.div 
