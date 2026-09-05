@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+- **2026-09-05**: Replaced missing/default favicon with the official Sierra Leone Aquatics logo (`/SLA.png`, `/favicon.png`, and `/favicon.ico`) and added `apple-touch-icon` support in `index.html`.
+- **2026-09-04**: Fixed news article content formatting and text bunching in `NewsArticlePage`. Added robust line ending normalization (\r\n/CRLF support), automatic detection of single vs. double newline paragraph breaks, and comprehensive editorial typography styles in `index.css` (`.article-content`) with generous 1.75rem paragraph margins, 1.85 line-height, and full styling for headings, quotes, and lists.
 - **2026-04-22**: Updated office address to "66 Kroo Town Road Facing Berwick Street, Freetown, Sierra Leone" across ContactPage, Footer, and ContactSection.
 - **2026-04-22**: Updated hero section description to include the official identity of Sierra Leone Aquatics as the national governing body for all aquatic sports in Sierra Leone.
 - **2026-04-21**: Complete "Minimalist Solid" redesign pass across all public-facing pages and homepage components. Removed all gradient backgrounds, blur orbs, heavy shadows, and generic icons. Flattened cards to rounded-2xl with slate borders. Unified color palette to slate/primary. Updated HeroSection (removed Watch Video), ActivitiesPage, AthletesPage, BoardPage, AboutPage, ContactPage, NewsPage, RegistrationPage, and all homepage sections (FeaturedAthletes, FeaturedNews, ActivitiesHighlight, SwimmingPackages, ContactSection).
