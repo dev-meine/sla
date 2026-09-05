@@ -36,6 +36,48 @@ const NewsArticlePage: React.FC = () => {
     }
   };
 
+  const renderArticleContent = (content: string) => {
+    if (!content) {
+      return <p className="text-slate-500 italic">Content unavailable for this article.</p>;
+    }
+
+    // If content contains rich HTML tags, render via dangerouslySetInnerHTML
+    const hasHtml = /<[a-z][\s\S]*>/i.test(content);
+    if (hasHtml) {
+      return <div className="article-content" dangerouslySetInnerHTML={{ __html: content }} />;
+    }
+
+    // Normalize Windows and Mac line endings (\r\n -> \n, \r -> \n)
+    const normalized = content.replace(/\r\n/g, '\n').replace(/\r/g, '\n').trim();
+
+    // Check if author used double line breaks (blank lines between paragraphs)
+    // or single line breaks (Enter pressed once per paragraph)
+    const hasDoubleNewlines = /\n\s*\n/.test(normalized);
+    const rawParagraphs = hasDoubleNewlines
+      ? normalized.split(/\n\s*\n+/)
+      : normalized.split(/\n+/);
+
+    const paragraphs = rawParagraphs.map(p => p.trim()).filter(Boolean);
+
+    return (
+      <div className="article-content">
+        {paragraphs.map((para, pIdx) => {
+          const lines = para.split('\n');
+          return (
+            <p key={pIdx}>
+              {lines.map((line, lIdx) => (
+                <React.Fragment key={lIdx}>
+                  {line}
+                  {lIdx < lines.length - 1 && <br />}
+                </React.Fragment>
+              ))}
+            </p>
+          );
+        })}
+      </div>
+    );
+  };
+
   const formatDate = (dateString: string | null) => {
     if (!dateString) return '';
     return new Date(dateString).toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' });
@@ -137,12 +179,8 @@ const NewsArticlePage: React.FC = () => {
               </div>
 
               {/* Main Content */}
-              <div className="prose prose-lg max-w-none text-gray-700 prose-headings:text-gray-900 prose-a:text-primary-600 hover:prose-a:text-primary-800">
-                {post.content ? (
-                  <div dangerouslySetInnerHTML={{ __html: post.content }} />
-                ) : (
-                  <p>Content unavailable for this article.</p>
-                )}
+              <div className="max-w-none">
+                {renderArticleContent(post.content || '')}
               </div>
             </motion.article>
 
