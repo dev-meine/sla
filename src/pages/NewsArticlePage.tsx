@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Calendar, ArrowLeft, User, Tag } from 'lucide-react';
-import PageHeader from '../components/ui/PageHeader';
+import { Calendar, ArrowLeft, User } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { Database } from '../types/supabase';
 
@@ -85,123 +84,94 @@ const NewsArticlePage: React.FC = () => {
 
   if (isLoading) {
     return (
-      <>
-        <PageHeader title="Loading Article..." />
-        <section className="section bg-slate-50 min-h-[50vh]">
-          <div className="container-custom">
-            <div className="flex justify-center py-20">
-              <div className="animate-spin rounded-full h-12 w-12 border-4 border-primary-600 border-t-transparent mx-auto"></div>
-            </div>
-          </div>
-        </section>
-      </>
+      <div className="min-h-[50vh] pt-12 pb-20 flex items-center justify-center bg-white">
+        <div className="animate-spin rounded-full h-12 w-12 border-4 border-primary-600 border-t-transparent"></div>
+      </div>
     );
   }
 
   if (!post) {
     return (
-      <>
-        <PageHeader title="Article Not Found" description="The story you are looking for does not exist or has been removed." />
-        <section className="section bg-slate-50 min-h-[40vh] flex items-center justify-center">
-          <div className="text-center">
-            <Link to="/news" className="btn btn-primary inline-flex items-center">
-              <ArrowLeft size={18} className="mr-2" />
-              Back to News
-            </Link>
-          </div>
-        </section>
-      </>
+      <div className="min-h-[50vh] pt-12 pb-20 flex items-center justify-center bg-white">
+        <div className="text-center max-w-md px-6">
+          <h1 className="text-2xl font-heading font-bold text-slate-900 mb-3">Article Not Found</h1>
+          <p className="text-slate-600 mb-6">The story you are looking for does not exist or has been removed.</p>
+          <Link to="/news" className="btn btn-primary inline-flex items-center">
+            <ArrowLeft size={18} className="mr-2" />
+            Back to News
+          </Link>
+        </div>
+      </div>
     );
   }
 
   return (
-    <>
-      <PageHeader
-        title={post.category || "Press Release"}
-        description={formatDate(post.created_at)}
-        image={post.image_url || "https://images.unsplash.com/photo-1519315901367-f34ff9154487?auto=format&fit=crop&w=1470&q=80"}
-      />
+    <article className="pt-10 md:pt-14 pb-20 bg-white min-h-screen">
+      <div className="container-custom">
+        <div className="max-w-4xl mx-auto">
+          {/* Back Button */}
+          <Link 
+            to="/news" 
+            className="inline-flex items-center text-sm font-semibold text-slate-500 hover:text-primary-600 mb-6 transition-colors group"
+          >
+            <ArrowLeft size={16} className="mr-2 group-hover:-translate-x-1 transition-transform" />
+            Back to All News
+          </Link>
 
-      <section className="section bg-white relative">
-        <div className="container-custom">
-          <div className="max-w-4xl mx-auto">
-            {/* Back Button */}
-            <Link to="/news" className="inline-flex items-center text-primary-600 hover:text-primary-800 font-medium mb-12 transition-colors">
-              <ArrowLeft size={18} className="mr-2" />
-              Back to Articles
-            </Link>
-
-            <motion.article 
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-              className="bg-white"
-            >
-              <div className="mb-10 text-center md:text-left">
-                <div className="flex flex-wrap items-center justify-center md:justify-start gap-4 text-sm text-gray-500 mb-6 font-medium">
-                  <span className="flex items-center bg-slate-100 px-3 py-1 rounded-full text-slate-700">
-                    <Calendar size={16} className="mr-2" />
-                    {formatDate(post.created_at)}
-                  </span>
-                  
-                  {post.category && (
-                    <span className="flex items-center bg-primary-50 px-3 py-1 rounded-full text-primary-700">
-                      <Tag size={16} className="mr-2" />
-                      {post.category}
-                    </span>
-                  )}
-                  
-                  {/* Defaulting author since it's typically internal SLA communications */}
-                  <span className="flex items-center bg-slate-100 px-3 py-1 rounded-full text-slate-700">
-                    <User size={16} className="mr-2" />
-                    Sierra Leone Aquatics
-                  </span>
-                </div>
-
-                <h1 className="text-4xl md:text-5xl font-bold text-gray-900 leading-tight mb-6">
-                  {post.title}
-                </h1>
-
-                {post.excerpt && (
-                  <p className="text-xl text-gray-600 leading-relaxed font-medium">
-                    {post.excerpt}
-                  </p>
-                )}
-              </div>
-
-              {/* Main Image Banner — Medium/LinkedIn style: max-height capped, minimal crop */}
-              <div className="w-full max-h-[480px] rounded-2xl overflow-hidden mb-12 shadow-md bg-slate-100">
-                 <img 
-                    src={post.image_url || "https://images.unsplash.com/photo-1519315901367-f34ff9154487?auto=format&fit=crop&w=1470&q=80"}
-                    alt={post.title}
-                    className="w-full h-full max-h-[480px] object-cover"
-                 />
-              </div>
-
-              {/* Main Content */}
-              <div className="max-w-none">
-                {renderArticleContent(post.content || '')}
-              </div>
-            </motion.article>
-
-            <div className="mt-16 pt-8 border-t border-gray-100 flex flex-col md:flex-row justify-between items-center bg-slate-50 p-8 rounded-xl">
-              <div className="mb-4 md:mb-0 text-center md:text-left">
-                <h3 className="font-bold text-lg text-gray-900 mb-1">Spread the Word</h3>
-                <p className="text-gray-500 text-sm">Share this article with your community</p>
-              </div>
-              <div className="flex gap-4">
-                <button 
-                  onClick={() => navigator.clipboard.writeText(window.location.href)}
-                  className="px-6 py-2 bg-white border border-gray-200 text-gray-700 rounded-full font-medium hover:bg-gray-50 hover:border-gray-300 transition-colors shadow-sm"
-                >
-                  Copy Link
-                </button>
-              </div>
+          <motion.div 
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+          >
+            {/* Metadata Bar */}
+            <div className="flex flex-wrap items-center gap-3 text-xs md:text-sm text-slate-500 mb-4 font-medium">
+              {post.category && (
+                <span className="px-3 py-1 bg-primary-50 text-primary-700 rounded-full font-bold text-xs uppercase tracking-wider">
+                  {post.category}
+                </span>
+              )}
+              <span className="flex items-center bg-slate-100 px-3 py-1 rounded-full text-slate-600 text-xs">
+                <Calendar size={13} className="mr-1.5 text-slate-400" />
+                {formatDate(post.created_at)}
+              </span>
+              <span className="flex items-center bg-slate-100 px-3 py-1 rounded-full text-slate-600 text-xs">
+                <User size={13} className="mr-1.5 text-slate-400" />
+                Sierra Leone Aquatics
+              </span>
             </div>
-          </div>
+
+            {/* Article Title */}
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-heading font-bold text-slate-900 leading-[1.2] tracking-tight mb-6">
+              {post.title}
+            </h1>
+
+            {/* Excerpt */}
+            {post.excerpt && (
+              <p className="text-lg md:text-xl text-slate-600 leading-relaxed font-normal mb-8 border-l-4 border-primary-500 pl-4 py-1 italic bg-slate-50 rounded-r-lg">
+                {post.excerpt}
+              </p>
+            )}
+
+            {/* Featured Image */}
+            {post.image_url && (
+              <div className="w-full max-h-[480px] rounded-2xl overflow-hidden mb-10 shadow-sm bg-slate-100 border border-slate-200/60">
+                <img 
+                  src={post.image_url} 
+                  alt={post.title}
+                  className="w-full h-full max-h-[480px] object-cover"
+                />
+              </div>
+            )}
+
+            {/* Main Content */}
+            <div className="max-w-none">
+              {renderArticleContent(post.content || '')}
+            </div>
+
+          </motion.div>
         </div>
-      </section>
-    </>
+      </div>
+    </article>
   );
 };
 
