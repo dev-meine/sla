@@ -74,10 +74,6 @@ const Footer: React.FC = () => {
           
           {/* Menu Column */}
           <motion.div className="md:col-span-4 lg:col-span-3" variants={itemVariants}>
-            <h3 className="font-sans text-xs uppercase tracking-widest text-slate-500 font-bold mb-6 flex items-center">
-              <span className="w-2 h-2 rounded-full bg-secondary-500 mr-2"></span>
-              Navigation
-            </h3>
             <ul className="space-y-4">
               {navItems.map((item) => (
                 <li key={item.label}>
@@ -93,10 +89,6 @@ const Footer: React.FC = () => {
           
           {/* Contact Column */}
           <motion.div className="md:col-span-8 lg:col-span-4" variants={itemVariants}>
-            <h3 className="font-sans text-xs uppercase tracking-widest text-slate-500 font-bold mb-6 flex items-center">
-              <span className="w-2 h-2 rounded-full bg-primary-500 mr-2"></span>
-              Contact
-            </h3>
             <ul className="space-y-5">
               <li className="flex items-start group">
                 <div className="w-8 h-8 rounded-full bg-slate-800/50 flex items-center justify-center mr-4 flex-shrink-0 group-hover:bg-primary-900/50 group-hover:text-primary-400 transition-colors">

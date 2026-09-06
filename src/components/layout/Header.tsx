@@ -16,27 +16,30 @@ const Header: React.FC = () => {
 
   useEffect(() => {
     const handleScroll = () => {
-      if (window.scrollY > 20) {
+      if (window.scrollY > 15) {
         setScrolled(true);
       } else {
         setScrolled(false);
       }
     };
 
-    window.addEventListener('scroll', handleScroll);
+    handleScroll();
+    window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+  }, [location.pathname]);
 
   const isActive = (path: string) => {
     return location.pathname === path;
   };
 
+  const isHomePage = location.pathname === '/';
+
   return (
     <header
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
-        scrolled
-          ? 'bg-white/80 backdrop-blur-xl shadow-[0_4px_30px_rgba(0,0,0,0.03)] border-b border-primary-500/10 py-4'
-          : 'bg-transparent py-6'
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+        isHomePage && !scrolled
+          ? 'bg-transparent py-5 md:py-6'
+          : 'bg-white/95 backdrop-blur-xl shadow-sm border-b border-slate-200/80 py-3.5 md:py-4'
       }`}
     >
       <div className="container mx-auto px-6 lg:px-12">
@@ -83,13 +86,14 @@ const Header: React.FC = () => {
             ))}
             
             <motion.div
+              className="flex items-center"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               transition={{ type: "spring", stiffness: 400, damping: 10 }}
             >
               <Link
                 to="/admin"
-                className="ml-4 inline-flex items-center justify-center bg-gradient-to-r from-primary-600 to-blue-500 text-white px-6 py-3 rounded-full shadow-[0_0_20px_rgba(37,99,235,0.3)] font-sans text-xs uppercase tracking-widest font-semibold transition-all duration-300 hover:shadow-[0_0_25px_rgba(37,99,235,0.5)]"
+                className="inline-flex items-center justify-center bg-gradient-to-r from-primary-600 to-blue-500 text-white px-5 py-2.5 rounded-full shadow-[0_2px_10px_rgba(37,99,235,0.25)] font-sans text-xs uppercase tracking-wider font-semibold transition-all duration-300 hover:shadow-[0_4px_15px_rgba(37,99,235,0.4)]"
               >
                 Admin Login
               </Link>
