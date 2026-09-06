@@ -13,26 +13,26 @@ const PageHeader: React.FC<PageHeaderProps> = ({
   image = "https://images.pexels.com/photos/863988/pexels-photo-863988.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
 }) => {
   return (
-    <section className="relative py-32 md:py-40 overflow-hidden bg-slate-950">
+    <section className="relative py-14 md:py-20 overflow-hidden bg-slate-950">
       
       {/* Content */}
       <div className="container-custom relative z-10">
         <div className="max-w-3xl">
           <motion.h1 
-            className="text-white mb-5"
-            initial={{ opacity: 0, y: 20 }}
+            className="text-white font-heading text-3xl md:text-5xl font-bold tracking-tight mb-3"
+            initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
+            transition={{ duration: 0.5 }}
           >
             {title}
           </motion.h1>
           
           {description && (
             <motion.p 
-              className="text-gray-100 text-lg"
-              initial={{ opacity: 0, y: 20 }}
+              className="text-slate-200 text-base md:text-lg max-w-2xl font-normal leading-relaxed"
+              initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
+              transition={{ duration: 0.5, delay: 0.15 }}
             >
               {description}
             </motion.p>

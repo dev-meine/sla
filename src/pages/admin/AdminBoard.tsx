@@ -182,7 +182,7 @@ const AdminBoard: React.FC = () => {
         </div>
 
         {isAdding && (
-          <div className="bg-white p-6 rounded-lg shadow-md mb-8">
+          <div className="bg-white p-6 rounded-lg border border-slate-200 mb-8">
             <h3 className="text-xl font-semibold mb-4">
               {editingMember ? 'Edit Board Member' : 'Add New Board Member'}
             </h3>
@@ -261,7 +261,7 @@ const AdminBoard: React.FC = () => {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
             {boardMembers.map((member) => (
-              <div key={member.id} className="bg-white rounded-lg shadow-md overflow-hidden">
+              <div key={member.id} className="bg-white rounded-lg border border-slate-200 overflow-hidden">
                 <div className="h-48 w-full overflow-hidden bg-gray-100">
                   <img
                     src={member.image || 'https://via.placeholder.com/400x300'}

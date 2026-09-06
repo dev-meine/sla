@@ -117,7 +117,7 @@ const SwimmingRegistration: React.FC = () => {
             {packages.map((pkg) => (
               <label
                 key={pkg.id}
-                className="relative cursor-pointer"
+                className="relative cursor-pointer flex flex-col h-full"
               >
                 <input
                   type="radio"
@@ -125,10 +125,12 @@ const SwimmingRegistration: React.FC = () => {
                   value={pkg.id}
                   className="peer sr-only"
                 />
-                <div className="p-5 rounded-2xl border-2 border-slate-100 peer-checked:border-primary-600 peer-checked:bg-primary-50 hover:bg-slate-50 transition-all">
-                  <h3 className="font-semibold text-slate-900">{pkg.name}</h3>
-                  <p className="text-sm text-slate-500 mt-1 leading-relaxed">{pkg.description}</p>
-                  <p className="text-lg font-semibold text-primary-600 mt-3">
+                <div className="h-full flex-1 flex flex-col justify-between p-5 rounded-2xl border-2 border-slate-100 peer-checked:border-primary-600 peer-checked:bg-primary-50 hover:bg-slate-50 transition-all">
+                  <div>
+                    <h3 className="font-semibold text-slate-900">{pkg.name}</h3>
+                    <p className="text-sm text-slate-500 mt-1 leading-relaxed">{pkg.description}</p>
+                  </div>
+                  <p className="text-lg font-semibold text-primary-600 mt-3 pt-1">
                     Le {pkg.price.toLocaleString()}
                   </p>
                 </div>

@@ -184,7 +184,7 @@ const AdminGallery: React.FC = () => {
         </div>
 
         {isAdding && (
-          <div className="bg-white p-6 rounded-lg shadow-md mb-8">
+          <div className="bg-white p-6 rounded-lg border border-slate-200 mb-8">
             <h3 className="text-xl font-semibold mb-4">
               {editingItem ? 'Edit Gallery Item' : 'Add New Gallery Item'}
             </h3>
@@ -288,7 +288,7 @@ const AdminGallery: React.FC = () => {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {galleryItems.map((item) => (
-              <div key={item.id} className="bg-white rounded-lg shadow-md overflow-hidden">
+              <div key={item.id} className="bg-white rounded-lg border border-slate-200 overflow-hidden">
                 <div className="aspect-w-16 aspect-h-9">
                   {item.type === 'image' ? (
                     <img

@@ -54,7 +54,7 @@ const AdminLogin: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8 admin-portal">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         <motion.div 
           className="flex justify-center"
@@ -88,7 +88,7 @@ const AdminLogin: React.FC = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.4 }}
       >
-        <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
+        <div className="bg-white py-8 px-4 border border-gray-200 sm:rounded-lg sm:px-10">
           {error && (
             <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-md">
               <div className="flex items-center">
@@ -119,7 +119,7 @@ const AdminLogin: React.FC = () => {
                   id="email"
                   type="email"
                   autoComplete="email"
-                  className={`block w-full rounded-md shadow-sm focus:border-primary-500 focus:ring-primary-500 px-3 py-2 border ${
+                  className={`block w-full rounded-md focus:border-primary-500 focus:ring-primary-500 px-3 py-2 border ${
                     errors.email ? 'border-red-500' : 'border-gray-300'
                   }`}
                   {...register('email', { 
@@ -145,7 +145,7 @@ const AdminLogin: React.FC = () => {
                   id="password"
                   type="password"
                   autoComplete="current-password"
-                  className={`block w-full rounded-md shadow-sm focus:border-primary-500 focus:ring-primary-500 px-3 py-2 border ${
+                  className={`block w-full rounded-md focus:border-primary-500 focus:ring-primary-500 px-3 py-2 border ${
                     errors.password ? 'border-red-500' : 'border-gray-300'
                   }`}
                   {...register('password', { 
@@ -186,7 +186,7 @@ const AdminLogin: React.FC = () => {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="flex w-full justify-center rounded-md border border-transparent bg-primary-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 disabled:opacity-70"
+                className="flex w-full justify-center rounded-md border border-transparent bg-primary-600 py-2 px-4 text-sm font-medium text-white hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 disabled:opacity-70"
               >
                 {isLoading ? 'Signing in...' : 'Sign in'}
               </button>

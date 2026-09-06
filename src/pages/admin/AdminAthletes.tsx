@@ -196,7 +196,7 @@ const AdminAthletes: React.FC = () => {
         </div>
 
         {isAdding && (
-          <div className="bg-white p-6 rounded-lg shadow-md mb-8">
+          <div className="bg-white p-6 rounded-lg border border-slate-200 mb-8">
             <h3 className="text-xl font-semibold mb-4">
               {editingAthlete ? 'Edit Athlete' : 'Add New Athlete'}
             </h3>
@@ -430,7 +430,7 @@ const AdminAthletes: React.FC = () => {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {athletes.map((athlete) => (
-              <div key={athlete.id} className="bg-white rounded-lg shadow-md overflow-hidden">
+              <div key={athlete.id} className="bg-white rounded-lg border border-slate-200 overflow-hidden">
                 <div className="grid grid-cols-1">
                   <div className="relative h-[400px]">
                     <img 

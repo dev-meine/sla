@@ -103,7 +103,7 @@ const SwimmingPackages: React.FC = () => {
             return (
               <motion.div 
                 key={pkg.id} 
-                className={`bg-white rounded-[2rem] flex flex-col p-8 lg:p-10 relative overflow-hidden group ring-1 ${
+                className={`bg-white rounded-[2rem] flex flex-col h-full p-8 lg:p-10 relative overflow-hidden group ring-1 ${
                   isFeatured 
                     ? 'ring-primary-400 shadow-md md:-translate-y-4' 
                     : 'ring-slate-100 shadow-sm'

@@ -63,7 +63,7 @@ const ActivitiesHighlight: React.FC = () => {
   }
 
   return (
-    <section className="bg-slate-50 py-24 md:py-32 relative overflow-hidden">
+    <section className="bg-slate-50 pt-6 md:pt-8 pb-16 md:pb-20 relative overflow-hidden">
       <div className="container mx-auto px-6 lg:px-12 relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-20 items-start">
           

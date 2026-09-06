@@ -184,7 +184,7 @@ const AdminRegistrations: React.FC = () => {
           </p>
         </div>
 
-        <div className="bg-white shadow-md rounded-lg overflow-hidden">
+        <div className="bg-white border border-slate-200 rounded-lg overflow-hidden">
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
@@ -248,7 +248,7 @@ const AdminRegistrations: React.FC = () => {
                         <select
                           value={registration.tutor_name || ''}
                           onChange={(e) => updateRegistrationDetails(registration.id, 'tutor_name', e.target.value)}
-                          className="block w-full text-sm border-gray-300 rounded-md shadow-sm focus:border-primary-500 focus:ring-primary-500"
+                          className="block w-full text-sm border-gray-300 rounded-md focus:border-primary-500 focus:ring-primary-500"
                         >
                           <option value="">Select Tutor</option>
                           <optgroup label="Athletes">
@@ -266,13 +266,13 @@ const AdminRegistrations: React.FC = () => {
                           type="date"
                           value={registration.class_date || ''}
                           onChange={(e) => updateRegistrationDetails(registration.id, 'class_date', e.target.value)}
-                          className="block w-full text-sm border-gray-300 rounded-md shadow-sm focus:border-primary-500 focus:ring-primary-500"
+                          className="block w-full text-sm border-gray-300 rounded-md focus:border-primary-500 focus:ring-primary-500"
                         />
                         <input
                           type="time"
                           value={registration.class_time || ''}
                           onChange={(e) => updateRegistrationDetails(registration.id, 'class_time', e.target.value)}
-                          className="block w-full text-sm border-gray-300 rounded-md shadow-sm focus:border-primary-500 focus:ring-primary-500"
+                          className="block w-full text-sm border-gray-300 rounded-md focus:border-primary-500 focus:ring-primary-500"
                         />
                       </div>
                     </td>
@@ -283,7 +283,7 @@ const AdminRegistrations: React.FC = () => {
                       <select
                         value={registration.status || 'pending'}
                         onChange={(e) => updateStatus(registration.id, e.target.value)}
-                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
+                        className="mt-1 block w-full rounded-md border-gray-300 focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
                       >
                         <option value="pending">Pending</option>
                         <option value="confirmed">Payment Confirmed</option>

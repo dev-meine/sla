@@ -108,7 +108,7 @@ const AdminReports: React.FC = () => {
         ) : (
           <div className="space-y-6">
             {reports.map((report) => (
-              <div key={report.id} className="bg-white rounded-lg shadow-md p-6">
+              <div key={report.id} className="bg-white rounded-lg border border-slate-200 p-6">
                 <div className="flex justify-between items-start mb-4">
                   <div>
                     <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(report.status)}`}>
@@ -164,7 +164,7 @@ const AdminReports: React.FC = () => {
             ))}
 
             {reports.length === 0 && (
-              <div className="text-center py-12 bg-white rounded-lg shadow-md">
+              <div className="text-center py-12 bg-white rounded-lg border border-slate-200">
                 <AlertTriangle className="mx-auto h-12 w-12 text-gray-400" />
                 <h3 className="mt-2 text-sm font-medium text-gray-900">No Reports</h3>
                 <p className="mt-1 text-sm text-gray-500">

@@ -186,7 +186,7 @@ const AdminPosts: React.FC = () => {
         </div>
 
         {isAdding && (
-          <div className="bg-white p-6 rounded-lg shadow-md mb-8">
+          <div className="bg-white p-6 rounded-lg border border-slate-200 mb-8">
             <h3 className="text-xl font-semibold mb-4">
               {editingPost ? 'Edit Post' : 'Add New Post'}
             </h3>
@@ -287,7 +287,7 @@ const AdminPosts: React.FC = () => {
             <div className="animate-spin rounded-full h-12 w-12 border-4 border-primary-600 border-t-transparent mx-auto"></div>
           </div>
         ) : (
-          <div className="bg-white rounded-lg shadow-md overflow-hidden">
+          <div className="bg-white rounded-lg border border-slate-200 overflow-hidden">
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>

@@ -74,26 +74,26 @@ const AdminDashboard: React.FC = () => {
     <AdminLayout>
       <div className="p-8">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <div className="bg-white p-6 rounded-lg shadow-md">
+          <div className="bg-white p-6 rounded-lg border border-slate-200">
             <h3 className="text-lg font-semibold mb-2">Total Athletes</h3>
             <p className="text-3xl font-bold text-primary-600">{stats.athletes}</p>
           </div>
-          <div className="bg-white p-6 rounded-lg shadow-md">
+          <div className="bg-white p-6 rounded-lg border border-slate-200">
             <h3 className="text-lg font-semibold mb-2">Active Events</h3>
             <p className="text-3xl font-bold text-secondary-500">{stats.events}</p>
           </div>
-          <div className="bg-white p-6 rounded-lg shadow-md">
+          <div className="bg-white p-6 rounded-lg border border-slate-200">
             <h3 className="text-lg font-semibold mb-2">Gallery Items</h3>
             <p className="text-3xl font-bold text-accent-500">{stats.gallery}</p>
           </div>
-          <div className="bg-white p-6 rounded-lg shadow-md">
+          <div className="bg-white p-6 rounded-lg border border-slate-200">
             <h3 className="text-lg font-semibold mb-2">Blog Posts</h3>
             <p className="text-3xl font-bold text-gray-600">{stats.posts}</p>
           </div>
         </div>
 
         <div className="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <div className="bg-white p-6 rounded-lg shadow-md">
+          <div className="bg-white p-6 rounded-lg border border-slate-200">
             <h3 className="text-lg font-semibold mb-4">Recent Events</h3>
             <div className="space-y-4">
               {recentEvents.map(event => (
@@ -119,7 +119,7 @@ const AdminDashboard: React.FC = () => {
             </div>
           </div>
 
-          <div className="bg-white p-6 rounded-lg shadow-md">
+          <div className="bg-white p-6 rounded-lg border border-slate-200">
             <h3 className="text-lg font-semibold mb-4">Recent Posts</h3>
             <div className="space-y-4">
               {recentPosts.map(post => (

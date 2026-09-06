@@ -112,7 +112,7 @@ const AdminTechnicalStaff: React.FC = () => {
         </div>
 
         {isAdding && (
-          <div className="bg-white p-6 rounded-lg shadow-md mb-8">
+          <div className="bg-white p-6 rounded-lg border border-slate-200 mb-8">
             <h3 className="text-xl font-semibold mb-4">
               {editingStaff ? 'Edit Staff Member' : 'Add New Staff Member'}
             </h3>
@@ -252,7 +252,7 @@ const AdminTechnicalStaff: React.FC = () => {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {staff.map((member) => (
-              <div key={member.id} className="bg-white rounded-lg shadow-md overflow-hidden">
+              <div key={member.id} className="bg-white rounded-lg border border-slate-200 overflow-hidden">
                 <div className="aspect-w-4 aspect-h-3">
                   <img
                     src={member.image || 'https://via.placeholder.com/400x300'}

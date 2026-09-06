@@ -41,8 +41,8 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
   const isActive = (path: string) => location.pathname === path;
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <aside className="fixed top-0 left-0 h-full w-64 bg-white shadow-lg">
+    <div className="min-h-screen bg-gray-50 admin-portal">
+      <aside className="fixed top-0 left-0 h-full w-64 bg-white border-r border-slate-200">
         <div className="p-6">
           <h1 className="text-xl font-bold text-primary-600">Admin</h1>
         </div>
