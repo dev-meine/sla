@@ -6,6 +6,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+- **2026-10-16**: Cleaned up Admin Posts copy and upgraded featured header image area selection:
+  - Removed page subtitle *"Create, edit, and publish official articles and news updates for Sierra Leone Aquatics."* from `AdminPosts.tsx`.
+  - Removed form guidance copy *"Enter headline, category, featured image and story body."* from `AdminPosts.tsx`.
+  - Upgraded `ImageCropUpload.tsx` and `AdminPosts.tsx` with interactive area selection for article featured header images: configured 16:9 widescreen header framing by default, added aspect ratio selector options (`16:9 (Header)`, `4:3 (Standard)`, `Free (Any Area)`), quick alignment presets (`Top`, `Center`, `Bottom`), and an active "Select Area / Adjust Framing" button on image previews so admins can choose and fine-tune exactly what region of any photo appears in article headers and cards.
+
 - **2026-10-16**: Modern SaaS redesign of the complete Admin Portal matching the public website's design system and color palette:
   - **Color Tokens & Elevation Utilities (`src/index.css`)**: Removed destructive `.admin-portal * { box-shadow: none !important; }` reset. Added modern SaaS utility tokens (`.admin-card`, `.admin-card-hover`, `.admin-input`, `.admin-select`) based strictly on the official website brand colors (`primary-600 #005FB3`, `primary-700 #004C90`, `secondary-700 #997000`, `accent-700 #006A26`, `slate-50`, `border-slate-200/80`).
   - **Shared SaaS Admin UI Components**:

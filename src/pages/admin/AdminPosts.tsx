@@ -183,7 +183,6 @@ const AdminPosts: React.FC = () => {
     <AdminLayout>
       <AdminPageHeader
         title="Press & Media Posts"
-        description="Create, edit, and publish official articles and news updates for Sierra Leone Aquatics."
         breadcrumbs={[
           { label: 'Admin', href: '/admin' },
           { label: 'News Posts' }
@@ -211,7 +210,6 @@ const AdminPosts: React.FC = () => {
               <h3 className="text-lg font-bold text-slate-900 font-heading">
                 {editingPost ? 'Edit Press Release' : 'Compose New Article'}
               </h3>
-              <p className="text-xs text-slate-500">Enter headline, category, featured image and story body.</p>
             </div>
             <button
               onClick={() => {
@@ -255,7 +253,7 @@ const AdminPosts: React.FC = () => {
                 </select>
               </div>
 
-              <div>
+              <div className="md:col-span-2">
                 <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
                   Author / Byline
                 </label>
@@ -267,10 +265,15 @@ const AdminPosts: React.FC = () => {
                 />
               </div>
 
-              <div>
-                <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
-                  Featured Header Image (16:9)
-                </label>
+              <div className="md:col-span-2">
+                <div className="flex items-center justify-between mb-1.5">
+                  <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider">
+                    Featured Header Image (16:9)
+                  </label>
+                  <span className="text-[11px] text-slate-500">
+                    Select what area of the image is shown as the article header
+                  </span>
+                </div>
                 <ImageCropUpload
                   currentImage={editingPost?.image_url}
                   onImageUpload={async (file) => {
@@ -278,7 +281,12 @@ const AdminPosts: React.FC = () => {
                     if (url) setValue('image_url', url);
                   }}
                   onImageRemove={() => setValue('image_url', null)}
-                  aspectRatio={1}
+                  aspectRatio={16 / 9}
+                  aspectRatioOptions={[
+                    { label: '16:9 (Header)', value: 16 / 9 },
+                    { label: '4:3 (Standard)', value: 4 / 3 },
+                    { label: 'Free (Any Area)', value: undefined }
+                  ]}
                 />
               </div>
             </div>
