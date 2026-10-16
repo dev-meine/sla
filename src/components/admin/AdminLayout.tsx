@@ -23,6 +23,8 @@ import {
   ShieldCheck
 } from 'lucide-react';
 import Logo from '../ui/Logo';
+import AdminSearchModal from './AdminSearchModal';
+import AdminNotificationsDropdown from './AdminNotificationsDropdown';
 
 interface AdminLayoutProps {
   children: React.ReactNode;
@@ -77,6 +79,22 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [userEmail, setUserEmail] = useState<string | null>(null);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
+  const [unreadNotificationsCount, setUnreadNotificationsCount] = useState(0);
+
+  // Global Cmd+K / Ctrl+K keyboard shortcut
+  useEffect(() => {
+    const handleGlobalKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        setIsSearchOpen(prev => !prev);
+      }
+    };
+
+    window.addEventListener('keydown', handleGlobalKeyDown);
+    return () => window.removeEventListener('keydown', handleGlobalKeyDown);
+  }, []);
 
   useEffect(() => {
     // Load session user email
@@ -296,23 +314,59 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
 
           {/* Right: Search, Notifications & User Session Menu */}
           <div className="flex items-center gap-3">
-            {/* Quick Search Cue */}
-            <div className="hidden md:flex items-center gap-2 px-3 py-1.5 bg-slate-100/80 hover:bg-slate-100 rounded-lg text-xs text-slate-400 border border-slate-200/60 transition-colors cursor-pointer">
+            {/* Quick Search Cue (Desktop) */}
+            <button
+              type="button"
+              onClick={() => setIsSearchOpen(true)}
+              className="hidden md:flex items-center gap-2 px-3 py-1.5 bg-slate-100/80 hover:bg-slate-100 rounded-lg text-xs text-slate-500 border border-slate-200/60 transition-colors cursor-pointer"
+              title="Search admin platform (⌘K)"
+            >
               <Search size={14} className="text-slate-400" />
               <span>Search platform...</span>
               <kbd className="px-1.5 py-0.5 text-[10px] font-semibold bg-white border border-slate-200 rounded text-slate-500 shadow-xs">
                 ⌘K
               </kbd>
-            </div>
-
-            {/* Notifications Bell */}
-            <button
-              className="relative p-2 rounded-lg text-slate-500 hover:text-slate-700 hover:bg-slate-100 transition-colors"
-              aria-label="Notifications"
-            >
-              <Bell size={18} />
-              <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-primary-600 ring-2 ring-white" />
             </button>
+
+            {/* Quick Search Trigger (Mobile) */}
+            <button
+              type="button"
+              onClick={() => setIsSearchOpen(true)}
+              className="md:hidden p-2 rounded-lg text-slate-500 hover:text-slate-700 hover:bg-slate-100 transition-colors"
+              aria-label="Search platform"
+            >
+              <Search size={18} />
+            </button>
+
+            {/* Notifications Bell with Popover Anchor */}
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => setIsNotificationsOpen(prev => !prev)}
+                className={`relative p-2 rounded-lg transition-colors ${
+                  isNotificationsOpen
+                    ? 'bg-slate-100 text-primary-600'
+                    : 'text-slate-500 hover:text-slate-700 hover:bg-slate-100'
+                }`}
+                aria-label="Notifications"
+                title="Notifications & System Alerts"
+              >
+                <Bell size={18} />
+                {unreadNotificationsCount > 0 && (
+                  <span className="absolute top-1.5 right-1.5 flex h-2 w-2">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary-400 opacity-75" />
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-primary-600 ring-2 ring-white" />
+                  </span>
+                )}
+              </button>
+
+              {/* Notifications Dropdown Flyout */}
+              <AdminNotificationsDropdown
+                isOpen={isNotificationsOpen}
+                onClose={() => setIsNotificationsOpen(false)}
+                onUnreadCountChange={setUnreadNotificationsCount}
+              />
+            </div>
 
             <div className="h-4 w-px bg-slate-200 mx-1 hidden sm:block" />
 
@@ -339,6 +393,12 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
           {children}
         </main>
       </div>
+
+      {/* Global Command Palette / Search Modal */}
+      <AdminSearchModal
+        isOpen={isSearchOpen}
+        onClose={() => setIsSearchOpen(false)}
+      />
     </div>
   );
 };

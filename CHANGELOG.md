@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+- **2026-10-16**: Implemented interactive Global Search (Command Palette) and Notifications Flyout in Admin Layout:
+  - **Global Command Palette (`AdminSearchModal.tsx`)**: Created an interactive modal command palette accessible via `⌘K` / `Ctrl+K` or clicking the top bar search bar (desktop) or search icon (mobile). Provides instant keyboard navigation (`↑`/`↓` and `Enter`), fast navigation shortcuts across all admin management modules, and real-time debounced Supabase database queries searching athletes, news posts, and aquatic events.
+  - **Live Notifications Popover (`AdminNotificationsDropdown.tsx`)**: Connected the top bar notification bell into an interactive flyout popover dynamically aggregating actionable alerts from Supabase: pending student swimmer registrations awaiting tutor assignment, pending Safe Sport confidential reports, upcoming aquatic events, and news posts. Includes unread badge tracking, localStorage persistence, and a 1-click "Mark all read" action.
+
 - **2026-10-16**: Standardized article card sizing and layout under "Latest News":
   - Replaced the previous asymmetrical layout on the homepage (`FeaturedNews.tsx`), which had an oversized 7-column lead article and smaller 5-column secondary articles with mismatched aspect ratios (`aspect-[16/9]` vs `aspect-[4/3]`), with a balanced, uniform 3-column responsive grid.
   - Standardized all news article cards across `FeaturedNews.tsx` and `NewsPage.tsx` with identical 16:9 widescreen image containers, consistent card heights (`flex flex-col h-full`), uniform typography (`line-clamp-2` titles, `line-clamp-3` excerpts), and aligned "Read Story" action links.
