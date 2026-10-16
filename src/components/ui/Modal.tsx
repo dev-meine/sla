@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { X } from 'lucide-react';
+import { X, AlertTriangle } from 'lucide-react';
 
 interface ModalProps {
   isOpen: boolean;
@@ -9,6 +9,7 @@ interface ModalProps {
   message: string;
   confirmText?: string;
   cancelText?: string;
+  variant?: 'danger' | 'primary';
 }
 
 const Modal: React.FC<ModalProps> = ({
@@ -18,7 +19,8 @@ const Modal: React.FC<ModalProps> = ({
   title,
   message,
   confirmText = 'Confirm',
-  cancelText = 'Cancel'
+  cancelText = 'Cancel',
+  variant = 'danger'
 }) => {
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
@@ -43,46 +45,65 @@ const Modal: React.FC<ModalProps> = ({
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto">
       <div className="flex min-h-screen items-center justify-center p-4 text-center">
-        <div className="fixed inset-0 bg-black bg-opacity-50 transition-opacity" onClick={onClose} />
-        
-        <div className="relative transform overflow-hidden rounded-lg bg-white text-left border border-slate-200 transition-all sm:w-full sm:max-w-lg">
-          <div className="absolute right-0 top-0 pr-4 pt-4">
+        {/* Backdrop with blur */}
+        <div
+          className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs transition-opacity"
+          onClick={onClose}
+          aria-hidden="true"
+        />
+
+        {/* Modal Dialog Card */}
+        <div className="relative transform overflow-hidden rounded-2xl bg-white text-left border border-slate-200/90 shadow-xl transition-all sm:w-full sm:max-w-md p-6">
+          <div className="absolute right-4 top-4">
             <button
               type="button"
-              className="rounded-md bg-white text-gray-400 hover:text-gray-500"
+              className="p-1 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors"
               onClick={onClose}
+              aria-label="Close dialog"
             >
-              <X size={20} />
+              <X size={18} />
             </button>
           </div>
-          
-          <div className="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
-            <div className="sm:flex sm:items-start">
-              <div className="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
-                <h3 className="text-xl font-semibold leading-6 text-gray-900">
-                  {title}
-                </h3>
-                <div className="mt-2">
-                  <p className="text-sm text-gray-500">{message}</p>
-                </div>
-              </div>
+
+          <div className="flex items-start gap-4">
+            <div
+              className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${
+                variant === 'danger'
+                  ? 'bg-rose-50 text-rose-600 border border-rose-100'
+                  : 'bg-primary-50 text-primary-600 border border-primary-100'
+              }`}
+            >
+              <AlertTriangle size={20} />
+            </div>
+
+            <div className="flex-1 pr-4">
+              <h3 className="text-lg font-bold font-heading text-slate-900 leading-snug">
+                {title}
+              </h3>
+              <p className="mt-1.5 text-sm text-slate-500 leading-relaxed">
+                {message}
+              </p>
             </div>
           </div>
-          
-          <div className="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
+
+          <div className="mt-6 flex flex-col-reverse sm:flex-row sm:justify-end gap-2.5">
             <button
               type="button"
-              className="inline-flex w-full justify-center rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white hover:bg-red-500 sm:ml-3 sm:w-auto"
-              onClick={onConfirm}
-            >
-              {confirmText}
-            </button>
-            <button
-              type="button"
-              className="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto"
+              className="px-4 py-2 text-xs font-semibold text-slate-700 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors"
               onClick={onClose}
             >
               {cancelText}
+            </button>
+            <button
+              type="button"
+              className={`px-4 py-2 text-xs font-semibold text-white rounded-lg transition-colors shadow-xs ${
+                variant === 'danger'
+                  ? 'bg-rose-600 hover:bg-rose-700'
+                  : 'bg-primary-600 hover:bg-primary-700'
+              }`}
+              onClick={onConfirm}
+            >
+              {confirmText}
             </button>
           </div>
         </div>

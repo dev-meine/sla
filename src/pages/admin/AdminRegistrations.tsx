@@ -1,26 +1,41 @@
 import React, { useState, useEffect } from 'react';
 import AdminLayout from '../../components/admin/AdminLayout';
+import AdminPageHeader from '../../components/admin/AdminPageHeader';
+import AdminBadge from '../../components/admin/AdminBadge';
+import AdminEmptyState from '../../components/admin/AdminEmptyState';
 import { supabase } from '../../lib/supabase';
-import { CheckCircle, Clock, XCircle } from 'lucide-react';
+import {
+  ClipboardList,
+  Search,
+  CheckCircle2,
+  Clock,
+  XCircle,
+  AlertCircle,
+  Phone,
+  Mail,
+  UserCheck
+} from 'lucide-react';
 import { Database } from '../../types/supabase';
 
-type SwimmingRegistration = Database['public']['Tables']['swimming_registrations']['Row'] & {
-  swimming_packages: {
+type Registration = Database['public']['Tables']['swimming_registrations']['Row'] & {
+  swimming_packages?: {
     name: string;
     price: number;
-  } | null;
+  };
 };
 
-interface TutorOption {
+type Tutor = {
   id: string;
   name: string;
   type: 'athlete' | 'technical_staff';
-}
+};
 
 const AdminRegistrations: React.FC = () => {
-  const [registrations, setRegistrations] = useState<SwimmingRegistration[]>([]);
-  const [tutors, setTutors] = useState<TutorOption[]>([]);
+  const [registrations, setRegistrations] = useState<Registration[]>([]);
+  const [tutors, setTutors] = useState<Tutor[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [statusFilter, setStatusFilter] = useState<string>('all');
 
   useEffect(() => {
     fetchRegistrations();
@@ -29,22 +44,18 @@ const AdminRegistrations: React.FC = () => {
 
   const fetchTutors = async () => {
     try {
-      // Fetch athletes
-      const { data: athletesData, error: athletesError } = await supabase
-        .from('athletes')
-        .select('id, name')
-        .order('name');
-
-      // Fetch technical staff
-      const { data: staffData, error: staffError } = await supabase
-        .from('technical_staff')
-        .select('id, name')
-        .order('name');
+      const [
+        { data: athletesData, error: athletesError },
+        { data: staffData, error: staffError }
+      ] = await Promise.all([
+        supabase.from('athletes').select('id, name').order('name'),
+        supabase.from('technical_staff').select('id, name').order('name')
+      ]);
 
       if (athletesError) throw athletesError;
       if (staffError) throw staffError;
 
-      const allTutors: TutorOption[] = [
+      const allTutors: Tutor[] = [
         ...(athletesData || []).map(athlete => ({
           id: athlete.id,
           name: athlete.name,
@@ -113,200 +124,243 @@ const AdminRegistrations: React.FC = () => {
     }
   };
 
-  const getStatusBadge = (status: string) => {
+  const renderStatusBadge = (status: string) => {
     switch (status) {
       case 'pending':
-        return (
-          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-            <Clock size={12} className="mr-1" />
-            Pending
-          </span>
-        );
+        return <AdminBadge variant="warning" size="sm">Pending Review</AdminBadge>;
       case 'confirmed':
-        return (
-          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-            <CheckCircle size={12} className="mr-1" />
-            Payment Confirmed
-          </span>
-        );
-      case 'assigned':
-        return (
-          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-            <CheckCircle size={12} className="mr-1" />
-            Tutor Assigned
-          </span>
-        );
-      case 'scheduled':
-        return (
-          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
-            <CheckCircle size={12} className="mr-1" />
-            Class Scheduled
-          </span>
-        );
+        return <AdminBadge variant="info" size="sm">Confirmed</AdminBadge>;
       case 'completed':
-        return (
-          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-            <CheckCircle size={12} className="mr-1" />
-            Completed
-          </span>
-        );
+        return <AdminBadge variant="success" size="sm">Completed</AdminBadge>;
       case 'cancelled':
-        return (
-          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
-            <XCircle size={12} className="mr-1" />
-            Cancelled
-          </span>
-        );
+        return <AdminBadge variant="danger" size="sm">Cancelled</AdminBadge>;
       default:
-        return status;
+        return <AdminBadge variant="neutral" size="sm">{status}</AdminBadge>;
     }
   };
 
-  if (isLoading) {
-    return (
-      <AdminLayout>
-        <div className="p-8">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-4 border-primary-600 border-t-transparent mx-auto"></div>
-          </div>
-        </div>
-      </AdminLayout>
-    );
-  }
+  const filteredRegistrations = registrations.filter(reg => {
+    const q = searchQuery.toLowerCase();
+    const matchesSearch =
+      reg.name.toLowerCase().includes(q) ||
+      (reg.email && reg.email.toLowerCase().includes(q)) ||
+      (reg.phone && reg.phone.toLowerCase().includes(q)) ||
+      (reg.transaction_id && reg.transaction_id.toLowerCase().includes(q));
+
+    const matchesStatus = statusFilter === 'all' || reg.status === statusFilter;
+    return matchesSearch && matchesStatus;
+  });
+
+  const pendingCount = registrations.filter(r => r.status === 'pending').length;
+  const confirmedCount = registrations.filter(r => r.status === 'confirmed').length;
+  const completedCount = registrations.filter(r => r.status === 'completed').length;
 
   return (
     <AdminLayout>
-      <div className="p-8">
-        <div className="mb-6">
-          <h2 className="text-2xl font-semibold">Swimming Registrations</h2>
-          <p className="text-gray-600 mt-1">
-            Manage swimming lesson registrations and payment status
-          </p>
+      <AdminPageHeader
+        title="Swimming Registrations"
+        description="Process lesson applicants, verify transactions, assign coaches, and track schedule fulfillment."
+        breadcrumbs={[
+          { label: 'Admin', href: '/admin' },
+          { label: 'Athletic Roster' },
+          { label: 'Registrations' }
+        ]}
+      />
+
+      {/* Mini KPI Chips */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
+        <div className="admin-card p-4 flex items-center justify-between">
+          <div>
+            <p className="text-xs text-slate-500 font-semibold uppercase tracking-wider">Total Orders</p>
+            <p className="text-xl font-bold text-slate-900 font-heading mt-0.5">{registrations.length}</p>
+          </div>
+          <div className="w-9 h-9 rounded-lg bg-primary-50 text-primary-600 flex items-center justify-center">
+            <ClipboardList size={18} />
+          </div>
         </div>
 
-        <div className="bg-white border border-slate-200 rounded-lg overflow-hidden">
+        <div className="admin-card p-4 flex items-center justify-between">
+          <div>
+            <p className="text-xs text-slate-500 font-semibold uppercase tracking-wider">Pending</p>
+            <p className="text-xl font-bold text-secondary-800 font-heading mt-0.5">{pendingCount}</p>
+          </div>
+          <div className="w-9 h-9 rounded-lg bg-secondary-50 text-secondary-700 flex items-center justify-center">
+            <Clock size={18} />
+          </div>
+        </div>
+
+        <div className="admin-card p-4 flex items-center justify-between">
+          <div>
+            <p className="text-xs text-slate-500 font-semibold uppercase tracking-wider">Confirmed</p>
+            <p className="text-xl font-bold text-primary-700 font-heading mt-0.5">{confirmedCount}</p>
+          </div>
+          <div className="w-9 h-9 rounded-lg bg-primary-50 text-primary-600 flex items-center justify-center">
+            <CheckCircle2 size={18} />
+          </div>
+        </div>
+
+        <div className="admin-card p-4 flex items-center justify-between">
+          <div>
+            <p className="text-xs text-slate-500 font-semibold uppercase tracking-wider">Completed</p>
+            <p className="text-xl font-bold text-accent-700 font-heading mt-0.5">{completedCount}</p>
+          </div>
+          <div className="w-9 h-9 rounded-lg bg-accent-50 text-accent-700 flex items-center justify-center">
+            <UserCheck size={18} />
+          </div>
+        </div>
+      </div>
+
+      {/* Filter and Search Bar */}
+      <div className="admin-card p-4 mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="relative flex-1 max-w-sm">
+          <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+          <input
+            type="text"
+            placeholder="Search by student name, phone, email, or transaction ID..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full pl-9 pr-3.5 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs text-slate-900 placeholder:text-slate-400 focus:bg-white focus:outline-none focus:border-primary-600 focus:ring-2 focus:ring-primary-50 transition-all"
+          />
+        </div>
+
+        {/* Status Filter Pills */}
+        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0">
+          {['all', 'pending', 'confirmed', 'completed', 'cancelled'].map((status) => (
+            <button
+              key={status}
+              onClick={() => setStatusFilter(status)}
+              className={`px-3 py-1.5 rounded-lg text-xs font-semibold capitalize whitespace-nowrap transition-colors ${
+                statusFilter === status
+                  ? 'bg-primary-600 text-white shadow-xs'
+                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200/70'
+              }`}
+            >
+              {status === 'all' ? 'All Applications' : status}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Table Container Card */}
+      <div className="admin-card overflow-hidden">
+        {isLoading ? (
+          <div className="text-center py-16">
+            <div className="animate-spin rounded-full h-8 w-8 border-2 border-primary-600 border-t-transparent mx-auto" />
+            <p className="mt-3 text-xs text-slate-500">Loading registrations...</p>
+          </div>
+        ) : filteredRegistrations.length === 0 ? (
+          <div className="p-8">
+            <AdminEmptyState
+              icon={ClipboardList}
+              title={searchQuery || statusFilter !== 'all' ? 'No matching registrations' : 'No registrations recorded'}
+              description={
+                searchQuery || statusFilter !== 'all'
+                  ? 'Try modifying your search or status filter parameters.'
+                  : 'Registrations submitted via the public swimming lesson portal will appear here.'
+              }
+            />
+          </div>
+        ) : (
           <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Name
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Contact
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Package
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Transaction ID
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Tutor & Schedule
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Status
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Actions
-                  </th>
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr className="bg-slate-50/90 border-b border-slate-200 text-[11px] font-semibold uppercase tracking-wider text-slate-500">
+                  <th className="px-5 py-3.5">Student / Contact</th>
+                  <th className="px-4 py-3.5">Package & Price</th>
+                  <th className="px-4 py-3.5">Payment Ref</th>
+                  <th className="px-4 py-3.5">Assigned Tutor</th>
+                  <th className="px-4 py-3.5">Schedule</th>
+                  <th className="px-4 py-3.5">Status</th>
+                  <th className="px-5 py-3.5 text-right">Quick Update</th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {registrations.map((registration) => (
-                  <tr key={registration.id}>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm font-medium text-gray-900">
-                        {registration.name}
+              <tbody className="divide-y divide-slate-100 bg-white text-sm">
+                {filteredRegistrations.map((reg) => (
+                  <tr key={reg.id} className="hover:bg-slate-50/70 transition-colors">
+                    <td className="px-5 py-3.5">
+                      <div>
+                        <p className="font-semibold text-slate-900">{reg.name}</p>
+                        <div className="flex flex-col gap-0.5 text-xs text-slate-500 mt-1">
+                          {reg.email && (
+                            <span className="flex items-center gap-1">
+                              <Mail size={12} className="text-slate-400" /> {reg.email}
+                            </span>
+                          )}
+                          {reg.phone && (
+                            <span className="flex items-center gap-1">
+                              <Phone size={12} className="text-slate-400" /> {reg.phone}
+                            </span>
+                          )}
+                        </div>
                       </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">
-                        {registration.email && (
-                          <div className="text-gray-600">{registration.email}</div>
-                        )}
-                        {registration.phone && (
-                          <div className="text-gray-600">{registration.phone}</div>
-                        )}
-                      </div>
+
+                    <td className="px-4 py-3.5 whitespace-nowrap">
+                      <p className="font-medium text-slate-900">
+                        {reg.swimming_packages?.name || 'General Lesson'}
+                      </p>
+                      <p className="text-xs text-primary-600 font-semibold mt-0.5">
+                        Le {reg.swimming_packages?.price ? reg.swimming_packages.price.toLocaleString() : '—'}
+                      </p>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">
-                        {registration.swimming_packages?.name}
-                      </div>
-                      <div className="text-sm text-gray-500">
-                        Le {registration.swimming_packages?.price.toLocaleString()}
-                      </div>
+
+                    <td className="px-4 py-3.5 whitespace-nowrap text-xs">
+                      {reg.transaction_id ? (
+                        <code className="px-2 py-0.5 rounded bg-slate-100 font-mono text-[11px] text-slate-700 border border-slate-200">
+                          {reg.transaction_id}
+                        </code>
+                      ) : (
+                        <span className="text-slate-400 italic">None provided</span>
+                      )}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">
-                        {registration.transaction_id}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="space-y-2">
-                        <select
-                          value={registration.tutor_name || ''}
-                          onChange={(e) => updateRegistrationDetails(registration.id, 'tutor_name', e.target.value)}
-                          className="block w-full text-sm border-gray-300 rounded-md focus:border-primary-500 focus:ring-primary-500"
-                        >
-                          <option value="">Select Tutor</option>
-                          <optgroup label="Athletes">
-                            {tutors.filter(tutor => tutor.type === 'athlete').map(tutor => (
-                              <option key={tutor.id} value={tutor.name}>{tutor.name}</option>
-                            ))}
-                          </optgroup>
-                          <optgroup label="Technical Staff">
-                            {tutors.filter(tutor => tutor.type === 'technical_staff').map(tutor => (
-                              <option key={tutor.id} value={tutor.name}>{tutor.name}</option>
-                            ))}
-                          </optgroup>
-                        </select>
-                        <input
-                          type="date"
-                          value={registration.class_date || ''}
-                          onChange={(e) => updateRegistrationDetails(registration.id, 'class_date', e.target.value)}
-                          className="block w-full text-sm border-gray-300 rounded-md focus:border-primary-500 focus:ring-primary-500"
-                        />
-                        <input
-                          type="time"
-                          value={registration.class_time || ''}
-                          onChange={(e) => updateRegistrationDetails(registration.id, 'class_time', e.target.value)}
-                          className="block w-full text-sm border-gray-300 rounded-md focus:border-primary-500 focus:ring-primary-500"
-                        />
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      {getStatusBadge(registration.status || 'pending')}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+
+                    <td className="px-4 py-3.5 whitespace-nowrap">
                       <select
-                        value={registration.status || 'pending'}
-                        onChange={(e) => updateStatus(registration.id, e.target.value)}
-                        className="mt-1 block w-full rounded-md border-gray-300 focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
+                        value={reg.assigned_tutor_id || ''}
+                        onChange={(e) => updateRegistrationDetails(reg.id, 'assigned_tutor_id', e.target.value)}
+                        className="px-2.5 py-1 text-xs border border-slate-200 rounded-lg bg-white text-slate-800 focus:outline-none focus:border-primary-600 focus:ring-2 focus:ring-primary-50"
                       >
-                        <option value="pending">Pending</option>
-                        <option value="confirmed">Payment Confirmed</option>
-                        <option value="assigned">Tutor Assigned</option>
-                        <option value="scheduled">Class Scheduled</option>
-                        <option value="completed">Completed</option>
-                        <option value="cancelled">Cancelled</option>
+                        <option value="">Assign Coach...</option>
+                        {tutors.map((tutor) => (
+                          <option key={tutor.id} value={tutor.id}>
+                            {tutor.name} ({tutor.type === 'athlete' ? 'Athlete' : 'Staff'})
+                          </option>
+                        ))}
+                      </select>
+                    </td>
+
+                    <td className="px-4 py-3.5 whitespace-nowrap">
+                      <input
+                        type="text"
+                        defaultValue={reg.schedule_notes || ''}
+                        onBlur={(e) => updateRegistrationDetails(reg.id, 'schedule_notes', e.target.value)}
+                        placeholder="e.g. Saturdays 9 AM"
+                        className="w-36 px-2.5 py-1 text-xs border border-slate-200 rounded-lg bg-white placeholder:text-slate-400 focus:outline-none focus:border-primary-600 focus:ring-2 focus:ring-primary-50"
+                      />
+                    </td>
+
+                    <td className="px-4 py-3.5 whitespace-nowrap">
+                      {renderStatusBadge(reg.status)}
+                    </td>
+
+                    <td className="px-5 py-3.5 whitespace-nowrap text-right">
+                      <select
+                        value={reg.status}
+                        onChange={(e) => updateStatus(reg.id, e.target.value)}
+                        className="px-2.5 py-1 text-xs font-medium border border-slate-200 rounded-lg bg-white text-slate-700 hover:border-slate-300 focus:outline-none focus:border-primary-600 focus:ring-2 focus:ring-primary-50"
+                      >
+                        <option value="pending">Mark Pending</option>
+                        <option value="confirmed">Confirm</option>
+                        <option value="completed">Complete</option>
+                        <option value="cancelled">Cancel</option>
                       </select>
                     </td>
                   </tr>
                 ))}
-
-                {registrations.length === 0 && (
-                  <tr>
-                    <td colSpan={7} className="px-6 py-4 text-center text-gray-500">
-                      No registrations found
-                    </td>
-                  </tr>
-                )}
               </tbody>
             </table>
           </div>
-        </div>
+        )}
       </div>
     </AdminLayout>
   );

@@ -1,7 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import AdminLayout from '../../components/admin/AdminLayout';
+import AdminPageHeader from '../../components/admin/AdminPageHeader';
+import AdminBadge from '../../components/admin/AdminBadge';
+import AdminEmptyState from '../../components/admin/AdminEmptyState';
 import { supabase, invalidateCache } from '../../lib/supabase';
-import { PlusCircle, Edit2, Trash2, Calendar, MapPin, Timer, Medal } from 'lucide-react';
+import {
+  Plus,
+  Edit2,
+  Trash2,
+  Calendar,
+  MapPin,
+  Medal,
+  Users,
+  Search,
+  X,
+  Trophy,
+  Filter
+} from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { Database } from '../../types/supabase';
 import ImageUpload from '../../components/ui/ImageUpload';
@@ -16,7 +31,9 @@ const AdminAthletes: React.FC = () => {
   const [editingAthlete, setEditingAthlete] = useState<Athlete | null>(null);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [athleteToDelete, setAthleteToDelete] = useState<string | null>(null);
-  
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedSport, setSelectedSport] = useState<string>('all');
+
   const { register, handleSubmit, reset, setValue, formState: { errors } } = useForm<Athlete>();
 
   useEffect(() => {
@@ -29,7 +46,7 @@ const AdminAthletes: React.FC = () => {
         .from('athletes')
         .select('*')
         .order('name');
-      
+
       if (error) throw error;
       setAthletes(data || []);
     } catch (error) {
@@ -79,14 +96,13 @@ const AdminAthletes: React.FC = () => {
 
   const sanitizeText = (text: string | null): string | null => {
     if (!text) return null;
-    // Remove any potential null bytes and invalid characters
     return text.replace(/\0/g, '').trim();
   };
 
   const onSubmit = async (data: Athlete) => {
     try {
       setIsLoading(true);
-      
+
       const athleteData = {
         name: sanitizeText(data.name),
         nickname: sanitizeText(data.nickname),
@@ -106,16 +122,13 @@ const AdminAthletes: React.FC = () => {
         caps: sanitizeText(data.caps)
       };
 
-      console.log('Submitting athlete data:', athleteData);
-
       if (editingAthlete) {
         const { error } = await supabase
           .from('athletes')
           .update(athleteData)
           .eq('id', editingAthlete.id);
-          
+
         if (error) {
-          console.error('Supabase update error:', error);
           alert(`Error updating athlete: ${error.message}`);
           return;
         }
@@ -123,9 +136,8 @@ const AdminAthletes: React.FC = () => {
         const { error } = await supabase
           .from('athletes')
           .insert([athleteData]);
-          
+
         if (error) {
-          console.error('Supabase insert error:', error);
           alert(`Error saving athlete: ${error.message}`);
           return;
         }
@@ -159,14 +171,14 @@ const AdminAthletes: React.FC = () => {
 
   const handleDeleteConfirm = async () => {
     if (!athleteToDelete) return;
-    
+
     try {
       setIsLoading(true);
       const { error } = await supabase
         .from('athletes')
         .delete()
         .eq('id', athleteToDelete);
-        
+
       if (error) throw error;
       invalidateCache('athlete');
       fetchAthletes();
@@ -179,367 +191,496 @@ const AdminAthletes: React.FC = () => {
     }
   };
 
+  const filteredAthletes = athletes.filter(athlete => {
+    const matchesSearch =
+      athlete.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (athlete.training_base && athlete.training_base.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      (athlete.club && athlete.club.toLowerCase().includes(searchQuery.toLowerCase()));
+
+    const matchesSport =
+      selectedSport === 'all' ||
+      (athlete.sport && athlete.sport.toLowerCase().includes(selectedSport.toLowerCase()));
+
+    return matchesSearch && matchesSport;
+  });
+
   return (
     <AdminLayout>
-      <div className="p-8">
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-semibold">Manage Athletes</h2>
+      <AdminPageHeader
+        title="Athletic Roster"
+        description="Manage verified national competitors, training bases, specialties, and international caps."
+        breadcrumbs={[
+          { label: 'Admin', href: '/admin' },
+          { label: 'Athletic Roster' },
+          { label: 'Athletes' }
+        ]}
+        actions={
           <button
             onClick={() => {
               setIsAdding(!isAdding);
               setEditingAthlete(null);
               reset();
             }}
-            className="btn btn-primary"
+            className="inline-flex items-center gap-2 px-3.5 py-2 text-xs font-semibold bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors shadow-xs"
           >
-            <PlusCircle size={20} className="mr-2" />
-            Add Athlete
+            {isAdding ? <X size={15} /> : <Plus size={15} />}
+            <span>{isAdding ? 'Close Editor' : 'Register Athlete'}</span>
           </button>
-        </div>
+        }
+      />
 
-        {isAdding && (
-          <div className="bg-white p-6 rounded-lg border border-slate-200 mb-8">
-            <h3 className="text-xl font-semibold mb-4">
-              {editingAthlete ? 'Edit Athlete' : 'Add New Athlete'}
-            </h3>
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
-                  <input
-                    type="text"
-                    {...register('name', { required: 'Name is required' })}
-                    className="w-full px-3 py-2 border rounded-md"
-                    placeholder="e.g., OLAMIDAY ELIZABETH SAM"
-                  />
-                  {errors.name && (
-                    <p className="text-red-500 text-xs mt-1">{errors.name.message}</p>
-                  )}
-                </div>
+      {/* Editor Drawer / Form Card */}
+      {isAdding && (
+        <div className="admin-card p-6 mb-8 border-primary-200/80 shadow-sm">
+          <div className="flex items-center justify-between pb-4 mb-6 border-b border-slate-200">
+            <div>
+              <h3 className="text-lg font-bold text-slate-900 font-heading">
+                {editingAthlete ? 'Update Athlete Profile' : 'Register New Athlete'}
+              </h3>
+              <p className="text-xs text-slate-500">Provide official biometric data, club details, and competitive history.</p>
+            </div>
+            <button
+              onClick={() => {
+                setIsAdding(false);
+                setEditingAthlete(null);
+                reset();
+              }}
+              className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100"
+            >
+              <X size={18} />
+            </button>
+          </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Nickname</label>
-                  <input
-                    type="text"
-                    {...register('nickname')}
-                    className="w-full px-3 py-2 border rounded-md"
-                    placeholder="e.g., OLY"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Sport</label>
-                  <select
-                    {...register('sport', { required: 'Sport is required' })}
-                    className="w-full px-3 py-2 border rounded-md"
-                  >
-                    <option value="">Select Sport</option>
-                    <option value="swimming">Swimming</option>
-                    <option value="diving">Diving</option>
-                    <option value="water-polo">Water Polo</option>
-                  </select>
-                  {errors.sport && (
-                    <p className="text-red-500 text-xs mt-1">{errors.sport.message}</p>
-                  )}
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Image</label>
-                  <ImageUpload
-                    currentImage={editingAthlete?.image}
-                    onImageUpload={async (file) => {
-                      const url = await uploadImage(file);
-                      if (url) setValue('image', url);
-                    }}
-                    onImageRemove={() => setValue('image', null)}
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Height (meters)</label>
-                  <input
-                    type="number"
-                    step="0.01"
-                    {...register('height_meters', {
-                      min: { value: 0.5, message: 'Height must be at least 0.5m' },
-                      max: { value: 2.5, message: 'Height must be less than 2.5m' }
-                    })}
-                    className="w-full px-3 py-2 border rounded-md"
-                    placeholder="e.g., 1.75"
-                  />
-                  {errors.height_meters && (
-                    <p className="text-red-500 text-xs mt-1">{errors.height_meters.message}</p>
-                  )}
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Weight (kg)</label>
-                  <input
-                    type="number"
-                    step="0.1"
-                    {...register('weight_kg', {
-                      min: { value: 30, message: 'Weight must be at least 30kg' },
-                      max: { value: 150, message: 'Weight must be less than 150kg' }
-                    })}
-                    className="w-full px-3 py-2 border rounded-md"
-                    placeholder="e.g., 65.5"
-                  />
-                  {errors.weight_kg && (
-                    <p className="text-red-500 text-xs mt-1">{errors.weight_kg.message}</p>
-                  )}
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Date of Birth</label>
-                  <input
-                    type="date"
-                    {...register('date_of_birth')}
-                    className="w-full px-3 py-2 border rounded-md"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Place of Birth</label>
-                  <input
-                    type="text"
-                    {...register('place_of_birth')}
-                    className="w-full px-3 py-2 border rounded-md"
-                    placeholder="e.g., Freetown, Sierra Leone"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Nationality</label>
-                  <input
-                    type="text"
-                    {...register('nationality')}
-                    className="w-full px-3 py-2 border rounded-md"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Club</label>
-                  <input
-                    type="text"
-                    {...register('club')}
-                    className="w-full px-3 py-2 border rounded-md"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Coach</label>
-                  <input
-                    type="text"
-                    {...register('coach')}
-                    className="w-full px-3 py-2 border rounded-md"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Training Base</label>
-                  <input
-                    type="text"
-                    {...register('training_base')}
-                    className="w-full px-3 py-2 border rounded-md"
-                  />
-                </div>
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
+                  Full Name *
+                </label>
+                <input
+                  type="text"
+                  placeholder="e.g. Joshua Wyse"
+                  {...register('name', { required: 'Name is required' })}
+                  className="admin-input"
+                />
+                {errors.name && (
+                  <p className="text-rose-600 text-xs mt-1">{errors.name.message}</p>
+                )}
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Bio</label>
-                <textarea
-                  {...register('bio')}
-                  rows={4}
-                  className="w-full px-3 py-2 border rounded-md"
-                ></textarea>
+                <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
+                  Nickname / Alias
+                </label>
+                <input
+                  type="text"
+                  placeholder='e.g. "The Torpedo"'
+                  {...register('nickname')}
+                  className="admin-input"
+                />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Specialties</label>
+                <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
+                  Primary Sport / Discipline *
+                </label>
+                <select
+                  {...register('sport', { required: 'Sport is required' })}
+                  className="admin-select"
+                >
+                  <option value="">Select Discipline</option>
+                  <option value="swimming">Swimming</option>
+                  <option value="diving">Diving</option>
+                  <option value="water-polo">Water Polo</option>
+                  <option value="open-water">Open Water Swimming</option>
+                </select>
+                {errors.sport && (
+                  <p className="text-rose-600 text-xs mt-1">{errors.sport.message}</p>
+                )}
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
+                  Date of Birth
+                </label>
+                <input
+                  type="date"
+                  {...register('date_of_birth')}
+                  className="admin-input"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
+                  Nationality
+                </label>
+                <input
+                  type="text"
+                  defaultValue="Sierra Leonean"
+                  {...register('nationality')}
+                  className="admin-input"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
+                  Current Club
+                </label>
+                <input
+                  type="text"
+                  placeholder="e.g. Aberdeen Aquatics Club"
+                  {...register('club')}
+                  className="admin-input"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
+                  Assigned Coach
+                </label>
+                <input
+                  type="text"
+                  placeholder="e.g. Coach Mohamed Kamara"
+                  {...register('coach')}
+                  className="admin-input"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
+                  Primary Training Base
+                </label>
+                <input
+                  type="text"
+                  placeholder="e.g. Siaka Stevens Stadium Olympic Pool"
+                  {...register('training_base')}
+                  className="admin-input"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
+                  Place of Birth
+                </label>
+                <input
+                  type="text"
+                  placeholder="e.g. Freetown, Sierra Leone"
+                  {...register('place_of_birth')}
+                  className="admin-input"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
+                  Height (Meters)
+                </label>
+                <input
+                  type="number"
+                  step="0.01"
+                  placeholder="e.g. 1.82"
+                  {...register('height_meters')}
+                  className="admin-input"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
+                  Weight (KG)
+                </label>
+                <input
+                  type="number"
+                  step="0.1"
+                  placeholder="e.g. 74.5"
+                  {...register('weight_kg')}
+                  className="admin-input"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
+                  Profile Photo
+                </label>
+                <ImageUpload
+                  currentImage={editingAthlete?.image}
+                  onImageUpload={async (file) => {
+                    const url = await uploadImage(file);
+                    if (url) setValue('image', url);
+                  }}
+                  onImageRemove={() => setValue('image', null)}
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
+                  Specialties (one per line)
+                </label>
                 <textarea
                   {...register('specialties')}
-                  rows={4}
-                  className="w-full px-3 py-2 border rounded-md"
-                  placeholder="Enter specialties (one per line)"
-                ></textarea>
-                <p className="text-sm text-gray-500 mt-1">
-                  Enter each specialty on a new line (e.g., Freestyle, Butterfly, Platform Diving)
-                </p>
+                  rows={3}
+                  placeholder="50m Freestyle&#10;100m Butterfly"
+                  className="admin-input text-xs"
+                />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Personal Bests</label>
+                <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
+                  Personal Bests (one per line)
+                </label>
                 <textarea
                   {...register('personal_bests')}
-                  rows={4}
-                  className="w-full px-3 py-2 border rounded-md"
-                  placeholder="Enter personal bests (e.g., 100m Freestyle - 48.23s (2024-01-15))"
-                ></textarea>
-                <p className="text-sm text-gray-500 mt-1">
-                  Enter each personal best on a new line in the format: Event - Time in seconds (Date)
-                </p>
+                  rows={3}
+                  placeholder="50m Free - 24.12s&#10;100m Free - 53.40s"
+                  className="admin-input text-xs"
+                />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">International Caps</label>
+                <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
+                  International Caps & Medals
+                </label>
                 <textarea
                   {...register('caps')}
-                  rows={4}
-                  className="w-full px-3 py-2 border rounded-md"
-                  placeholder="Enter international caps (e.g., 2024 African Games - Cairo, Egypt)"
-                ></textarea>
-                <p className="text-sm text-gray-500 mt-1">
-                  Enter each cap on a new line in the format: Year Competition - Location
-                </p>
+                  rows={3}
+                  placeholder="2024 Olympic Games (Paris)&#10;2026 Commonwealth Games"
+                  className="admin-input text-xs"
+                />
               </div>
+            </div>
 
-              {Object.keys(errors).length > 0 && (
-                <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-                  <p className="text-red-700 font-medium text-sm">Please fix the following errors:</p>
-                  <ul className="text-red-600 text-sm mt-1 list-disc list-inside">
-                    {errors.name && <li>{errors.name.message}</li>}
-                    {errors.sport && <li>{errors.sport.message}</li>}
-                    {errors.height_meters && <li>{errors.height_meters.message}</li>}
-                    {errors.weight_kg && <li>{errors.weight_kg.message}</li>}
-                  </ul>
-                </div>
-              )}
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
+                Biography & Athletic Career Overview
+              </label>
+              <textarea
+                {...register('bio')}
+                rows={3}
+                placeholder="Background, early swimming career, and major milestones..."
+                className="admin-input text-xs"
+              />
+            </div>
 
-              <div className="flex justify-end gap-4">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setIsAdding(false);
-                    setEditingAthlete(null);
-                    reset();
-                  }}
-                  className="btn btn-outline"
-                >
-                  Cancel
-                </button>
-                <button type="submit" className="btn btn-primary">
-                  {editingAthlete ? 'Update' : 'Save'} Athlete
-                </button>
-              </div>
-            </form>
-          </div>
-        )}
+            <div className="flex justify-end gap-3 pt-4 border-t border-slate-200">
+              <button
+                type="button"
+                onClick={() => {
+                  setIsAdding(false);
+                  setEditingAthlete(null);
+                  reset();
+                }}
+                className="px-4 py-2 text-xs font-semibold text-slate-700 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                className="px-4 py-2 text-xs font-semibold text-white bg-primary-600 hover:bg-primary-700 rounded-lg transition-colors shadow-xs"
+              >
+                {editingAthlete ? 'Update Athlete' : 'Save Athlete'}
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
 
-        {isLoading ? (
-          <div className="text-center py-12">
-            <div className="animate-spin rounded-full h-12 w-12 border-4 border-primary-600 border-t-transparent mx-auto"></div>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {athletes.map((athlete) => (
-              <div key={athlete.id} className="bg-white rounded-lg border border-slate-200 overflow-hidden">
-                <div className="grid grid-cols-1">
-                  <div className="relative h-[400px]">
-                    <img 
-                      src={athlete.image || "https://images.pexels.com/photos/863988/pexels-photo-863988.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"}
-                      alt={athlete.name}
-                      className="absolute inset-0 w-full h-full object-cover object-top"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
-                    <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
-                      <h3 className="text-2xl font-semibold mb-1 text-white">{athlete.name}</h3>
-                      {athlete.nickname && (
-                        <p className="text-gray-200">"{athlete.nickname}"</p>
-                      )}
-                      <p className="text-gray-200 capitalize">{athlete.sport?.replace('-', ' ') || 'Athlete'}</p>
-                    </div>
-                  </div>
+      {/* Filter and Search Bar */}
+      <div className="admin-card p-4 mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="relative flex-1 max-w-sm">
+          <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+          <input
+            type="text"
+            placeholder="Search by athlete name, club, or training base..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full pl-9 pr-3.5 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs text-slate-900 placeholder:text-slate-400 focus:bg-white focus:outline-none focus:border-primary-600 focus:ring-2 focus:ring-primary-50 transition-all"
+          />
+        </div>
 
-                  <div className="p-6">
-                    <div className="space-y-4">
-                      <div className="flex items-center text-sm text-gray-600">
-                        <Calendar size={16} className="mr-2" />
-                        Born: {athlete.date_of_birth ? new Date(athlete.date_of_birth).toLocaleDateString() : 'N/A'}
-                      </div>
-                      
-                      <div className="flex items-center text-sm text-gray-600">
-                        <MapPin size={16} className="mr-2" />
-                        Training: {athlete.training_base || 'Not specified'}
-                      </div>
-
-                      {athlete.specialties && (
-                        <div className="mb-4">
-                          <h4 className="text-sm font-semibold text-gray-700 mb-2">Specialties</h4>
-                          <div className="flex flex-wrap gap-2">
-                            {athlete.specialties.split('\n').map((specialty, index) => (
-                              <span
-                                key={index}
-                                className="px-2 py-1 bg-primary-50 text-primary-700 rounded-full text-sm"
-                              >
-                                {specialty}
-                              </span>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-
-                      {athlete.personal_bests && (
-                        <div className="mb-4">
-                          <h4 className="text-sm font-semibold text-gray-700 mb-2">Personal Bests</h4>
-                          <div className="space-y-2">
-                            {athlete.personal_bests.split('\n').map((pb, index) => (
-                              <div key={index} className="bg-gray-50 p-2 rounded">
-                                <div className="text-sm text-gray-600">{pb}</div>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-
-                      {athlete.caps && (
-                        <div className="mb-4">
-                          <h4 className="text-sm font-semibold text-gray-700 mb-2">International Caps</h4>
-                          <div className="space-y-2">
-                            {athlete.caps.split('\n').map((cap, index) => (
-                              <div key={index} className="flex items-center text-sm text-gray-600">
-                                <Medal size={14} className="mr-2 text-yellow-500" />
-                                {cap}
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-
-                      <div className="flex justify-end space-x-2 mt-4 pt-4 border-t">
-                        <button
-                          onClick={() => handleEdit(athlete)}
-                          className="text-primary-600 hover:text-primary-900"
-                        >
-                          <Edit2 size={16} />
-                        </button>
-                        <button
-                          onClick={() => handleDeleteClick(athlete.id)}
-                          className="text-red-600 hover:text-red-900"
-                        >
-                          <Trash2 size={16} />
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-
-        <Modal
-          isOpen={deleteModalOpen}
-          onClose={() => {
-            setDeleteModalOpen(false);
-            setAthleteToDelete(null);
-          }}
-          onConfirm={handleDeleteConfirm}
-          title="Delete Athlete"
-          message="Are you sure you want to delete this athlete? This action cannot be undone."
-          confirmText="Delete"
-          cancelText="Cancel"
-        />
+        {/* Filter Pills */}
+        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0">
+          {['all', 'swimming', 'diving', 'water-polo'].map((sport) => (
+            <button
+              key={sport}
+              onClick={() => setSelectedSport(sport)}
+              className={`px-3 py-1.5 rounded-lg text-xs font-semibold capitalize whitespace-nowrap transition-colors ${
+                selectedSport === sport
+                  ? 'bg-primary-600 text-white shadow-xs'
+                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200/70'
+              }`}
+            >
+              {sport === 'all' ? 'All Disciplines' : sport.replace('-', ' ')}
+            </button>
+          ))}
+        </div>
       </div>
+
+      {/* Athletes Cards Grid */}
+      {isLoading ? (
+        <div className="text-center py-20">
+          <div className="animate-spin rounded-full h-8 w-8 border-2 border-primary-600 border-t-transparent mx-auto" />
+          <p className="mt-3 text-xs text-slate-500">Loading athletic roster...</p>
+        </div>
+      ) : filteredAthletes.length === 0 ? (
+        <div className="admin-card p-8">
+          <AdminEmptyState
+            icon={Users}
+            title={searchQuery || selectedSport !== 'all' ? 'No athletes match filter' : 'No athletes registered'}
+            description={
+              searchQuery || selectedSport !== 'all'
+                ? 'Try adjusting your search criteria or discipline filter.'
+                : 'Start building the national aquatic database by registering your first athlete.'
+            }
+            action={
+              !searchQuery && selectedSport === 'all' && (
+                <button
+                  onClick={() => setIsAdding(true)}
+                  className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
+                >
+                  <Plus size={14} /> Register Athlete
+                </button>
+              )
+            }
+          />
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredAthletes.map((athlete) => (
+            <div
+              key={athlete.id}
+              className="admin-card admin-card-hover overflow-hidden flex flex-col group"
+            >
+              {/* Photo & Hero Header */}
+              <div className="relative h-64 overflow-hidden bg-slate-100">
+                <img
+                  src={
+                    athlete.image ||
+                    'https://images.pexels.com/photos/863988/pexels-photo-863988.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1'
+                  }
+                  alt={athlete.name}
+                  className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-500"
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    target.src =
+                      'https://images.pexels.com/photos/863988/pexels-photo-863988.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1';
+                  }}
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/30 to-transparent" />
+
+                {/* Top Badge */}
+                <div className="absolute top-3 left-3">
+                  <AdminBadge variant="info" size="sm">
+                    {athlete.sport?.replace('-', ' ') || 'Athlete'}
+                  </AdminBadge>
+                </div>
+
+                {/* Bottom Overlay Title */}
+                <div className="absolute bottom-3 left-3 right-3 text-white">
+                  <h3 className="text-lg font-bold font-heading leading-tight drop-shadow-sm">
+                    {athlete.name}
+                  </h3>
+                  {athlete.nickname && (
+                    <p className="text-xs text-slate-200 italic mt-0.5">"{athlete.nickname}"</p>
+                  )}
+                </div>
+              </div>
+
+              {/* Bio & Details Content */}
+              <div className="p-5 flex-1 flex flex-col justify-between space-y-4">
+                <div className="space-y-2.5 text-xs text-slate-600">
+                  <div className="flex items-center gap-2">
+                    <Calendar size={14} className="text-slate-400 flex-shrink-0" />
+                    <span>
+                      Born:{' '}
+                      <strong className="text-slate-900 font-medium">
+                        {athlete.date_of_birth
+                          ? new Date(athlete.date_of_birth).toLocaleDateString()
+                          : 'N/A'}
+                      </strong>
+                    </span>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <MapPin size={14} className="text-slate-400 flex-shrink-0" />
+                    <span className="truncate">
+                      Base:{' '}
+                      <strong className="text-slate-900 font-medium">
+                        {athlete.training_base || 'Unspecified'}
+                      </strong>
+                    </span>
+                  </div>
+
+                  {athlete.specialties && (
+                    <div className="pt-2 border-t border-slate-100">
+                      <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">
+                        Specialties
+                      </p>
+                      <div className="flex flex-wrap gap-1.5">
+                        {athlete.specialties.split('\n').slice(0, 3).map((spec, i) => (
+                          <span
+                            key={i}
+                            className="px-2 py-0.5 rounded-md bg-slate-100 text-slate-700 text-[11px] font-medium"
+                          >
+                            {spec}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {athlete.caps && (
+                    <div className="pt-2 border-t border-slate-100">
+                      <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">
+                        International Caps
+                      </p>
+                      <p className="text-xs text-slate-700 line-clamp-1 flex items-center gap-1.5">
+                        <Medal size={13} className="text-secondary-500 flex-shrink-0" />
+                        {athlete.caps.split('\n')[0]}
+                      </p>
+                    </div>
+                  )}
+                </div>
+
+                {/* Card Actions */}
+                <div className="pt-3 border-t border-slate-100 flex items-center justify-between">
+                  <span className="text-[11px] text-slate-400 font-medium">
+                    {athlete.club || 'National Roster'}
+                  </span>
+                  <div className="flex items-center gap-1">
+                    <button
+                      onClick={() => handleEdit(athlete)}
+                      className="p-1.5 rounded-lg text-slate-400 hover:text-primary-600 hover:bg-primary-50 transition-colors"
+                      title="Edit athlete"
+                    >
+                      <Edit2 size={15} />
+                    </button>
+                    <button
+                      onClick={() => handleDeleteClick(athlete.id)}
+                      className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors"
+                      title="Delete athlete"
+                    >
+                      <Trash2 size={15} />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      <Modal
+        isOpen={deleteModalOpen}
+        onClose={() => {
+          setDeleteModalOpen(false);
+          setAthleteToDelete(null);
+        }}
+        onConfirm={handleDeleteConfirm}
+        title="Delete Athlete Record"
+        message="Are you sure you want to remove this athlete from the national registry? This action will permanently remove their profile and records."
+        confirmText="Delete Record"
+        cancelText="Cancel"
+      />
     </AdminLayout>
   );
 };

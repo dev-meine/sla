@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import AdminLayout from '../../components/admin/AdminLayout';
+import AdminPageHeader from '../../components/admin/AdminPageHeader';
+import AdminBadge from '../../components/admin/AdminBadge';
+import AdminEmptyState from '../../components/admin/AdminEmptyState';
 import { supabase, invalidateCache } from '../../lib/supabase';
-import { PlusCircle, Edit2, Trash2 } from 'lucide-react';
+import { Plus, Edit2, Trash2, Calendar, Search, X } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { Database } from '../../types/supabase';
 import ImageUpload from '../../components/ui/ImageUpload';
@@ -16,7 +19,8 @@ const AdminActivities: React.FC = () => {
   const [editingEvent, setEditingEvent] = useState<Event | null>(null);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [eventToDelete, setEventToDelete] = useState<string | null>(null);
-  
+  const [searchQuery, setSearchQuery] = useState('');
+
   const { register, handleSubmit, reset, setValue, formState: { errors } } = useForm<Event>();
 
   useEffect(() => {
@@ -29,7 +33,7 @@ const AdminActivities: React.FC = () => {
         .from('events')
         .select('*')
         .order('date', { ascending: false });
-      
+
       if (error) throw error;
       setEvents(data || []);
     } catch (error) {
@@ -39,37 +43,51 @@ const AdminActivities: React.FC = () => {
     }
   };
 
+  const uploadImage = async (file: File): Promise<string | null> => {
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Math.random()}.${fileExt}`;
+      const filePath = `events/${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('images')
+        .upload(filePath, file);
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('images')
+        .getPublicUrl(filePath);
+
+      return publicUrl;
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      return null;
+    }
+  };
+
   const onSubmit = async (data: Event) => {
     try {
       setIsLoading(true);
-      
+
       const eventData = {
         title: data.title,
         description: data.description,
-        image: data.image,
-        category: data.category,
         date: data.date,
-        created_at: new Date().toISOString()
+        category: data.category,
+        image: data.image
       };
 
       let result;
-      
       if (editingEvent) {
         result = await supabase
           .from('events')
-          .update({
-            ...eventData,
-            updated_at: new Date().toISOString()
-          })
-          .eq('id', editingEvent.id)
-          .select()
-          .single();
+          .update(eventData)
+          .eq('id', editingEvent.id);
       } else {
         result = await supabase
           .from('events')
-          .insert([eventData])
-          .select()
-          .single();
+          .insert([eventData]);
       }
 
       if (result.error) {
@@ -103,14 +121,14 @@ const AdminActivities: React.FC = () => {
 
   const handleDeleteConfirm = async () => {
     if (!eventToDelete) return;
-    
+
     try {
       setIsLoading(true);
       const { error } = await supabase
         .from('events')
         .delete()
         .eq('id', eventToDelete);
-        
+
       if (error) throw error;
       invalidateCache('event');
       await fetchEvents();
@@ -123,187 +141,313 @@ const AdminActivities: React.FC = () => {
     }
   };
 
+  const filteredEvents = events.filter(event => {
+    const q = searchQuery.toLowerCase();
+    return (
+      event.title.toLowerCase().includes(q) ||
+      (event.category && event.category.toLowerCase().includes(q)) ||
+      (event.description && event.description.toLowerCase().includes(q))
+    );
+  });
+
   return (
     <AdminLayout>
-      <div className="p-8">
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-semibold">Manage Activities</h2>
+      <AdminPageHeader
+        title="Activities & Calendar"
+        description="Organize aquatic tournaments, coaching clinics, open water meets, and training camps."
+        breadcrumbs={[
+          { label: 'Admin', href: '/admin' },
+          { label: 'Content & Media' },
+          { label: 'Activities' }
+        ]}
+        actions={
           <button
             onClick={() => {
               setIsAdding(!isAdding);
               setEditingEvent(null);
               reset();
             }}
-            className="btn btn-primary"
+            className="inline-flex items-center gap-2 px-3.5 py-2 text-xs font-semibold bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors shadow-xs"
           >
-            <PlusCircle size={20} className="mr-2" />
-            Add Activity
+            {isAdding ? <X size={15} /> : <Plus size={15} />}
+            <span>{isAdding ? 'Close Editor' : 'Add Activity'}</span>
           </button>
-        </div>
+        }
+      />
 
-        {isAdding && (
-          <div className="bg-white p-6 rounded-lg border border-slate-200 mb-8">
-            <h3 className="text-xl font-semibold mb-4">
-              {editingEvent ? 'Edit Activity' : 'Add New Activity'}
-            </h3>
-            <form onSubmit={handleSubmit(onSubmit)} className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      {/* Editor Drawer / Form Card */}
+      {isAdding && (
+        <div className="admin-card p-6 mb-8 border-primary-200/80 shadow-sm">
+          <div className="flex items-center justify-between pb-4 mb-6 border-b border-slate-200">
+            <div>
+              <h3 className="text-lg font-bold text-slate-900 font-heading">
+                {editingEvent ? 'Edit Activity Details' : 'Schedule New Activity'}
+              </h3>
+              <p className="text-xs text-slate-500">Specify dates, category, and descriptive details for the calendar.</p>
+            </div>
+            <button
+              onClick={() => {
+                setIsAdding(false);
+                setEditingEvent(null);
+                reset();
+              }}
+              className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100"
+            >
+              <X size={18} />
+            </button>
+          </div>
+
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Title</label>
+                <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
+                  Activity Title *
+                </label>
                 <input
                   type="text"
+                  placeholder="e.g. Sierra Leone National Swimming Championship 2026"
                   {...register('title', { required: 'Title is required' })}
-                  className="w-full px-3 py-2 border rounded-md"
+                  className="admin-input"
                 />
                 {errors.title && (
-                  <p className="text-red-500 text-xs mt-1">{errors.title.message}</p>
+                  <p className="text-rose-600 text-xs mt-1">{errors.title.message}</p>
                 )}
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
+                <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
+                  Category *
+                </label>
                 <select
-                  {...register('category')}
-                  className="w-full px-3 py-2 border rounded-md"
+                  {...register('category', { required: 'Category is required' })}
+                  className="admin-select"
                 >
                   <option value="">Select Category</option>
                   <option value="competition">Competition</option>
-                  <option value="training">Training</option>
-                  <option value="development">Development</option>
-                  <option value="camp">Camp</option>
+                  <option value="training">Training Camp</option>
+                  <option value="development">Grassroots Clinic</option>
+                  <option value="community">Community Program</option>
                 </select>
+                {errors.category && (
+                  <p className="text-rose-600 text-xs mt-1">{errors.category.message}</p>
+                )}
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Date</label>
+                <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
+                  Event Date *
+                </label>
                 <input
                   type="date"
-                  {...register('date')}
-                  className="w-full px-3 py-2 border rounded-md"
+                  {...register('date', { required: 'Date is required' })}
+                  className="admin-input"
                 />
+                {errors.date && (
+                  <p className="text-rose-600 text-xs mt-1">{errors.date.message}</p>
+                )}
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Image</label>
+                <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
+                  Cover Photo
+                </label>
                 <ImageUpload
                   currentImage={editingEvent?.image}
-                  onImageUpload={(url) => setValue('image', url)}
+                  onImageUpload={async (file) => {
+                    const url = await uploadImage(file);
+                    if (url) setValue('image', url);
+                  }}
                   onImageRemove={() => setValue('image', null)}
                 />
               </div>
+            </div>
 
-              <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
-                <textarea
-                  {...register('description')}
-                  rows={4}
-                  className="w-full px-3 py-2 border rounded-md"
-                ></textarea>
-              </div>
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
+                Description & Schedule Details *
+              </label>
+              <textarea
+                {...register('description', { required: 'Description is required' })}
+                rows={4}
+                placeholder="Overview of the event, venue location, eligibility, and program schedule..."
+                className="admin-input text-xs"
+              />
+              {errors.description && (
+                <p className="text-rose-600 text-xs mt-1">{errors.description.message}</p>
+              )}
+            </div>
 
-              <div className="md:col-span-2 flex justify-end gap-4">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setIsAdding(false);
-                    setEditingEvent(null);
-                    reset();
-                  }}
-                  className="btn btn-outline"
-                >
-                  Cancel
-                </button>
-                <button type="submit" className="btn btn-primary">
-                  {editingEvent ? 'Update' : 'Save'} Activity
-                </button>
-              </div>
-            </form>
+            <div className="flex justify-end gap-3 pt-4 border-t border-slate-200">
+              <button
+                type="button"
+                onClick={() => {
+                  setIsAdding(false);
+                  setEditingEvent(null);
+                  reset();
+                }}
+                className="px-4 py-2 text-xs font-semibold text-slate-700 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                className="px-4 py-2 text-xs font-semibold text-white bg-primary-600 hover:bg-primary-700 rounded-lg transition-colors shadow-xs"
+              >
+                {editingEvent ? 'Save Changes' : 'Schedule Activity'}
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
+
+      {/* Table Container Card */}
+      <div className="admin-card overflow-hidden">
+        {/* Table Toolbar */}
+        <div className="p-4 border-b border-slate-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white">
+          <div className="relative flex-1 max-w-sm">
+            <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+            <input
+              type="text"
+              placeholder="Search by title, category, or description..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-9 pr-3.5 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs text-slate-900 placeholder:text-slate-400 focus:bg-white focus:outline-none focus:border-primary-600 focus:ring-2 focus:ring-primary-50 transition-all"
+            />
           </div>
-        )}
+          <div className="text-xs text-slate-500 font-medium">
+            Showing {filteredEvents.length} of {events.length} {events.length === 1 ? 'activity' : 'activities'}
+          </div>
+        </div>
 
         {isLoading ? (
-          <div className="text-center py-12">
-            <div className="animate-spin rounded-full h-12 w-12 border-4 border-primary-600 border-t-transparent mx-auto"></div>
+          <div className="text-center py-16">
+            <div className="animate-spin rounded-full h-8 w-8 border-2 border-primary-600 border-t-transparent mx-auto" />
+            <p className="mt-3 text-xs text-slate-500">Loading activities...</p>
+          </div>
+        ) : filteredEvents.length === 0 ? (
+          <div className="p-8">
+            <AdminEmptyState
+              icon={Calendar}
+              title={searchQuery ? 'No matching activities' : 'No activities scheduled yet'}
+              description={
+                searchQuery
+                  ? `No activities match "${searchQuery}". Clear your search or add a new event.`
+                  : 'Keep athletes and followers informed by posting upcoming swimming galas and workshops.'
+              }
+              action={
+                !searchQuery && (
+                  <button
+                    onClick={() => setIsAdding(true)}
+                    className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
+                  >
+                    <Plus size={14} /> Schedule First Activity
+                  </button>
+                )
+              }
+            />
           </div>
         ) : (
-          <div className="bg-white rounded-lg border border-slate-200 overflow-hidden">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Title
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Category
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Date
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Actions
-                  </th>
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr className="bg-slate-50/90 border-b border-slate-200 text-[11px] font-semibold uppercase tracking-wider text-slate-500">
+                  <th className="px-5 py-3.5">Activity</th>
+                  <th className="px-4 py-3.5">Category</th>
+                  <th className="px-4 py-3.5">Date</th>
+                  <th className="px-4 py-3.5">Status</th>
+                  <th className="px-5 py-3.5 text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {events.map((event) => (
-                  <tr key={event.id}>
-                    <td className="px-6 py-4">
-                      <div className="flex items-center">
-                        {event.image && (
-                          <img
-                            src={event.image}
-                            alt={event.title}
-                            className="h-12 w-12 rounded-lg object-cover mr-3"
-                            onError={(e) => {
-                              const target = e.target as HTMLImageElement;
-                              target.src = 'https://via.placeholder.com/48';
-                            }}
-                          />
-                        )}
-                        <div className="text-sm font-medium text-gray-900">{event.title}</div>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-primary-100 text-primary-800">
-                        {event.category}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {event.date ? new Date(event.date).toLocaleDateString() : '-'}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                      <button
-                        onClick={() => handleEdit(event)}
-                        className="text-primary-600 hover:text-primary-900 mr-4"
-                      >
-                        <Edit2 size={16} />
-                      </button>
-                      <button
-                        onClick={() => handleDeleteClick(event.id)}
-                        className="text-red-600 hover:text-red-900"
-                      >
-                        <Trash2 size={16} />
-                      </button>
-                    </td>
-                  </tr>
-                ))}
+              <tbody className="divide-y divide-slate-100 bg-white text-sm">
+                {filteredEvents.map((event) => {
+                  const isUpcoming = event.date ? new Date(event.date) >= new Date() : false;
+                  return (
+                    <tr
+                      key={event.id}
+                      className="hover:bg-slate-50/70 transition-colors group"
+                    >
+                      <td className="px-5 py-3.5">
+                        <div className="flex items-center gap-3">
+                          {event.image ? (
+                            <img
+                              src={event.image}
+                              alt={event.title}
+                              className="h-10 w-14 rounded-lg object-cover border border-slate-200 flex-shrink-0"
+                              onError={(e) => {
+                                const target = e.target as HTMLImageElement;
+                                target.src =
+                                  'https://images.pexels.com/photos/863988/pexels-photo-863988.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1';
+                              }}
+                            />
+                          ) : (
+                            <div className="h-10 w-14 rounded-lg bg-secondary-50 border border-secondary-100 flex items-center justify-center flex-shrink-0 text-secondary-600">
+                              <Calendar size={18} />
+                            </div>
+                          )}
+                          <div className="min-w-0">
+                            <p className="font-semibold text-slate-900 group-hover:text-primary-600 transition-colors line-clamp-1">
+                              {event.title}
+                            </p>
+                            {event.description && (
+                              <p className="text-xs text-slate-500 line-clamp-1 mt-0.5">
+                                {event.description}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-4 py-3.5 whitespace-nowrap">
+                        <AdminBadge variant="warning" size="sm">
+                          {event.category?.replace('-', ' ') || 'General'}
+                        </AdminBadge>
+                      </td>
+                      <td className="px-4 py-3.5 whitespace-nowrap text-xs text-slate-600">
+                        {event.date ? new Date(event.date).toLocaleDateString() : '—'}
+                      </td>
+                      <td className="px-4 py-3.5 whitespace-nowrap">
+                        <AdminBadge variant={isUpcoming ? 'success' : 'neutral'} size="sm">
+                          {isUpcoming ? 'Upcoming' : 'Past'}
+                        </AdminBadge>
+                      </td>
+                      <td className="px-5 py-3.5 whitespace-nowrap text-right">
+                        <div className="flex items-center justify-end gap-1">
+                          <button
+                            onClick={() => handleEdit(event)}
+                            className="p-1.5 rounded-lg text-slate-400 hover:text-primary-600 hover:bg-primary-50 transition-colors"
+                            title="Edit activity"
+                          >
+                            <Edit2 size={15} />
+                          </button>
+                          <button
+                            onClick={() => handleDeleteClick(event.id)}
+                            className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors"
+                            title="Delete activity"
+                          >
+                            <Trash2 size={15} />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
         )}
-
-        <Modal
-          isOpen={deleteModalOpen}
-          onClose={() => {
-            setDeleteModalOpen(false);
-            setEventToDelete(null);
-          }}
-          onConfirm={handleDeleteConfirm}
-          title="Delete Activity"
-          message="Are you sure you want to delete this activity? This action cannot be undone."
-          confirmText="Delete"
-          cancelText="Cancel"
-        />
       </div>
+
+      <Modal
+        isOpen={deleteModalOpen}
+        onClose={() => {
+          setDeleteModalOpen(false);
+          setEventToDelete(null);
+        }}
+        onConfirm={handleDeleteConfirm}
+        title="Delete Activity"
+        message="Are you sure you want to remove this activity from the federation calendar? This action cannot be undone."
+        confirmText="Delete Activity"
+        cancelText="Cancel"
+      />
     </AdminLayout>
   );
 };

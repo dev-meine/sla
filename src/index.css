@@ -218,13 +218,19 @@
   mix-blend-mode: multiply;
 }
 
-/* Ensure completely shadow-free flat aesthetic across entire admin portal */
-.admin-portal,
-.admin-portal *,
-.admin-portal input,
-.admin-portal select,
-.admin-portal textarea,
-.admin-portal button {
-  box-shadow: none !important;
-  -webkit-box-shadow: none !important;
+/* Modern SaaS Admin Design Tokens */
+.admin-card {
+  @apply bg-white rounded-xl border border-slate-200/80 shadow-[0_1px_3px_0_rgba(15,23,42,0.04)] transition-all duration-200;
+}
+
+.admin-card-hover {
+  @apply hover:shadow-[0_4px_12px_0_rgba(15,23,42,0.06)] hover:border-slate-300;
+}
+
+.admin-input {
+  @apply w-full px-3.5 py-2 bg-white border border-slate-200 rounded-lg text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-primary-600 focus:ring-4 focus:ring-primary-50 transition-all duration-150;
+}
+
+.admin-select {
+  @apply w-full px-3.5 py-2 bg-white border border-slate-200 rounded-lg text-sm text-slate-900 focus:outline-none focus:border-primary-600 focus:ring-4 focus:ring-primary-50 transition-all duration-150;
 }

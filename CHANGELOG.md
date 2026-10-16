@@ -6,6 +6,27 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+- **2026-10-16**: Modern SaaS redesign of the complete Admin Portal matching the public website's design system and color palette:
+  - **Color Tokens & Elevation Utilities (`src/index.css`)**: Removed destructive `.admin-portal * { box-shadow: none !important; }` reset. Added modern SaaS utility tokens (`.admin-card`, `.admin-card-hover`, `.admin-input`, `.admin-select`) based strictly on the official website brand colors (`primary-600 #005FB3`, `primary-700 #004C90`, `secondary-700 #997000`, `accent-700 #006A26`, `slate-50`, `border-slate-200/80`).
+  - **Shared SaaS Admin UI Components**:
+    - `src/components/admin/AdminBadge.tsx`: WCAG AA compliant badge tokens (`success`, `warning`, `info`, `danger`, `neutral`) with indicator dots.
+    - `src/components/admin/AdminPageHeader.tsx`: Unified header with title, subtitle, breadcrumb path, and action slots.
+    - `src/components/admin/AdminEmptyState.tsx`: Reusable empty state with brand icon container, title, copy, and call-to-action button.
+  - **Layout Shell Overhaul (`src/components/admin/AdminLayout.tsx`)**: Fixed left desktop sidebar with collapsible rail mode (260px to 72px), categorized navigation groups (`Overview`, `Athletic Roster`, `Content & Media`, `Operations`), official SLA logo badge, live operations indicator, mobile drawer with backdrop blur, sticky top bar with breadcrumbs, global search shortcut (`⌘K`), notification badge, and administrator user avatar.
+  - **Dashboard Modernization (`src/pages/AdminDashboard.tsx`)**: 4 KPI metric cards with brand icon pills and trend badges, multi-segment platform resource distribution bar, split recent activity feeds for competitions and press releases, operations shortcuts grid, and skeleton loading states.
+  - **Modal Elevation (`src/components/ui/Modal.tsx`)**: Refined with backdrop blur, rounded-2xl container, alert icon pill, and clear primary/secondary action hierarchy.
+  - **Comprehensive Admin Page Restyling**:
+    - `src/pages/admin/AdminPosts.tsx`: Restyled news table with search filter, `AdminPageHeader`, `AdminBadge`, and unified form card.
+    - `src/pages/admin/AdminAthletes.tsx`: Restyled athlete roster with sport discipline filter tabs, search filter, `AdminBadge`, and registration form.
+    - `src/pages/admin/AdminActivities.tsx`: Restyled events table with search filter, status badges (`Upcoming` / `Past`), date chips, and scheduling form.
+    - `src/pages/admin/AdminBoard.tsx`: Restyled board directory with executive avatars, role badges, email links, and appointment form.
+    - `src/pages/admin/AdminTechnicalStaff.tsx`: Restyled technical staff table with staff avatars, role badges, credentials, and registration form.
+    - `src/pages/admin/AdminGallery.tsx`: Restyled 16:9 media grid with type filters (`all`, `image`, `video`), `AdminBadge`, search bar, and upload form.
+    - `src/pages/admin/AdminRegistrations.tsx`: Restyled swimming registration table with mini KPI chips, search filter, status pills, inline tutor assignment dropdown, and inline status updates.
+    - `src/pages/admin/AdminReports.tsx`: Restyled confidential safe sport report feed with status pills (`Pending`, `Resolved`, `Dismissed`), search, and delete modals.
+    - `src/pages/admin/AdminTravel.tsx`: Modern segmented tabs (`Travel Records`, `Ferry Timetables`, `Hotels & Lodging`), travel records search, status badges, unified modal delete confirmations, live iframe container, and hotel accommodation finder.
+    - `src/pages/AdminLogin.tsx`: Modern sign-in experience with ambient gradient backdrop, official SLA logo pill, elevated card with clean input states, and troubleshooting tips.
+
 - **2026-10-16**: Comprehensive website performance optimization across bundling, asset delivery, database payload, and caching:
   - **Route Code-Splitting & Lazy Loading**: Converted all 22 application routes in `App.tsx` from static imports to dynamic `React.lazy()` imports with `<Suspense>` and a resilient retry handler (`lazyRetry`) to prevent chunk load errors on unstable mobile connections. Drops initial public bundle size from ~682 kB to ~30 kB (~95% reduction in initial JavaScript parsing overhead).
   - **Vite Bundler Optimization & Long-Term Vendor Caching**: Configured Rollup `manualChunks` in `vite.config.ts` separating vendor libraries into distinct long-term cached bundles (`vendor-react`, `vendor-motion`, `vendor-supabase`, `vendor-icons`), isolating heavyweight admin libraries (`react-image-crop`, `axios`, admin dashboards) entirely from public visitors.
