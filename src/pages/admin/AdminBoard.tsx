@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import AdminLayout from '../../components/admin/AdminLayout';
-import { supabase } from '../../lib/supabase';
+import { supabase, invalidateCache } from '../../lib/supabase';
 import { PlusCircle, Edit2, Trash2 } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { Database } from '../../types/supabase';
@@ -114,6 +114,7 @@ const AdminBoard: React.FC = () => {
       reset();
       setIsAdding(false);
       setEditingMember(null);
+      invalidateCache('board');
       fetchBoardMembers();
     } catch (error) {
       console.error('Error saving board member:', error);
@@ -153,6 +154,7 @@ const AdminBoard: React.FC = () => {
         .eq('id', memberToDelete);
         
       if (error) throw error;
+      invalidateCache('board');
       fetchBoardMembers();
     } catch (error) {
       console.error('Error deleting board member:', error);

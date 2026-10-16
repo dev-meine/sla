@@ -99,6 +99,8 @@ const ActivitiesHighlight: React.FC = () => {
                 <img 
                   src={events[0]?.image || "https://images.pexels.com/photos/863988/pexels-photo-863988.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"}
                   alt="Featured Activity"
+                  loading="lazy"
+                  decoding="async"
                   className="w-full h-full object-cover hover:scale-110 transition-transform duration-[2s] ease-out"
                   onError={(e) => {
                     const target = e.target as HTMLImageElement;

@@ -45,6 +45,8 @@ const PageHeader: React.FC<PageHeaderProps> = ({
         <img 
           src={image} 
           alt={title}
+          fetchPriority="high"
+          decoding="async"
           className="w-full h-full object-cover opacity-30"
           width="1280" 
           height="720"

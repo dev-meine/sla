@@ -2,10 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, ArrowUpRight } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { supabase } from '../../lib/supabase';
+import { supabase, cachedQuery } from '../../lib/supabase';
 import { Database } from '../../types/supabase';
 
-type NewsPost = Database['public']['Tables']['news_posts']['Row'];
+type NewsPost = Pick<Database['public']['Tables']['news_posts']['Row'], 'id' | 'title' | 'author' | 'category' | 'excerpt' | 'image_url' | 'created_at'>;
 
 const FeaturedNews: React.FC = () => {
   const [newsPosts, setNewsPosts] = useState<NewsPost[]>([]);
@@ -17,14 +17,17 @@ const FeaturedNews: React.FC = () => {
 
   const fetchNewsPosts = async () => {
     try {
-      const { data, error } = await supabase
-        .from('news_posts')
-        .select('*')
-        .order('created_at', { ascending: false })
-        .limit(3);
+      const { data, error } = await cachedQuery(
+        'featured-news',
+        () => supabase
+          .from('news_posts')
+          .select('id, title, author, category, excerpt, image_url, created_at')
+          .order('created_at', { ascending: false })
+          .limit(3)
+      );
       
       if (error) throw error;
-      setNewsPosts(data || []);
+      setNewsPosts((data as NewsPost[]) || []);
     } catch (error) {
       console.error('Error fetching news posts:', error);
     } finally {
@@ -132,6 +135,8 @@ const FeaturedNews: React.FC = () => {
                     <img 
                       src={post.image_url || "https://images.unsplash.com/photo-1519315901367-f34ff9154487?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80"}
                       alt={post.title}
+                      loading="lazy"
+                      decoding="async"
                       className="w-full h-full object-cover filter saturate-110 contrast-110 transition-transform duration-[1.5s] transform group-hover:scale-110"
                       onError={(e) => {
                         const target = e.target as HTMLImageElement;

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import AdminLayout from '../../components/admin/AdminLayout';
-import { supabase } from '../../lib/supabase';
+import { supabase, invalidateCache } from '../../lib/supabase';
 import { PlusCircle, Edit2, Trash2 } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { Database } from '../../types/supabase';
@@ -79,6 +79,7 @@ const AdminActivities: React.FC = () => {
       reset();
       setIsAdding(false);
       setEditingEvent(null);
+      invalidateCache('event');
       await fetchEvents();
     } catch (error) {
       console.error('Error saving event:', error);
@@ -111,6 +112,7 @@ const AdminActivities: React.FC = () => {
         .eq('id', eventToDelete);
         
       if (error) throw error;
+      invalidateCache('event');
       await fetchEvents();
     } catch (error) {
       console.error('Error deleting event:', error);

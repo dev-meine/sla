@@ -129,6 +129,8 @@ const FeaturedAthletes: React.FC = () => {
                   <img 
                     src={athlete.image || "https://images.pexels.com/photos/863988/pexels-photo-863988.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"}
                     alt={athlete.name}
+                    loading="lazy"
+                    decoding="async"
                     className="w-full h-full object-cover object-top transition-transform duration-[1.5s] ease-out transform group-hover:scale-110"
                   />
                 </motion.div>

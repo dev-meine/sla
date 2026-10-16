@@ -94,6 +94,11 @@ const HeroSection: React.FC = () => {
                 <img 
                   src="https://i.ibb.co/9kDWFfBB/Screenshot-2025-05-14-at-2-02-57-AM-min.png"
                   alt="Professional swimmers in competition" 
+                  fetchPriority="high"
+                  loading="eager"
+                  decoding="async"
+                  width="960"
+                  height="640"
                   className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-[2000ms] ease-out filter contrast-125 saturate-110"
                 />
 
@@ -112,6 +117,10 @@ const HeroSection: React.FC = () => {
                   <img 
                     src="https://i.ibb.co/K3VFCBD/20240801-112429-min.jpg" 
                     alt="Sierra Leone swimming team" 
+                    loading="lazy"
+                    decoding="async"
+                    width="640"
+                    height="480"
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-[2000ms] ease-out filter contrast-110 saturate-110"
                   />
 

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import AdminLayout from '../../components/admin/AdminLayout';
-import { supabase } from '../../lib/supabase';
+import { supabase, invalidateCache } from '../../lib/supabase';
 import { PlusCircle, Edit2, Trash2, Calendar, MapPin, Timer, Medal } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { Database } from '../../types/supabase';
@@ -134,6 +134,7 @@ const AdminAthletes: React.FC = () => {
       reset();
       setIsAdding(false);
       setEditingAthlete(null);
+      invalidateCache('athlete');
       fetchAthletes();
     } catch (error) {
       console.error('Error saving athlete:', error);
@@ -167,6 +168,7 @@ const AdminAthletes: React.FC = () => {
         .eq('id', athleteToDelete);
         
       if (error) throw error;
+      invalidateCache('athlete');
       fetchAthletes();
     } catch (error) {
       console.error('Error deleting athlete:', error);

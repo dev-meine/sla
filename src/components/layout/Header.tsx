@@ -16,11 +16,8 @@ const Header: React.FC = () => {
 
   useEffect(() => {
     const handleScroll = () => {
-      if (window.scrollY > 15) {
-        setScrolled(true);
-      } else {
-        setScrolled(false);
-      }
+      const isPast = window.scrollY > 15;
+      setScrolled((prev) => (prev !== isPast ? isPast : prev));
     };
 
     handleScroll();

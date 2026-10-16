@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import AdminLayout from '../../components/admin/AdminLayout';
-import { supabase } from '../../lib/supabase';
+import { supabase, invalidateCache } from '../../lib/supabase';
 import { PlusCircle, Edit2, Trash2 } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { Database } from '../../types/supabase';
@@ -118,6 +118,7 @@ const AdminPosts: React.FC = () => {
       reset();
       setIsAdding(false);
       setEditingPost(null);
+      invalidateCache('news');
       fetchPosts();
     } catch (error) {
       console.error('Error saving post:', error);
@@ -157,6 +158,7 @@ const AdminPosts: React.FC = () => {
         .eq('id', postToDelete);
         
       if (error) throw error;
+      invalidateCache('news');
       fetchPosts();
     } catch (error) {
       console.error('Error deleting post:', error);

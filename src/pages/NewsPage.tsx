@@ -3,10 +3,10 @@ import { Link } from 'react-router-dom';
 import PageHeader from '../components/ui/PageHeader';
 import { motion } from 'framer-motion';
 import { Calendar, ArrowRight } from 'lucide-react';
-import { supabase } from '../lib/supabase';
+import { supabase, cachedQuery } from '../lib/supabase';
 import { Database } from '../types/supabase';
 
-type NewsPost = Database['public']['Tables']['news_posts']['Row'];
+type NewsPost = Pick<Database['public']['Tables']['news_posts']['Row'], 'id' | 'title' | 'author' | 'category' | 'excerpt' | 'image_url' | 'created_at'>;
 
 const NewsPage: React.FC = () => {
   const [posts, setPosts] = useState<NewsPost[]>([]);
@@ -19,13 +19,16 @@ const NewsPage: React.FC = () => {
 
   const fetchPosts = async () => {
     try {
-      const { data, error } = await supabase
-        .from('news_posts')
-        .select('*')
-        .order('created_at', { ascending: false });
+      const { data, error } = await cachedQuery(
+        'all-news',
+        () => supabase
+          .from('news_posts')
+          .select('id, title, author, category, excerpt, image_url, created_at')
+          .order('created_at', { ascending: false })
+      );
       
       if (error) throw error;
-      setPosts(data || []);
+      setPosts((data as NewsPost[]) || []);
     } catch (error) {
       console.error('Error fetching posts:', error);
     } finally {
@@ -117,13 +120,15 @@ const NewsPage: React.FC = () => {
                   <img 
                     src={post.image_url || "https://images.pexels.com/photos/863988/pexels-photo-863988.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"}
                     alt={post.title}
+                    loading="lazy"
+                    decoding="async"
                     className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                   />
                 </div>
                 <div className="p-6">
                   <div className="flex items-center text-sm text-slate-500 mb-3">
                     <Calendar size={14} className="mr-1" />
-                    <span>{new Date(post.created_at).toLocaleDateString()}</span>
+                    <span>{post.created_at ? new Date(post.created_at).toLocaleDateString() : ''}</span>
                     {post.category && (
                       <>
                         <span className="mx-2">•</span>

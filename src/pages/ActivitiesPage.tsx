@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import PageHeader from '../components/ui/PageHeader';
 import { motion } from 'framer-motion';
 import { Calendar, ArrowRight } from 'lucide-react';
-import { supabase } from '../lib/supabase';
+import { supabase, cachedQuery } from '../lib/supabase';
 import { Database } from '../types/supabase';
 
 type Event = Database['public']['Tables']['events']['Row'];
@@ -18,10 +18,13 @@ const ActivitiesPage: React.FC = () => {
 
   const fetchEvents = async () => {
     try {
-      const { data, error } = await supabase
-        .from('events')
-        .select('*')
-        .order('date', { ascending: false });
+      const { data, error } = await cachedQuery<Event[]>(
+        'all-events',
+        () => supabase
+          .from('events')
+          .select('*')
+          .order('date', { ascending: false })
+      );
       
       if (error) throw error;
       setEvents(data || []);
@@ -122,6 +125,8 @@ const ActivitiesPage: React.FC = () => {
                   <img 
                     src={event.image || "https://images.pexels.com/photos/863988/pexels-photo-863988.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"}
                     alt={event.title}
+                    loading="lazy"
+                    decoding="async"
                     className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                   />
                 </div>
