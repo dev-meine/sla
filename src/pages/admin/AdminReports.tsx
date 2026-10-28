@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import AdminLayout from '../../components/admin/AdminLayout';
+import AdminPageHeader from '../../components/admin/AdminPageHeader';
+import AdminBadge from '../../components/admin/AdminBadge';
+import AdminEmptyState from '../../components/admin/AdminEmptyState';
 import { supabase } from '../../lib/supabase';
-import { AlertTriangle, Trash2, CheckCircle, XCircle, Clock } from 'lucide-react';
+import { ShieldAlert, Trash2, Search, Calendar, FileText } from 'lucide-react';
 import Modal from '../../components/ui/Modal';
 import { Database } from '../../types/supabase';
 
@@ -12,6 +15,8 @@ const AdminReports: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [reportToDelete, setReportToDelete] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [statusFilter, setStatusFilter] = useState<string>('all');
 
   useEffect(() => {
     fetchReports();
@@ -23,7 +28,7 @@ const AdminReports: React.FC = () => {
         .from('anonymous_reports')
         .select('*')
         .order('created_at', { ascending: false });
-      
+
       if (error) throw error;
       setReports(data || []);
     } catch (error) {
@@ -39,7 +44,7 @@ const AdminReports: React.FC = () => {
         .from('anonymous_reports')
         .update({ status: newStatus })
         .eq('id', reportId);
-      
+
       if (error) throw error;
       fetchReports();
     } catch (error) {
@@ -54,14 +59,14 @@ const AdminReports: React.FC = () => {
 
   const handleDeleteConfirm = async () => {
     if (!reportToDelete) return;
-    
+
     try {
       setIsLoading(true);
       const { error } = await supabase
         .from('anonymous_reports')
         .delete()
         .eq('id', reportToDelete);
-        
+
       if (error) throw error;
       fetchReports();
     } catch (error) {
@@ -73,121 +78,155 @@ const AdminReports: React.FC = () => {
     }
   };
 
-  const getStatusColor = (status: string) => {
+  const renderStatusBadge = (status: string | null) => {
     switch (status) {
       case 'resolved':
-        return 'bg-green-100 text-green-800';
-      case 'pending':
-        return 'bg-yellow-100 text-yellow-800';
+        return <AdminBadge variant="success" size="sm">Resolved</AdminBadge>;
       case 'dismissed':
-        return 'bg-red-100 text-red-800';
+        return <AdminBadge variant="neutral" size="sm">Dismissed</AdminBadge>;
+      case 'pending':
       default:
-        return 'bg-gray-100 text-gray-800';
+        return <AdminBadge variant="warning" size="sm">Pending Review</AdminBadge>;
     }
   };
 
+  const filteredReports = reports.filter(report => {
+    const q = searchQuery.toLowerCase();
+    const matchesSearch =
+      report.report_content.toLowerCase().includes(q) ||
+      (report.category && report.category.toLowerCase().includes(q));
+
+    const matchesStatus =
+      statusFilter === 'all' ||
+      (statusFilter === 'pending' && (!report.status || report.status === 'pending')) ||
+      report.status === statusFilter;
+
+    return matchesSearch && matchesStatus;
+  });
+
   return (
     <AdminLayout>
-      <div className="p-8">
-        <div className="flex justify-between items-center mb-6">
-          <div>
-            <h2 className="text-2xl font-semibold flex items-center">
-              <AlertTriangle className="text-red-500 mr-2" />
-              Anonymous Reports
-            </h2>
-            <p className="text-gray-600 mt-1">
-              Review and manage anonymous reports submitted.
-            </p>
-          </div>
+      <AdminPageHeader
+        title="SafeSport & Confidential Reports"
+        description="Review anonymous reports, whistleblowing submissions, safety inquiries, and ethics complaints."
+        breadcrumbs={[
+          { label: 'Admin', href: '/admin' },
+          { label: 'Operations' },
+          { label: 'Reports' }
+        ]}
+      />
+
+      {/* Filter and Search Bar */}
+      <div className="admin-card p-4 mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="relative flex-1 max-w-sm">
+          <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+          <input
+            type="text"
+            placeholder="Search report contents or category..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full pl-9 pr-3.5 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs text-slate-900 placeholder:text-slate-400 focus:bg-white focus:outline-none focus:border-primary-600 focus:ring-2 focus:ring-primary-50 transition-all"
+          />
         </div>
 
+        {/* Status Filter Pills */}
+        <div className="flex items-center gap-1.5">
+          {['all', 'pending', 'resolved', 'dismissed'].map((status) => (
+            <button
+              key={status}
+              onClick={() => setStatusFilter(status)}
+              className={`px-3 py-1.5 rounded-lg text-xs font-semibold capitalize transition-colors ${
+                statusFilter === status
+                  ? 'bg-primary-600 text-white shadow-xs'
+                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200/70'
+              }`}
+            >
+              {status === 'all' ? 'All Submissions' : status}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Table Container Card */}
+      <div className="admin-card overflow-hidden">
         {isLoading ? (
-          <div className="text-center py-12">
-            <div className="animate-spin rounded-full h-12 w-12 border-4 border-primary-600 border-t-transparent mx-auto"></div>
+          <div className="text-center py-16">
+            <div className="animate-spin rounded-full h-8 w-8 border-2 border-primary-600 border-t-transparent mx-auto" />
+            <p className="mt-3 text-xs text-slate-500">Loading confidential reports...</p>
+          </div>
+        ) : filteredReports.length === 0 ? (
+          <div className="p-8">
+            <AdminEmptyState
+              icon={ShieldAlert}
+              title={searchQuery || statusFilter !== 'all' ? 'No matching reports' : 'No reports filed'}
+              description={
+                searchQuery || statusFilter !== 'all'
+                  ? 'Try clearing your search or status filter criteria.'
+                  : 'SafeSport whistleblowing submissions and athlete inquiries will appear securely here.'
+              }
+            />
           </div>
         ) : (
-          <div className="space-y-6">
-            {reports.map((report) => (
-              <div key={report.id} className="bg-white rounded-lg shadow-md p-6">
-                <div className="flex justify-between items-start mb-4">
-                  <div>
-                    <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(report.status)}`}>
-                      {report.status.charAt(0).toUpperCase() + report.status.slice(1)}
-                    </span>
-                    <span className="text-sm text-gray-500 ml-4">
-                      {new Date(report.created_at).toLocaleDateString()} at{' '}
-                      {new Date(report.created_at).toLocaleTimeString()}
+          <div className="divide-y divide-slate-100">
+            {filteredReports.map((report) => (
+              <div
+                key={report.id}
+                className="p-5 hover:bg-slate-50/70 transition-colors flex flex-col md:flex-row md:items-start justify-between gap-4"
+              >
+                <div className="flex-1 space-y-2">
+                  <div className="flex items-center gap-2.5 flex-wrap">
+                    <AdminBadge variant="danger" size="sm">
+                      {report.category || 'General Ethics'}
+                    </AdminBadge>
+                    {renderStatusBadge(report.status)}
+                    <span className="text-xs text-slate-400 flex items-center gap-1">
+                      <Calendar size={13} />
+                      {report.created_at ? new Date(report.created_at).toLocaleString() : 'Date recorded'}
                     </span>
                   </div>
-                  <div className="flex items-center space-x-2">
-                    <button
-                      onClick={() => handleStatusChange(report.id, 'resolved')}
-                      className="p-2 text-green-600 hover:text-green-800"
-                      title="Mark as Resolved"
-                    >
-                      <CheckCircle size={20} />
-                    </button>
-                    <button
-                      onClick={() => handleStatusChange(report.id, 'dismissed')}
-                      className="p-2 text-red-600 hover:text-red-800"
-                      title="Dismiss Report"
-                    >
-                      <XCircle size={20} />
-                    </button>
-                    <button
-                      onClick={() => handleStatusChange(report.id, 'pending')}
-                      className="p-2 text-yellow-600 hover:text-yellow-800"
-                      title="Mark as Pending"
-                    >
-                      <Clock size={20} />
-                    </button>
-                    <button
-                      onClick={() => handleDeleteClick(report.id)}
-                      className="p-2 text-gray-600 hover:text-gray-800"
-                      title="Delete Report"
-                    >
-                      <Trash2 size={20} />
-                    </button>
+
+                  <div className="p-4 bg-slate-50 rounded-xl border border-slate-200/80 text-sm text-slate-800 whitespace-pre-wrap leading-relaxed">
+                    {report.report_content}
                   </div>
                 </div>
 
-                <div className="bg-gray-50 rounded-lg p-4 mb-4">
-                  <div className="text-sm font-medium text-gray-500 mb-2">Category</div>
-                  <div className="text-gray-900">{report.category}</div>
-                </div>
+                <div className="flex md:flex-col items-center md:items-end gap-2.5 flex-shrink-0">
+                  <select
+                    value={report.status || 'pending'}
+                    onChange={(e) => handleStatusChange(report.id, e.target.value)}
+                    className="px-2.5 py-1 text-xs font-semibold border border-slate-200 rounded-lg bg-white text-slate-700 hover:border-slate-300 focus:outline-none focus:border-primary-600 focus:ring-2 focus:ring-primary-50"
+                  >
+                    <option value="pending">Mark Pending</option>
+                    <option value="resolved">Mark Resolved</option>
+                    <option value="dismissed">Mark Dismissed</option>
+                  </select>
 
-                <div className="bg-gray-50 rounded-lg p-4">
-                  <div className="text-sm font-medium text-gray-500 mb-2">Report Content</div>
-                  <div className="text-gray-900 whitespace-pre-wrap">{report.report_content}</div>
+                  <button
+                    onClick={() => handleDeleteClick(report.id)}
+                    className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors"
+                    title="Delete record"
+                  >
+                    <Trash2 size={16} />
+                  </button>
                 </div>
               </div>
             ))}
-
-            {reports.length === 0 && (
-              <div className="text-center py-12 bg-white rounded-lg shadow-md">
-                <AlertTriangle className="mx-auto h-12 w-12 text-gray-400" />
-                <h3 className="mt-2 text-sm font-medium text-gray-900">No Reports</h3>
-                <p className="mt-1 text-sm text-gray-500">
-                  There are no anonymous reports to display.
-                </p>
-              </div>
-            )}
           </div>
         )}
-
-        <Modal
-          isOpen={deleteModalOpen}
-          onClose={() => {
-            setDeleteModalOpen(false);
-            setReportToDelete(null);
-          }}
-          onConfirm={handleDeleteConfirm}
-          title="Delete Report"
-          message="Are you sure you want to delete this report? This action cannot be undone."
-          confirmText="Delete"
-          cancelText="Cancel"
-        />
       </div>
+
+      <Modal
+        isOpen={deleteModalOpen}
+        onClose={() => {
+          setDeleteModalOpen(false);
+          setReportToDelete(null);
+        }}
+        onConfirm={handleDeleteConfirm}
+        title="Delete Confidential Report"
+        message="Are you sure you want to permanently delete this report? This action cannot be undone."
+        confirmText="Delete Report"
+        cancelText="Cancel"
+      />
     </AdminLayout>
   );
 };

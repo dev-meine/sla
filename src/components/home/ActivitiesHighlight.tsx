@@ -63,7 +63,7 @@ const ActivitiesHighlight: React.FC = () => {
   }
 
   return (
-    <section className="bg-slate-50 py-24 md:py-32 relative overflow-hidden">
+    <section className="bg-slate-50 pt-6 md:pt-8 pb-16 md:pb-20 relative overflow-hidden">
       <div className="container mx-auto px-6 lg:px-12 relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-20 items-start">
           
@@ -99,6 +99,8 @@ const ActivitiesHighlight: React.FC = () => {
                 <img 
                   src={events[0]?.image || "https://images.pexels.com/photos/863988/pexels-photo-863988.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"}
                   alt="Featured Activity"
+                  loading="lazy"
+                  decoding="async"
                   className="w-full h-full object-cover hover:scale-110 transition-transform duration-[2s] ease-out"
                   onError={(e) => {
                     const target = e.target as HTMLImageElement;

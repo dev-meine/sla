@@ -71,6 +71,8 @@ const GalleryGrid: React.FC = () => {
                 <img
                   src={item.url}
                   alt={item.title}
+                  loading="lazy"
+                  decoding="async"
                   className="w-full transition-transform duration-500 group-hover:scale-105"
                   onError={(e) => {
                     const target = e.target as HTMLImageElement;

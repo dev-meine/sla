@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import PageHeader from '../components/ui/PageHeader';
 import { motion } from 'framer-motion';
 import { Medal, Calendar, MapPin, Trophy, Timer, ChevronDown, ChevronUp } from 'lucide-react';
-import { supabase } from '../lib/supabase';
+import { supabase, cachedQuery } from '../lib/supabase';
 import { Database } from '../types/supabase';
 import { useParams } from 'react-router-dom';
 
@@ -25,11 +25,14 @@ const AthletesPage: React.FC = () => {
 
   const fetchAthlete = async (athleteId: string) => {
     try {
-      const { data, error } = await supabase
-        .from('athletes')
-        .select('*')
-        .eq('id', athleteId)
-        .single();
+      const { data, error } = await cachedQuery<Athlete>(
+        `athlete-${athleteId}`,
+        () => supabase
+          .from('athletes')
+          .select('*')
+          .eq('id', athleteId)
+          .single()
+      );
 
       if (error) throw error;
       setCurrentAthlete(data || null);
@@ -42,10 +45,13 @@ const AthletesPage: React.FC = () => {
 
   const fetchAthletes = async () => {
     try {
-      const { data, error } = await supabase
-        .from('athletes')
-        .select('*')
-        .order('name');
+      const { data, error } = await cachedQuery<Athlete[]>(
+        'all-athletes',
+        () => supabase
+          .from('athletes')
+          .select('*')
+          .order('name')
+      );
       
       if (error) throw error;
       setAthletes(data || []);
@@ -148,6 +154,8 @@ const AthletesPage: React.FC = () => {
                 <img
                   src={currentAthlete.image || "https://images.pexels.com/photos/863988/pexels-photo-863988.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"}
                   alt={currentAthlete.name}
+                  loading="lazy"
+                  decoding="async"
                   className="absolute inset-0 w-full h-full object-cover object-top"
                 />
                 <div className="absolute inset-0 bg-slate-900/50"></div>
@@ -267,6 +275,8 @@ const AthletesPage: React.FC = () => {
                             <img 
                               src={athlete.image || "https://images.pexels.com/photos/863988/pexels-photo-863988.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"}
                               alt={athlete.name}
+                              loading="lazy"
+                              decoding="async"
                               className="absolute inset-0 w-full h-full object-cover object-top"
                             />
                             <div className="absolute inset-0 bg-slate-900/50"></div>

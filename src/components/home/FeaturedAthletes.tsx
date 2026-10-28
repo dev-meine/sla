@@ -76,7 +76,7 @@ const FeaturedAthletes: React.FC = () => {
   }
 
   return (
-    <section className="bg-slate-50 py-24 md:py-32 relative overflow-hidden">
+    <section className="bg-slate-50 pt-16 md:pt-20 pb-8 md:pb-10 relative overflow-hidden">
       <div className="container mx-auto px-6 lg:px-12 relative z-10">
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 md:mb-20">
           <div className="max-w-2xl">
@@ -129,6 +129,8 @@ const FeaturedAthletes: React.FC = () => {
                   <img 
                     src={athlete.image || "https://images.pexels.com/photos/863988/pexels-photo-863988.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"}
                     alt={athlete.name}
+                    loading="lazy"
+                    decoding="async"
                     className="w-full h-full object-cover object-top transition-transform duration-[1.5s] ease-out transform group-hover:scale-110"
                   />
                 </motion.div>

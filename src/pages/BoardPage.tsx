@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import PageHeader from '../components/ui/PageHeader';
 import { motion } from 'framer-motion';
 import { Mail } from 'lucide-react';
-import { supabase } from '../lib/supabase';
+import { supabase, cachedQuery } from '../lib/supabase';
 import { Database } from '../types/supabase';
 
 type BoardMember = Database['public']['Tables']['board_members']['Row'];
@@ -17,10 +17,13 @@ const BoardPage: React.FC = () => {
 
   const fetchBoardMembers = async () => {
     try {
-      const { data, error } = await supabase
-        .from('board_members')
-        .select('*')
-        .order('name');
+      const { data, error } = await cachedQuery<BoardMember[]>(
+        'board-members',
+        () => supabase
+          .from('board_members')
+          .select('*')
+          .order('name')
+      );
       
       if (error) throw error;
       setBoardMembers(data || []);
@@ -93,6 +96,8 @@ const BoardPage: React.FC = () => {
                     <img 
                       src={member.image || "https://images.pexels.com/photos/2379005/pexels-photo-2379005.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"}
                       alt={member.name}
+                      loading="lazy"
+                      decoding="async"
                       className="absolute inset-0 w-full h-full object-cover object-center transition-transform duration-500 group-hover:scale-105"
                       onError={(e) => {
                         const target = e.target as HTMLImageElement;

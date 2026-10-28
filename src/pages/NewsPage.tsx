@@ -3,10 +3,10 @@ import { Link } from 'react-router-dom';
 import PageHeader from '../components/ui/PageHeader';
 import { motion } from 'framer-motion';
 import { Calendar, ArrowRight } from 'lucide-react';
-import { supabase } from '../lib/supabase';
+import { supabase, cachedQuery } from '../lib/supabase';
 import { Database } from '../types/supabase';
 
-type NewsPost = Database['public']['Tables']['news_posts']['Row'];
+type NewsPost = Pick<Database['public']['Tables']['news_posts']['Row'], 'id' | 'title' | 'author' | 'category' | 'excerpt' | 'image_url' | 'created_at'>;
 
 const NewsPage: React.FC = () => {
   const [posts, setPosts] = useState<NewsPost[]>([]);
@@ -19,13 +19,16 @@ const NewsPage: React.FC = () => {
 
   const fetchPosts = async () => {
     try {
-      const { data, error } = await supabase
-        .from('news_posts')
-        .select('*')
-        .order('created_at', { ascending: false });
+      const { data, error } = await cachedQuery(
+        'all-news',
+        () => supabase
+          .from('news_posts')
+          .select('id, title, author, category, excerpt, image_url, created_at')
+          .order('created_at', { ascending: false })
+      );
       
       if (error) throw error;
-      setPosts(data || []);
+      setPosts((data as NewsPost[]) || []);
     } catch (error) {
       console.error('Error fetching posts:', error);
     } finally {
@@ -112,31 +115,41 @@ const NewsPage: React.FC = () => {
             key={activeCategory}
           >
             {filteredPosts.map((post) => (
-              <motion.div key={post.id} className="bg-white rounded-2xl border border-slate-100 overflow-hidden group" variants={item}>
-                <div className="h-48 overflow-hidden">
+              <motion.div key={post.id} className="bg-white rounded-2xl border border-slate-100/90 overflow-hidden group flex flex-col h-full shadow-sm hover:shadow-md transition-shadow" variants={item}>
+                <div className="aspect-[16/9] overflow-hidden bg-slate-100">
                   <img 
                     src={post.image_url || "https://images.pexels.com/photos/863988/pexels-photo-863988.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"}
                     alt={post.title}
+                    loading="lazy"
+                    decoding="async"
                     className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                   />
                 </div>
-                <div className="p-6">
-                  <div className="flex items-center text-sm text-slate-500 mb-3">
-                    <Calendar size={14} className="mr-1" />
-                    <span>{new Date(post.created_at).toLocaleDateString()}</span>
+                <div className="p-6 flex flex-col flex-1">
+                  <div className="flex items-center text-xs text-slate-500 mb-3">
+                    <Calendar size={13} className="mr-1.5 text-slate-400" />
+                    <span>{post.created_at ? new Date(post.created_at).toLocaleDateString() : ''}</span>
                     {post.category && (
                       <>
-                        <span className="mx-2">•</span>
-                        <span>{post.category}</span>
+                        <span className="mx-2 text-slate-300">•</span>
+                        <span className="px-2.5 py-0.5 rounded-full bg-primary-50 text-primary-700 text-[10px] font-bold uppercase tracking-wider">
+                          {post.category}
+                        </span>
                       </>
                     )}
                   </div>
-                  <h3 className="text-xl mb-3 text-slate-900">{post.title}</h3>
-                  <p className="text-slate-600 mb-4">{post.excerpt}</p>
-                  <Link to={`/news/${post.id}`} className="inline-flex items-center font-medium text-primary-600 hover:text-primary-700">
-                    Read More
-                    <ArrowRight size={16} className="ml-1" />
-                  </Link>
+                  <h3 className="text-xl font-bold font-heading mb-2.5 text-slate-900 group-hover:text-primary-600 transition-colors line-clamp-2 leading-snug">
+                    {post.title}
+                  </h3>
+                  <p className="text-slate-600 text-sm mb-4 line-clamp-3 leading-relaxed flex-1">
+                    {post.excerpt}
+                  </p>
+                  <div className="mt-auto pt-2">
+                    <Link to={`/news/${post.id}`} className="inline-flex items-center text-xs font-bold uppercase tracking-wider text-primary-600 hover:text-primary-700 transition-colors">
+                      Read Story
+                      <ArrowRight size={14} className="ml-1" />
+                    </Link>
+                  </div>
                 </div>
               </motion.div>
             ))}

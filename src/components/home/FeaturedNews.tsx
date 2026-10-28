@@ -2,10 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, ArrowUpRight } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { supabase } from '../../lib/supabase';
+import { supabase, cachedQuery } from '../../lib/supabase';
 import { Database } from '../../types/supabase';
 
-type NewsPost = Database['public']['Tables']['news_posts']['Row'];
+type NewsPost = Pick<Database['public']['Tables']['news_posts']['Row'], 'id' | 'title' | 'author' | 'category' | 'excerpt' | 'image_url' | 'created_at'>;
 
 const FeaturedNews: React.FC = () => {
   const [newsPosts, setNewsPosts] = useState<NewsPost[]>([]);
@@ -17,14 +17,17 @@ const FeaturedNews: React.FC = () => {
 
   const fetchNewsPosts = async () => {
     try {
-      const { data, error } = await supabase
-        .from('news_posts')
-        .select('*')
-        .order('created_at', { ascending: false })
-        .limit(3);
+      const { data, error } = await cachedQuery(
+        'featured-news',
+        () => supabase
+          .from('news_posts')
+          .select('id, title, author, category, excerpt, image_url, created_at')
+          .order('created_at', { ascending: false })
+          .limit(3)
+      );
       
       if (error) throw error;
-      setNewsPosts(data || []);
+      setNewsPosts((data as NewsPost[]) || []);
     } catch (error) {
       console.error('Error fetching news posts:', error);
     } finally {
@@ -109,66 +112,66 @@ const FeaturedNews: React.FC = () => {
         </motion.div>
 
         <motion.div 
-          className="grid grid-cols-1 md:grid-cols-12 gap-8 lg:gap-12"
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
           variants={container}
           initial="hidden"
           whileInView="show"
           viewport={{ once: true, margin: "-50px" }}
         >
-          {newsPosts.map((post, index) => {
-            const isFeatured = index === 0;
+          {newsPosts.map((post) => {
             return (
               <motion.article 
                 key={post.id} 
-                className={`group cursor-pointer ${isFeatured ? 'md:col-span-12 lg:col-span-7' : 'md:col-span-6 lg:col-span-5 flex flex-col justify-between'}`}
+                className="group cursor-pointer flex flex-col h-full"
                 variants={item}
               >
-                <Link to={`/news/${post.id}`} className="block h-full">
+                <Link to={`/news/${post.id}`} className="flex flex-col h-full">
                   <motion.div 
-                    className={`overflow-hidden bg-slate-200 mb-6 rounded-2xl relative shadow-md group-hover:shadow-[0_20px_50px_rgba(37,99,235,0.15)] transition-shadow duration-500 ring-1 ring-white/50 ${isFeatured ? 'aspect-[16/9]' : 'aspect-[4/3]'}`}
-                    whileHover={{ y: -8, scale: 1.01 }}
+                    className="overflow-hidden bg-slate-100 mb-5 rounded-2xl relative shadow-sm group-hover:shadow-md transition-shadow duration-300 ring-1 ring-slate-200/80 aspect-[16/9]"
+                    whileHover={{ y: -6, scale: 1.01 }}
                     transition={{ type: "spring", stiffness: 300, damping: 20 }}
                   >
                     <img 
                       src={post.image_url || "https://images.unsplash.com/photo-1519315901367-f34ff9154487?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80"}
                       alt={post.title}
-                      className="w-full h-full object-cover filter saturate-110 contrast-110 transition-transform duration-[1.5s] transform group-hover:scale-110"
+                      loading="lazy"
+                      decoding="async"
+                      className="w-full h-full object-cover filter saturate-105 transition-transform duration-700 transform group-hover:scale-105"
                       onError={(e) => {
                         const target = e.target as HTMLImageElement;
                         target.src = "https://images.unsplash.com/photo-1519315901367-f34ff9154487?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80";
                       }}
                     />
-
                   </motion.div>
                   
-                  <div className="flex flex-col flex-grow px-2">
-                    <div className="flex items-center justify-between mb-4">
-                      <span className="font-sans text-[10px] tracking-widest uppercase text-primary-700 bg-white border border-primary-100 shadow-sm px-3 py-1 rounded-full font-bold">
+                  <div className="flex flex-col flex-grow">
+                    <div className="flex items-center justify-between mb-3">
+                      <span className="font-sans text-[10px] tracking-widest uppercase text-primary-700 bg-primary-50 border border-primary-100 px-2.5 py-0.5 rounded-full font-bold">
                         {post.category || "General"}
                       </span>
-                      <span className="font-sans text-xs tracking-widest uppercase text-slate-400 font-bold flex items-center">
-                        <span className="w-1.5 h-1.5 rounded-full bg-slate-300 mr-2"></span>
+                      <span className="font-sans text-xs tracking-wider uppercase text-slate-400 font-semibold flex items-center">
+                        <span className="w-1.5 h-1.5 rounded-full bg-slate-300 mr-1.5"></span>
                         {formatDate(post.created_at)}
                       </span>
                     </div>
 
-                    <h3 className={`font-heading font-bold text-slate-900 mb-3 group-hover:text-primary-600 transition-colors ${isFeatured ? 'text-3xl md:text-4xl' : 'text-2xl'}`}>
+                    <h3 className="font-heading font-bold text-xl text-slate-900 mb-2.5 group-hover:text-primary-600 transition-colors line-clamp-2 leading-snug">
                       {post.title}
                     </h3>
                     
-                    <p className="font-sans text-slate-600 mb-6 line-clamp-3 font-medium text-sm md:text-base">
+                    <p className="font-sans text-slate-600 mb-5 line-clamp-3 font-normal text-sm leading-relaxed flex-grow">
                       {post.excerpt}
                     </p>
 
-                    <div className="mt-auto">
-                      <span className="inline-flex items-center text-primary-600 font-bold uppercase tracking-widest text-xs">
+                    <div className="mt-auto pt-2">
+                      <span className="inline-flex items-center text-primary-600 font-bold uppercase tracking-widest text-xs group-hover:text-primary-700 transition-colors">
                         Read Story
                         <motion.span
                           initial={{ x: 0, y: 0 }}
                           whileHover={{ x: 3, y: -3 }}
                           transition={{ type: "spring", stiffness: 400 }}
                         >
-                          <ArrowUpRight size={16} className="ml-1" />
+                          <ArrowUpRight size={15} className="ml-1" />
                         </motion.span>
                       </span>
                     </div>
