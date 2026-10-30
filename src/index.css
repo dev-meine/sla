@@ -208,29 +208,27 @@
     font-weight: 600;
     color: #0f172a;
   }
+
+  /* Modern SaaS Admin Design Tokens */
+  .admin-card {
+    @apply bg-white rounded-xl border border-slate-200/80 shadow-[0_1px_3px_0_rgba(15,23,42,0.04)] transition-all duration-200;
+  }
+
+  .admin-card-hover {
+    @apply hover:shadow-[0_4px_12px_0_rgba(15,23,42,0.06)] hover:border-slate-300;
+  }
+
+  .admin-input {
+    @apply w-full px-3.5 py-2 bg-white border border-slate-200 rounded-lg text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-primary-600 focus:ring-4 focus:ring-primary-50 transition-all duration-150;
+  }
+
+  .admin-select {
+    @apply w-full px-3.5 py-2 bg-white border border-slate-200 rounded-lg text-sm text-slate-900 focus:outline-none focus:border-primary-600 focus:ring-4 focus:ring-primary-50 transition-all duration-150;
+  }
 }
-
-
 
 .bg-noise {
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
   opacity: 0.04;
   mix-blend-mode: multiply;
-}
-
-/* Modern SaaS Admin Design Tokens */
-.admin-card {
-  @apply bg-white rounded-xl border border-slate-200/80 shadow-[0_1px_3px_0_rgba(15,23,42,0.04)] transition-all duration-200;
-}
-
-.admin-card-hover {
-  @apply hover:shadow-[0_4px_12px_0_rgba(15,23,42,0.06)] hover:border-slate-300;
-}
-
-.admin-input {
-  @apply w-full px-3.5 py-2 bg-white border border-slate-200 rounded-lg text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-primary-600 focus:ring-4 focus:ring-primary-50 transition-all duration-150;
-}
-
-.admin-select {
-  @apply w-full px-3.5 py-2 bg-white border border-slate-200 rounded-lg text-sm text-slate-900 focus:outline-none focus:border-primary-600 focus:ring-4 focus:ring-primary-50 transition-all duration-150;
 }

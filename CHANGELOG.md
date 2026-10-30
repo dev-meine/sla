@@ -6,6 +6,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+- **2026-10-30**: Redesigned Admin Login (`AdminLogin.tsx`) with a clean, minimalistic layout and fixed `.admin-input` CSS layer cascade:
+  - Stripped visual clutter from `/admin/login`: removed radial background gradients, Framer Motion entrance animations, colored icon box wrapper around the circular SLA crest, decorative `"Official Federation Administration"` and `"Encrypted 256-bit SSL Session"` badges, multi-line explanatory copy, inline left input icons, `"Contact a Super Admin for resets"` label clutter, and the unused `"Remember credentials"` checkbox.
+  - Replaced with a focused `380px` single-card layout featuring the SLA crest, concise `"Sign in"` heading, accessible `Email` (`autocomplete="username"`) and `Password` (`id="current-password"`, `autocomplete="current-password"`) inputs with a show/hide password toggle, on-blur validation, and an understated `"Back to website"` link.
+  - Moved `.admin-card`, `.admin-card-hover`, `.admin-input`, and `.admin-select` inside `@layer components` in `src/index.css` so Tailwind utility classes (such as `pl-9`, `pr-10`, and `text-base`) are no longer overridden by component defaults.
+
 - **2026-10-30**: Cleaned up Travel & Logistics header in `AdminTravel.tsx`:
   - Removed page title *"Travel & Delegation Logistics"* and subtitle description *"Manage national team itineraries, hotel accommodations, and live ferry timetables."* from the page header per user preference.
   - Made `title` optional on `AdminPageHeader.tsx`, retaining clean breadcrumbs at the top and integrating the *"Add Travel Record"* action button seamlessly alongside the segmented tab navigation bar.
