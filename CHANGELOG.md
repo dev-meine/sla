@@ -6,6 +6,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+- **2026-10-30**: Cleaned up Admin Users & Roles header in `AdminUsers.tsx`:
+  - Removed page subtitle description *"Create administrator accounts, set temporary or permanent passwords, assign role presets, and customize per-user module checkboxes."* from `AdminPageHeader` for a cleaner, unified header layout matching other admin modules.
+
 - **2026-10-29**: Implemented production-grade **Admin Users & Roles Management** (`/admin/users`) and comprehensive backend/frontend RBAC security hardening:
   - **Staff Lifecycle & Role Management (`AdminUsers.tsx`, `manage-users` Edge Function, `src/types/rbac.ts`, `src/lib/adminUsersApi.ts`)**:
     - Provisioned and backfilled the 4 initial verified `super_admin` accounts (`willamstimothy016@outlook.com`, `williamstimothy016@gmail.com`, `techwox@outlook.com`, and `mistamed@gmail.com`) with full access across all 9 modules and `must_change_password = false`.

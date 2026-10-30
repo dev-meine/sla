@@ -481,7 +481,6 @@ const AdminUsers: React.FC = () => {
       <div className="space-y-6">
         <AdminPageHeader
           title="Users & Roles"
-          description="Create administrator accounts, set temporary or permanent passwords, assign role presets, and customize per-user module checkboxes."
           breadcrumbs={[
             { label: 'Admin', href: '/admin' },
             { label: 'Users & Roles' },
