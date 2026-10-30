@@ -9,6 +9,7 @@ import { useForm } from 'react-hook-form';
 import { Database } from '../../types/supabase';
 import ImageUpload from '../../components/ui/ImageUpload';
 import Modal from '../../components/ui/Modal';
+import { isSafeHttpsUrl } from '../../utils/sanitizeHtml';
 
 type GalleryItem = Database['public']['Tables']['gallery_items']['Row'];
 
@@ -430,13 +431,19 @@ const AdminGallery: React.FC = () => {
                         'https://images.pexels.com/photos/863988/pexels-photo-863988.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1';
                     }}
                   />
-                ) : (
+                ) : isSafeHttpsUrl(item.url) ? (
                   <iframe
                     src={item.url}
                     title={item.title}
                     className="w-full h-full pointer-events-none"
+                    sandbox="allow-scripts allow-same-origin allow-presentation"
+                    referrerPolicy="strict-origin-when-cross-origin"
                     allowFullScreen
                   />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center text-xs text-slate-400 p-4 text-center">
+                    Invalid video URL
+                  </div>
                 )}
 
                 <div className="absolute top-2.5 left-2.5">

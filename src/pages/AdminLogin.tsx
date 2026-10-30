@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import Logo from '../components/ui/Logo';
 import { supabase } from '../lib/supabase';
+import { useAdminAuth } from '../contexts/AdminAuthContext';
 import { AlertCircle, Lock, Mail, ArrowLeft, ShieldCheck, Loader2 } from 'lucide-react';
 
 interface LoginForm {
@@ -16,36 +17,67 @@ const AdminLogin: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
+  const { session, profile, isLoading: isAuthLoading, refreshProfile } = useAdminAuth();
   const { register, handleSubmit, formState: { errors } } = useForm<LoginForm>();
+
+  useEffect(() => {
+    if (!isAuthLoading && session && profile && profile.is_active) {
+      navigate('/admin', { replace: true });
+    }
+  }, [isAuthLoading, session, profile, navigate]);
 
   const onSubmit = async (data: LoginForm) => {
     try {
       setIsLoading(true);
       setError(null);
-      
-      const { data: authData, error } = await supabase.auth.signInWithPassword({
-        email: data.email,
+
+      const normalizedEmail = data.email.trim().toLowerCase();
+
+      const { data: authData, error: signInError } = await supabase.auth.signInWithPassword({
+        email: normalizedEmail,
         password: data.password,
       });
 
-      if (error) {
-        if (error.message.includes('captcha')) {
+      if (signInError) {
+        const lowerMsg = signInError.message.toLowerCase();
+        if (lowerMsg.includes('captcha')) {
           setError('Captcha verification failed. Please try again.');
+        } else if (lowerMsg.includes('banned')) {
+          setError('Your account has been suspended. Please contact a Super Administrator.');
         } else {
-          setError(error.message);
+          setError(signInError.message);
         }
         return;
       }
 
-      // Check if user is admin
-      if (authData.session?.user?.user_metadata?.role !== 'admin') {
-        await supabase.auth.signOut();
-        setError('Unauthorized: Admin access required.');
+      const userId = authData.session?.user?.id;
+      if (!userId) {
+        setError('Unable to establish an authenticated session.');
         return;
       }
 
-      navigate('/admin');
-    } catch (error: any) {
+      // Verify authoritative staff profile in public.profiles
+      const { data: staffProfile, error: profileError } = await supabase
+        .from('profiles')
+        .select('id, role, is_active, must_change_password')
+        .eq('id', userId)
+        .maybeSingle();
+
+      if (profileError || !staffProfile) {
+        await supabase.auth.signOut();
+        setError('Unauthorized: Staff access required.');
+        return;
+      }
+
+      if (!staffProfile.is_active) {
+        await supabase.auth.signOut();
+        setError('Your account has been suspended. Please contact a Super Administrator.');
+        return;
+      }
+
+      await refreshProfile();
+      navigate('/admin', { replace: true });
+    } catch {
       setError('An unexpected error occurred. Please try again.');
     } finally {
       setIsLoading(false);
@@ -123,6 +155,7 @@ const AdminLogin: React.FC = () => {
                     id="email"
                     type="email"
                     autoComplete="email"
+                    spellCheck={false}
                     placeholder="official@sierraleoneaquatics.org"
                     className={`admin-input pl-10 text-xs py-2.5 ${errors.email ? 'border-red-400 focus:border-red-500 focus:ring-red-400/20' : ''}`}
                     {...register('email', { 
@@ -144,9 +177,9 @@ const AdminLogin: React.FC = () => {
                   <label htmlFor="password" className="block text-xs font-semibold text-slate-700 uppercase tracking-wider">
                     Password
                   </label>
-                  <a href="#" className="text-xs font-medium text-primary-600 hover:text-primary-700">
-                    Forgot password?
-                  </a>
+                  <span className="text-[11px] text-slate-400">
+                    Contact a Super Admin for resets
+                  </span>
                 </div>
                 <div className="relative">
                   <Lock size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />

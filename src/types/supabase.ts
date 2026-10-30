@@ -68,27 +68,87 @@ export type Database = {
         }
         Relationships: []
       }
-      admin_users: {
+      admin_audit_logs: {
         Row: {
-          created_at: string | null
+          action: string
+          actor_email: string
+          actor_id: string | null
+          created_at: string
+          details: Json
           id: string
-          is_super_admin: boolean | null
-          updated_at: string | null
-          user_id: string | null
+          ip_address: string | null
+          target_email: string | null
+          target_user_id: string | null
+          user_agent: string | null
         }
         Insert: {
-          created_at?: string | null
+          action: string
+          actor_email: string
+          actor_id?: string | null
+          created_at?: string
+          details?: Json
           id?: string
-          is_super_admin?: boolean | null
-          updated_at?: string | null
-          user_id?: string | null
+          ip_address?: string | null
+          target_email?: string | null
+          target_user_id?: string | null
+          user_agent?: string | null
         }
         Update: {
-          created_at?: string | null
+          action?: string
+          actor_email?: string
+          actor_id?: string | null
+          created_at?: string
+          details?: Json
           id?: string
-          is_super_admin?: boolean | null
+          ip_address?: string | null
+          target_email?: string | null
+          target_user_id?: string | null
+          user_agent?: string | null
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string | null
+          created_by: string | null
+          email: string
+          full_name: string | null
+          id: string
+          is_active: boolean
+          must_change_password: boolean
+          password_reset_at: string | null
+          permissions: string[]
+          role: string
+          updated_at: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          email: string
+          full_name?: string | null
+          id: string
+          is_active?: boolean
+          must_change_password?: boolean
+          password_reset_at?: string | null
+          permissions?: string[]
+          role?: string
           updated_at?: string | null
-          user_id?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          email?: string
+          full_name?: string | null
+          id?: string
+          is_active?: boolean
+          must_change_password?: boolean
+          password_reset_at?: string | null
+          permissions?: string[]
+          role?: string
+          updated_at?: string | null
         }
         Relationships: []
       }

@@ -1,11 +1,24 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Calendar, ArrowLeft, User } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { Database } from '../types/supabase';
+import { setSanitizedHtml } from '../utils/sanitizeHtml';
 
 type NewsPost = Database['public']['Tables']['news_posts']['Row'];
+
+const SanitizedArticleHtml: React.FC<{ html: string }> = ({ html }) => {
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (containerRef.current) {
+      setSanitizedHtml(containerRef.current, html);
+    }
+  }, [html]);
+
+  return <div ref={containerRef} className="article-content" />;
+};
 
 const NewsArticlePage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -40,10 +53,10 @@ const NewsArticlePage: React.FC = () => {
       return <p className="text-slate-500 italic">Content unavailable for this article.</p>;
     }
 
-    // If content contains rich HTML tags, render via dangerouslySetInnerHTML
+    // If content contains rich HTML tags, render sanitized DOM nodes (blocks Stored XSS / mXSS)
     const hasHtml = /<[a-z][\s\S]*>/i.test(content);
     if (hasHtml) {
-      return <div className="article-content" dangerouslySetInnerHTML={{ __html: content }} />;
+      return <SanitizedArticleHtml html={content} />;
     }
 
     // Normalize Windows and Mac line endings (\r\n -> \n, \r -> \n)

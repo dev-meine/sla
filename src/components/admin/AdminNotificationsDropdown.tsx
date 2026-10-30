@@ -1,6 +1,7 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
+import { useAdminAuth } from '../../contexts/AdminAuthContext';
 import {
   Bell,
   CheckCheck,
@@ -9,7 +10,6 @@ import {
   Calendar,
   FileText,
   Ship,
-  ExternalLink,
   ChevronRight,
   Loader2,
   X
@@ -39,10 +39,17 @@ const AdminNotificationsDropdown: React.FC<AdminNotificationsDropdownProps> = ({
   onClose,
   onUnreadCountChange
 }) => {
+  const { hasModule } = useAdminAuth();
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
+
+  const canRegistrations = hasModule('registrations');
+  const canReports = hasModule('reports');
+  const canActivities = hasModule('activities');
+  const canPosts = hasModule('posts');
+  const canTravel = hasModule('travel');
 
   // Load read notification IDs from localStorage
   const getReadIds = (): string[] => {
@@ -62,68 +69,83 @@ const AdminNotificationsDropdown: React.FC<AdminNotificationsDropdownProps> = ({
     }
   };
 
-  const fetchLiveNotifications = async () => {
+  const fetchLiveNotifications = useCallback(async () => {
     try {
       setIsLoading(true);
       const readIds = getReadIds();
 
       const [
-        { data: pendingRegistrations },
-        { data: pendingReports },
-        { data: upcomingEvents },
-        { data: recentNews }
+        registrationsRes,
+        reportsRes,
+        eventsRes,
+        newsRes
       ] = await Promise.all([
-        supabase
-          .from('swimming_registrations')
-          .select('id, student_name, created_at, status')
-          .eq('status', 'pending')
-          .order('created_at', { ascending: false })
-          .limit(5),
-        supabase
-          .from('reports')
-          .select('id, incident_type, created_at, status')
-          .eq('status', 'pending')
-          .order('created_at', { ascending: false })
-          .limit(5),
-        supabase
-          .from('events')
-          .select('id, title, date')
-          .gte('date', new Date().toISOString().split('T')[0])
-          .order('date', { ascending: true })
-          .limit(3),
-        supabase
-          .from('news_posts')
-          .select('id, title, created_at')
-          .order('created_at', { ascending: false })
-          .limit(2)
+        canRegistrations
+          ? supabase
+              .from('swimming_registrations')
+              .select('id, name, created_at, status')
+              .eq('status', 'pending')
+              .order('created_at', { ascending: false })
+              .limit(5)
+          : Promise.resolve({ data: null }),
+        canReports
+          ? supabase
+              .from('anonymous_reports')
+              .select('id, category, created_at, status')
+              .eq('status', 'pending')
+              .order('created_at', { ascending: false })
+              .limit(5)
+          : Promise.resolve({ data: null }),
+        canActivities
+          ? supabase
+              .from('events')
+              .select('id, title, date')
+              .gte('date', new Date().toISOString().split('T')[0])
+              .order('date', { ascending: true })
+              .limit(3)
+          : Promise.resolve({ data: null }),
+        canPosts
+          ? supabase
+              .from('news_posts')
+              .select('id, title, created_at')
+              .order('created_at', { ascending: false })
+              .limit(2)
+          : Promise.resolve({ data: null })
       ]);
+
+      const pendingRegistrations = registrationsRes.data;
+      const pendingReports = reportsRes.data;
+      const upcomingEvents = eventsRes.data;
+      const recentNews = newsRes.data;
 
       const items: NotificationItem[] = [];
 
       // Pending registrations
       if (pendingRegistrations && pendingRegistrations.length > 0) {
+        const regId = `reg-batch-${pendingRegistrations.length}-${pendingRegistrations[0].id}`;
         items.push({
-          id: `reg-batch-${pendingRegistrations.length}-${pendingRegistrations[0].id}`,
+          id: regId,
           title: 'Pending Swimming Registrations',
           description: `${pendingRegistrations.length} student applicant(s) awaiting tutor assignment and confirmation.`,
           timestamp: pendingRegistrations[0].created_at || new Date().toISOString(),
           category: 'registration',
           url: '/admin/registrations',
-          isRead: readIds.includes(`reg-batch-${pendingRegistrations.length}-${pendingRegistrations[0].id}`),
+          isRead: readIds.includes(regId),
           priority: 'high'
         });
       }
 
       // Safe sport confidential reports
       if (pendingReports && pendingReports.length > 0) {
+        const repId = `rep-batch-${pendingReports.length}-${pendingReports[0].id}`;
         items.push({
-          id: `rep-batch-${pendingReports.length}-${pendingReports[0].id}`,
+          id: repId,
           title: 'Safe Sport Incident Reports',
           description: `${pendingReports.length} confidential report(s) submitted requiring review.`,
           timestamp: pendingReports[0].created_at || new Date().toISOString(),
           category: 'report',
           url: '/admin/reports',
-          isRead: readIds.includes(`rep-batch-${pendingReports.length}-${pendingReports[0].id}`),
+          isRead: readIds.includes(repId),
           priority: 'high'
         });
       }
@@ -134,8 +156,8 @@ const AdminNotificationsDropdown: React.FC<AdminNotificationsDropdownProps> = ({
           items.push({
             id: `ev-${ev.id}`,
             title: `Upcoming Meet: ${ev.title}`,
-            description: `Scheduled on the national aquatic calendar for ${new Date(ev.date).toLocaleDateString()}.`,
-            timestamp: ev.date,
+            description: `Scheduled on the national aquatic calendar for ${ev.date ? new Date(ev.date).toLocaleDateString() : 'upcoming date'}.`,
+            timestamp: ev.date || new Date().toISOString(),
             category: 'event',
             url: '/admin/activities',
             isRead: readIds.includes(`ev-${ev.id}`)
@@ -159,15 +181,17 @@ const AdminNotificationsDropdown: React.FC<AdminNotificationsDropdownProps> = ({
       }
 
       // System Sea Coach operational status
-      items.push({
-        id: 'system-seacoach-live',
-        title: 'Sea Coach Ferry Feed Active',
-        description: 'Real-time timetable feed streaming for Aberdeen ⇄ Lungi delegation transfers.',
-        timestamp: new Date().toISOString(),
-        category: 'system',
-        url: '/admin/travel',
-        isRead: readIds.includes('system-seacoach-live')
-      });
+      if (canTravel) {
+        items.push({
+          id: 'system-seacoach-live',
+          title: 'Sea Coach Ferry Feed Active',
+          description: 'Real-time timetable feed streaming for Aberdeen ⇄ Lungi delegation transfers.',
+          timestamp: new Date().toISOString(),
+          category: 'system',
+          url: '/admin/travel',
+          isRead: readIds.includes('system-seacoach-live')
+        });
+      }
 
       setNotifications(items);
 
@@ -181,18 +205,18 @@ const AdminNotificationsDropdown: React.FC<AdminNotificationsDropdownProps> = ({
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [canRegistrations, canReports, canActivities, canPosts, canTravel, onUnreadCountChange]);
 
-  // Initial fetch and on open
+  // Initial fetch and on permission change
   useEffect(() => {
-    fetchLiveNotifications();
-  }, []);
+    void fetchLiveNotifications();
+  }, [fetchLiveNotifications]);
 
   useEffect(() => {
     if (isOpen) {
-      fetchLiveNotifications();
+      void fetchLiveNotifications();
     }
-  }, [isOpen]);
+  }, [isOpen, fetchLiveNotifications]);
 
   // Click outside to close
   useEffect(() => {
@@ -268,6 +292,11 @@ const AdminNotificationsDropdown: React.FC<AdminNotificationsDropdownProps> = ({
   if (!isOpen) return null;
 
   const unreadCount = notifications.filter(n => !n.isRead).length;
+  const footerDestination = canRegistrations
+    ? '/admin/registrations'
+    : canReports
+    ? '/admin/reports'
+    : '/admin';
 
   return (
     <div
@@ -368,11 +397,11 @@ const AdminNotificationsDropdown: React.FC<AdminNotificationsDropdownProps> = ({
         <button
           onClick={() => {
             onClose();
-            navigate('/admin/registrations');
+            navigate(footerDestination);
           }}
           className="text-xs font-semibold text-primary-700 hover:text-primary-800 transition-colors w-full py-1"
         >
-          Review All Pending Actions →
+          {canRegistrations || canReports ? 'Review Pending Actions →' : 'Go to Dashboard →'}
         </button>
       </div>
     </div>

@@ -2,14 +2,17 @@ import React, { useEffect, Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Layout from './components/layout/Layout';
 import ProtectedRoute from './components/auth/ProtectedRoute';
+import { AdminAuthProviderOutlet } from './contexts/AdminAuthContext';
 import { initSmoothScroll } from './utils/smoothScroll';
 
 // Resilient dynamic chunk loader with automatic retry on network dropout
-const lazyRetry = (componentImport: () => Promise<{ default: React.ComponentType<any> }>) =>
+const lazyRetry = <T extends React.ComponentType<object>>(
+  componentImport: () => Promise<{ default: T }>
+) =>
   lazy(async () => {
     try {
       return await componentImport();
-    } catch (error) {
+    } catch {
       try {
         await new Promise((resolve) => setTimeout(resolve, 800));
         return await componentImport();
@@ -44,6 +47,7 @@ const AdminTravel = lazyRetry(() => import('./pages/admin/AdminTravel'));
 const AdminTechnicalStaff = lazyRetry(() => import('./pages/admin/AdminTechnicalStaff'));
 const AdminReports = lazyRetry(() => import('./pages/admin/AdminReports'));
 const AdminRegistrations = lazyRetry(() => import('./pages/admin/AdminRegistrations'));
+const AdminUsers = lazyRetry(() => import('./pages/admin/AdminUsers'));
 
 const PageLoadingFallback: React.FC = () => (
   <div className="min-h-[50vh] flex flex-col items-center justify-center py-20 bg-transparent">
@@ -77,58 +81,65 @@ function App() {
           <Route path="/news/:id" element={<Layout><NewsArticlePage /></Layout>} />
           <Route path="/register" element={<Layout><RegistrationPage /></Layout>} />
           
-          {/* Admin Routes */}
-          <Route path="/admin" element={
-            <ProtectedRoute>
-              <AdminDashboard />
-            </ProtectedRoute>
-          } />
-          <Route path="/admin/login" element={<AdminLogin />} />
-          <Route path="/admin/athletes" element={
-            <ProtectedRoute>
-              <AdminAthletes />
-            </ProtectedRoute>
-          } />
-          <Route path="/admin/activities" element={
-            <ProtectedRoute>
-              <AdminActivities />
-            </ProtectedRoute>
-          } />
-          <Route path="/admin/gallery" element={
-            <ProtectedRoute>
-              <AdminGallery />
-            </ProtectedRoute>
-          } />
-          <Route path="/admin/posts" element={
-            <ProtectedRoute>
-              <AdminPosts />
-            </ProtectedRoute>
-          } />
-          <Route path="/admin/board" element={
-            <ProtectedRoute>
-              <AdminBoard />
-            </ProtectedRoute>
-          } />
-          <Route path="/admin/travel" element={
-            <ProtectedRoute>
-              <AdminTravel />
-            </ProtectedRoute>
-          } />
-          <Route path="/admin/technical-staff" element={
-            <ProtectedRoute>
-              <AdminTechnicalStaff />
-            </ProtectedRoute>
-          } />
-          <Route path="/admin/reports" element={
-            <ProtectedRoute>
-              <AdminReports />
-            </ProtectedRoute>
-          } />
-          <Route path="/admin/registrations" element={
-            <ProtectedRoute>
-              <AdminRegistrations />
-            </ProtectedRoute>
-          } />
+          {/* Admin Routes (Scoped within AdminAuthProviderOutlet to keep public routes isolated) */}
+          <Route element={<AdminAuthProviderOutlet />}>
+            <Route path="/admin/login" element={<AdminLogin />} />
+            <Route path="/admin" element={
+              <ProtectedRoute>
+                <AdminDashboard />
+              </ProtectedRoute>
+            } />
+            <Route path="/admin/users" element={
+              <ProtectedRoute requireSuperAdmin>
+                <AdminUsers />
+              </ProtectedRoute>
+            } />
+            <Route path="/admin/athletes" element={
+              <ProtectedRoute requiredModule="athletes">
+                <AdminAthletes />
+              </ProtectedRoute>
+            } />
+            <Route path="/admin/activities" element={
+              <ProtectedRoute requiredModule="activities">
+                <AdminActivities />
+              </ProtectedRoute>
+            } />
+            <Route path="/admin/gallery" element={
+              <ProtectedRoute requiredModule="gallery">
+                <AdminGallery />
+              </ProtectedRoute>
+            } />
+            <Route path="/admin/posts" element={
+              <ProtectedRoute requiredModule="posts">
+                <AdminPosts />
+              </ProtectedRoute>
+            } />
+            <Route path="/admin/board" element={
+              <ProtectedRoute requiredModule="board">
+                <AdminBoard />
+              </ProtectedRoute>
+            } />
+            <Route path="/admin/travel" element={
+              <ProtectedRoute requiredModule="travel">
+                <AdminTravel />
+              </ProtectedRoute>
+            } />
+            <Route path="/admin/technical-staff" element={
+              <ProtectedRoute requiredModule="technical_staff">
+                <AdminTechnicalStaff />
+              </ProtectedRoute>
+            } />
+            <Route path="/admin/reports" element={
+              <ProtectedRoute requiredModule="reports">
+                <AdminReports />
+              </ProtectedRoute>
+            } />
+            <Route path="/admin/registrations" element={
+              <ProtectedRoute requiredModule="registrations">
+                <AdminRegistrations />
+              </ProtectedRoute>
+            } />
+          </Route>
         </Routes>
       </Suspense>
     </Router>

@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
-import { supabase } from '../../lib/supabase';
 import {
   LayoutDashboard,
   Users,
@@ -20,24 +19,31 @@ import {
   Bell,
   Search,
   ExternalLink,
-  ShieldCheck
+  ShieldCheck,
+  Shield
 } from 'lucide-react';
 import Logo from '../ui/Logo';
 import AdminSearchModal from './AdminSearchModal';
 import AdminNotificationsDropdown from './AdminNotificationsDropdown';
+import { useAdminAuth } from '../../contexts/AdminAuthContext';
+import { ROLE_METADATA, type AdminModuleKey } from '../../types/rbac';
 
 interface AdminLayoutProps {
   children: React.ReactNode;
 }
 
+interface NavItem {
+  label: string;
+  icon: React.ReactNode;
+  path: string;
+  badge?: string;
+  requiredModule?: AdminModuleKey;
+  requireSuperAdmin?: boolean;
+}
+
 interface NavGroup {
   label: string;
-  items: {
-    label: string;
-    icon: React.ReactNode;
-    path: string;
-    badge?: string;
-  }[];
+  items: NavItem[];
 }
 
 const navGroups: NavGroup[] = [
@@ -50,25 +56,26 @@ const navGroups: NavGroup[] = [
   {
     label: 'Athletic Roster',
     items: [
-      { label: 'Athletes', icon: <Users size={18} />, path: '/admin/athletes' },
-      { label: 'Technical Staff', icon: <UserCog size={18} />, path: '/admin/technical-staff' },
-      { label: 'Registrations', icon: <ClipboardList size={18} />, path: '/admin/registrations' }
+      { label: 'Athletes', icon: <Users size={18} />, path: '/admin/athletes', requiredModule: 'athletes' },
+      { label: 'Technical Staff', icon: <UserCog size={18} />, path: '/admin/technical-staff', requiredModule: 'technical_staff' },
+      { label: 'Registrations', icon: <ClipboardList size={18} />, path: '/admin/registrations', requiredModule: 'registrations' }
     ]
   },
   {
     label: 'Content & Media',
     items: [
-      { label: 'News Posts', icon: <FileText size={18} />, path: '/admin/posts' },
-      { label: 'Activities', icon: <Calendar size={18} />, path: '/admin/activities' },
-      { label: 'Gallery', icon: <ImageIcon size={18} />, path: '/admin/gallery' }
+      { label: 'News Posts', icon: <FileText size={18} />, path: '/admin/posts', requiredModule: 'posts' },
+      { label: 'Activities', icon: <Calendar size={18} />, path: '/admin/activities', requiredModule: 'activities' },
+      { label: 'Gallery', icon: <ImageIcon size={18} />, path: '/admin/gallery', requiredModule: 'gallery' }
     ]
   },
   {
     label: 'Operations',
     items: [
-      { label: 'Executive Board', icon: <Users2 size={18} />, path: '/admin/board' },
-      { label: 'Travel & Ferry', icon: <Plane size={18} />, path: '/admin/travel' },
-      { label: 'Reports', icon: <AlertTriangle size={18} />, path: '/admin/reports' }
+      { label: 'Executive Board', icon: <Users2 size={18} />, path: '/admin/board', requiredModule: 'board' },
+      { label: 'Travel & Ferry', icon: <Plane size={18} />, path: '/admin/travel', requiredModule: 'travel' },
+      { label: 'Reports', icon: <AlertTriangle size={18} />, path: '/admin/reports', requiredModule: 'reports' },
+      { label: 'Users & Roles', icon: <Shield size={18} />, path: '/admin/users', requireSuperAdmin: true }
     ]
   }
 ];
@@ -76,9 +83,10 @@ const navGroups: NavGroup[] = [
 const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { profile, isSuperAdmin, hasModule, signOut } = useAdminAuth();
+
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
-  const [userEmail, setUserEmail] = useState<string | null>(null);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
   const [unreadNotificationsCount, setUnreadNotificationsCount] = useState(0);
@@ -96,33 +104,31 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
     return () => window.removeEventListener('keydown', handleGlobalKeyDown);
   }, []);
 
-  useEffect(() => {
-    // Load session user email
-    const fetchUser = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session?.user?.email) {
-        setUserEmail(session.user.email);
-      }
-    };
-    fetchUser();
-  }, []);
-
   // Close mobile drawer on route transition
   useEffect(() => {
     setIsMobileOpen(false);
   }, [location.pathname]);
 
+  const visibleNavGroups = useMemo(() => {
+    return navGroups
+      .map(group => ({
+        ...group,
+        items: group.items.filter(item => {
+          if (item.requireSuperAdmin) {
+            return isSuperAdmin;
+          }
+          if (item.requiredModule) {
+            return hasModule(item.requiredModule);
+          }
+          return true;
+        })
+      }))
+      .filter(group => group.items.length > 0);
+  }, [isSuperAdmin, hasModule]);
+
   const handleSignOut = async () => {
-    try {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session) {
-        await supabase.auth.signOut();
-      }
-      navigate('/admin/login');
-    } catch (error) {
-      console.error('Sign out error:', error);
-      navigate('/admin/login');
-    }
+    await signOut();
+    navigate('/admin/login', { replace: true });
   };
 
   const isActive = (path: string) => {
@@ -143,6 +149,14 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
     }
     return 'Admin';
   };
+
+  const displayName =
+    profile?.full_name?.trim() ||
+    (profile?.email ? profile.email.split('@')[0] : 'Staff User');
+  const displayInitial = displayName.charAt(0).toUpperCase();
+  const roleLabel = profile
+    ? (ROLE_METADATA[profile.role]?.shortLabel ?? 'Staff')
+    : 'Administrator';
 
   return (
     <div className="min-h-screen bg-slate-50 flex">
@@ -196,7 +210,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
 
         {/* Sidebar Grouped Navigation */}
         <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-6">
-          {navGroups.map((group) => (
+          {visibleNavGroups.map((group) => (
             <div key={group.label} className="space-y-1">
               {!isCollapsed ? (
                 <h4 className="px-3 text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-2">
@@ -262,7 +276,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
           </Link>
 
           <button
-            onClick={handleSignOut}
+            onClick={() => void handleSignOut()}
             title={isCollapsed ? 'Sign Out' : undefined}
             className={`w-full flex items-center rounded-lg text-xs font-medium text-rose-600 hover:bg-rose-50 transition-all ${
               isCollapsed ? 'justify-center h-10 w-10 mx-auto' : 'px-3 py-2 gap-2.5'
@@ -373,15 +387,15 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
             {/* Administrator Profile Pill */}
             <div className="flex items-center gap-2.5 pl-1">
               <div className="w-8 h-8 rounded-full bg-primary-600 text-white flex items-center justify-center font-bold text-xs shadow-xs">
-                {userEmail ? userEmail.charAt(0).toUpperCase() : 'A'}
+                {displayInitial}
               </div>
               <div className="hidden sm:flex flex-col text-left">
                 <span className="text-xs font-semibold text-slate-900 leading-tight truncate max-w-[140px]">
-                  {userEmail ? userEmail.split('@')[0] : 'Admin User'}
+                  {displayName}
                 </span>
                 <span className="text-[10px] font-medium text-primary-600 flex items-center gap-1">
                   <ShieldCheck size={11} />
-                  Administrator
+                  {roleLabel}
                 </span>
               </div>
             </div>

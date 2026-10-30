@@ -1,6 +1,8 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
+import { useAdminAuth } from '../../contexts/AdminAuthContext';
+import type { AdminModuleKey } from '../../types/rbac';
 import {
   Search,
   X,
@@ -14,10 +16,10 @@ import {
   Users2,
   UserCog,
   ShieldAlert,
+  Shield,
   ArrowRight,
   ExternalLink,
-  Loader2,
-  Clock
+  Loader2
 } from 'lucide-react';
 
 interface AdminSearchModalProps {
@@ -33,6 +35,8 @@ interface SearchResultItem {
   icon: React.ElementType;
   url: string;
   isExternal?: boolean;
+  requiredModule?: AdminModuleKey;
+  requireSuperAdmin?: boolean;
 }
 
 const staticNavItems: SearchResultItem[] = [
@@ -45,12 +49,22 @@ const staticNavItems: SearchResultItem[] = [
     url: '/admin'
   },
   {
+    id: 'nav-users',
+    title: 'Users & Roles',
+    subtitle: 'Manage staff accounts, passwords, role presets, and module checkboxes',
+    category: 'Navigation',
+    icon: Shield,
+    url: '/admin/users',
+    requireSuperAdmin: true
+  },
+  {
     id: 'nav-registrations',
     title: 'Swimming Registrations',
     subtitle: 'Manage swimmer enrollment applications and tutor assignments',
     category: 'Navigation',
     icon: ClipboardList,
-    url: '/admin/registrations'
+    url: '/admin/registrations',
+    requiredModule: 'registrations'
   },
   {
     id: 'nav-athletes',
@@ -58,7 +72,8 @@ const staticNavItems: SearchResultItem[] = [
     subtitle: 'Manage national aquatic athletes and discipline profiles',
     category: 'Navigation',
     icon: Users,
-    url: '/admin/athletes'
+    url: '/admin/athletes',
+    requiredModule: 'athletes'
   },
   {
     id: 'nav-posts',
@@ -66,7 +81,8 @@ const staticNavItems: SearchResultItem[] = [
     subtitle: 'Publish articles, press releases, and federation updates',
     category: 'Navigation',
     icon: FileText,
-    url: '/admin/posts'
+    url: '/admin/posts',
+    requiredModule: 'posts'
   },
   {
     id: 'nav-activities',
@@ -74,7 +90,8 @@ const staticNavItems: SearchResultItem[] = [
     subtitle: 'Aquatic tournaments, training camps, and coaching clinics',
     category: 'Navigation',
     icon: Calendar,
-    url: '/admin/activities'
+    url: '/admin/activities',
+    requiredModule: 'activities'
   },
   {
     id: 'nav-gallery',
@@ -82,7 +99,8 @@ const staticNavItems: SearchResultItem[] = [
     subtitle: 'Federation photo albums and competition video archives',
     category: 'Navigation',
     icon: ImageIcon,
-    url: '/admin/gallery'
+    url: '/admin/gallery',
+    requiredModule: 'gallery'
   },
   {
     id: 'nav-travel',
@@ -90,7 +108,8 @@ const staticNavItems: SearchResultItem[] = [
     subtitle: 'Delegation itineraries, Sea Coach timetables, and hotel stays',
     category: 'Navigation',
     icon: Ship,
-    url: '/admin/travel'
+    url: '/admin/travel',
+    requiredModule: 'travel'
   },
   {
     id: 'nav-board',
@@ -98,7 +117,8 @@ const staticNavItems: SearchResultItem[] = [
     subtitle: 'National federation executive committee and leadership directory',
     category: 'Navigation',
     icon: Users2,
-    url: '/admin/board'
+    url: '/admin/board',
+    requiredModule: 'board'
   },
   {
     id: 'nav-staff',
@@ -106,7 +126,8 @@ const staticNavItems: SearchResultItem[] = [
     subtitle: 'National coaches, FINA referees, and technical officials',
     category: 'Navigation',
     icon: UserCog,
-    url: '/admin/technical-staff'
+    url: '/admin/technical-staff',
+    requiredModule: 'technical_staff'
   },
   {
     id: 'nav-reports',
@@ -114,7 +135,8 @@ const staticNavItems: SearchResultItem[] = [
     subtitle: 'Confidential athlete welfare and ethics compliance reports',
     category: 'Navigation',
     icon: ShieldAlert,
-    url: '/admin/reports'
+    url: '/admin/reports',
+    requiredModule: 'reports'
   },
   {
     id: 'nav-public',
@@ -128,6 +150,7 @@ const staticNavItems: SearchResultItem[] = [
 ];
 
 const AdminSearchModal: React.FC<AdminSearchModalProps> = ({ isOpen, onClose }) => {
+  const { hasModule, isSuperAdmin } = useAdminAuth();
   const [query, setQuery] = useState('');
   const [dbResults, setDbResults] = useState<SearchResultItem[]>([]);
   const [isSearchingDb, setIsSearchingDb] = useState(false);
@@ -136,6 +159,10 @@ const AdminSearchModal: React.FC<AdminSearchModalProps> = ({ isOpen, onClose }) 
   const inputRef = useRef<HTMLInputElement>(null);
   const resultsContainerRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
+
+  const canAthletes = hasModule('athletes');
+  const canPosts = hasModule('posts');
+  const canActivities = hasModule('activities');
 
   // Focus input on open
   useEffect(() => {
@@ -149,7 +176,7 @@ const AdminSearchModal: React.FC<AdminSearchModalProps> = ({ isOpen, onClose }) 
     }
   }, [isOpen]);
 
-  // Live Supabase query search with debouncing
+  // Live Supabase query search with debouncing (gated by staff module permissions)
   useEffect(() => {
     const trimmed = query.trim();
     if (trimmed.length < 2) {
@@ -158,39 +185,47 @@ const AdminSearchModal: React.FC<AdminSearchModalProps> = ({ isOpen, onClose }) 
       return;
     }
 
+    if (!canAthletes && !canPosts && !canActivities) {
+      setDbResults([]);
+      setIsSearchingDb(false);
+      return;
+    }
+
     setIsSearchingDb(true);
     const timeout = setTimeout(async () => {
       try {
-        const [
-          { data: athletesData },
-          { data: postsData },
-          { data: eventsData }
-        ] = await Promise.all([
-          supabase
-            .from('athletes')
-            .select('id, name, discipline, club')
-            .ilike('name', `%${trimmed}%`)
-            .limit(4),
-          supabase
-            .from('news_posts')
-            .select('id, title, category, author')
-            .ilike('title', `%${trimmed}%`)
-            .limit(4),
-          supabase
-            .from('events')
-            .select('id, title, category, date')
-            .ilike('title', `%${trimmed}%`)
-            .limit(4)
+        const [athletesRes, postsRes, eventsRes] = await Promise.all([
+          canAthletes
+            ? supabase
+                .from('athletes')
+                .select('id, name, sport, club')
+                .ilike('name', `%${trimmed}%`)
+                .limit(4)
+            : Promise.resolve({ data: null }),
+          canPosts
+            ? supabase
+                .from('news_posts')
+                .select('id, title, category, author')
+                .ilike('title', `%${trimmed}%`)
+                .limit(4)
+            : Promise.resolve({ data: null }),
+          canActivities
+            ? supabase
+                .from('events')
+                .select('id, title, category, date')
+                .ilike('title', `%${trimmed}%`)
+                .limit(4)
+            : Promise.resolve({ data: null })
         ]);
 
         const formattedResults: SearchResultItem[] = [];
 
-        if (athletesData) {
-          athletesData.forEach(ath => {
+        if (athletesRes.data) {
+          athletesRes.data.forEach(ath => {
             formattedResults.push({
               id: `ath-${ath.id}`,
               title: ath.name,
-              subtitle: `Athlete • ${ath.discipline || 'Aquatics'} ${ath.club ? `(${ath.club})` : ''}`,
+              subtitle: `Athlete • ${ath.sport || 'Aquatics'} ${ath.club ? `(${ath.club})` : ''}`,
               category: 'Athletes',
               icon: Users,
               url: '/admin/athletes'
@@ -198,8 +233,8 @@ const AdminSearchModal: React.FC<AdminSearchModalProps> = ({ isOpen, onClose }) 
           });
         }
 
-        if (postsData) {
-          postsData.forEach(p => {
+        if (postsRes.data) {
+          postsRes.data.forEach(p => {
             formattedResults.push({
               id: `post-${p.id}`,
               title: p.title,
@@ -211,12 +246,12 @@ const AdminSearchModal: React.FC<AdminSearchModalProps> = ({ isOpen, onClose }) 
           });
         }
 
-        if (eventsData) {
-          eventsData.forEach(ev => {
+        if (eventsRes.data) {
+          eventsRes.data.forEach(ev => {
             formattedResults.push({
               id: `ev-${ev.id}`,
               title: ev.title,
-              subtitle: `Event • ${ev.category || 'Tournament'} • ${new Date(ev.date).toLocaleDateString()}`,
+              subtitle: `Event • ${ev.category || 'Tournament'} • ${ev.date ? new Date(ev.date).toLocaleDateString() : ''}`,
               category: 'Events',
               icon: Calendar,
               url: '/admin/activities'
@@ -233,10 +268,18 @@ const AdminSearchModal: React.FC<AdminSearchModalProps> = ({ isOpen, onClose }) 
     }, 250);
 
     return () => clearTimeout(timeout);
-  }, [query]);
+  }, [query, canAthletes, canPosts, canActivities]);
 
-  // Filter static navigation items
-  const filteredNavItems = staticNavItems.filter(item => {
+  // Filter static navigation items by staff permissions and search query
+  const permittedNavItems = useMemo(() => {
+    return staticNavItems.filter(item => {
+      if (item.requireSuperAdmin) return isSuperAdmin;
+      if (item.requiredModule) return hasModule(item.requiredModule);
+      return true;
+    });
+  }, [hasModule, isSuperAdmin]);
+
+  const filteredNavItems = permittedNavItems.filter(item => {
     if (!query.trim()) return true;
     const q = query.toLowerCase();
     return (
@@ -275,7 +318,7 @@ const AdminSearchModal: React.FC<AdminSearchModalProps> = ({ isOpen, onClose }) 
   const handleSelectItem = (item: SearchResultItem) => {
     onClose();
     if (item.isExternal) {
-      window.open(item.url, '_blank');
+      window.open(item.url, '_blank', 'noopener,noreferrer');
     } else {
       navigate(item.url);
     }
@@ -340,7 +383,7 @@ const AdminSearchModal: React.FC<AdminSearchModalProps> = ({ isOpen, onClose }) 
               </div>
               <p className="text-sm font-semibold text-slate-800">No matching results found</p>
               <p className="text-xs text-slate-500 mt-1">
-                No pages, athletes, or articles match "{query}". Try a different search term.
+                No permitted pages or records match "{query}". Try a different search term.
               </p>
             </div>
           ) : (

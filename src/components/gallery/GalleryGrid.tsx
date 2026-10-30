@@ -3,6 +3,7 @@ import Masonry from 'react-masonry-css';
 import { motion } from 'framer-motion';
 import { supabase, cachedQuery } from '../../lib/supabase';
 import { Database } from '../../types/supabase';
+import { isSafeHttpsUrl } from '../../utils/sanitizeHtml';
 
 type GalleryItem = Database['public']['Tables']['gallery_items']['Row'];
 
@@ -79,13 +80,19 @@ const GalleryGrid: React.FC = () => {
                     target.src = "https://images.pexels.com/photos/863988/pexels-photo-863988.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1";
                   }}
                 />
-              ) : (
+              ) : isSafeHttpsUrl(item.url) ? (
                 <iframe
                   src={item.url}
                   title={item.title}
                   className="w-full aspect-video"
+                  sandbox="allow-scripts allow-same-origin allow-presentation"
+                  referrerPolicy="strict-origin-when-cross-origin"
                   allowFullScreen
                 />
+              ) : (
+                <div className="w-full aspect-video bg-slate-900 text-slate-400 text-xs flex items-center justify-center p-4 text-center">
+                  Video preview unavailable
+                </div>
               )}
               <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-60 transition-all duration-300 flex items-end justify-start">
                 <div className="p-4 w-full translate-y-full group-hover:translate-y-0 transition-transform duration-300">
