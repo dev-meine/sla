@@ -8,7 +8,7 @@ interface BreadcrumbItem {
 }
 
 interface AdminPageHeaderProps {
-  title: string;
+  title?: string;
   description?: string;
   breadcrumbs?: BreadcrumbItem[];
   actions?: React.ReactNode;
@@ -23,9 +23,9 @@ export const AdminPageHeader: React.FC<AdminPageHeaderProps> = ({
   badge
 }) => {
   return (
-    <div className="mb-8">
+    <div className={title ? 'mb-8' : 'mb-4'}>
       {breadcrumbs && breadcrumbs.length > 0 && (
-        <nav aria-label="Breadcrumb" className="flex items-center gap-1.5 text-xs text-slate-500 mb-2.5">
+        <nav aria-label="Breadcrumb" className={`flex items-center gap-1.5 text-xs text-slate-500 ${title ? 'mb-2.5' : ''}`}>
           {breadcrumbs.map((crumb, idx) => {
             const isLast = idx === breadcrumbs.length - 1;
             return (
@@ -49,27 +49,35 @@ export const AdminPageHeader: React.FC<AdminPageHeaderProps> = ({
         </nav>
       )}
 
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-3">
-            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900 font-heading">
-              {title}
-            </h1>
-            {badge && <div>{badge}</div>}
-          </div>
-          {description && (
-            <p className="mt-1 text-sm text-slate-600 font-normal">
-              {description}
-            </p>
+      {(title || actions || badge || description) && (
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          {(title || badge || description) ? (
+            <div>
+              {title && (
+                <div className="flex items-center gap-3">
+                  <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900 font-heading">
+                    {title}
+                  </h1>
+                  {badge && <div>{badge}</div>}
+                </div>
+              )}
+              {description && (
+                <p className="mt-1 text-sm text-slate-600 font-normal">
+                  {description}
+                </p>
+              )}
+            </div>
+          ) : (
+            <div />
+          )}
+
+          {actions && (
+            <div className="flex items-center gap-3 flex-shrink-0">
+              {actions}
+            </div>
           )}
         </div>
-
-        {actions && (
-          <div className="flex items-center gap-3 flex-shrink-0">
-            {actions}
-          </div>
-        )}
-      </div>
+      )}
     </div>
   );
 };

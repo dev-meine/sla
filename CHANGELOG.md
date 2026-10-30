@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+- **2026-10-30**: Cleaned up Travel & Logistics header in `AdminTravel.tsx`:
+  - Removed page title *"Travel & Delegation Logistics"* and subtitle description *"Manage national team itineraries, hotel accommodations, and live ferry timetables."* from the page header per user preference.
+  - Made `title` optional on `AdminPageHeader.tsx`, retaining clean breadcrumbs at the top and integrating the *"Add Travel Record"* action button seamlessly alongside the segmented tab navigation bar.
+
 - **2026-10-30**: Cleaned up Admin Users & Roles header in `AdminUsers.tsx`:
   - Removed page subtitle description *"Create administrator accounts, set temporary or permanent passwords, assign role presets, and customize per-user module checkboxes."* from `AdminPageHeader` for a cleaner, unified header layout matching other admin modules.
 

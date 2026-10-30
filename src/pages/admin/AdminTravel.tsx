@@ -12,8 +12,6 @@ import axios from 'axios';
 import MultiSelect from '../../components/ui/MultiSelect';
 
 type TravelRecord = Database['public']['Tables']['travel_records']['Row'];
-type Flight = Database['public']['Tables']['flights']['Row'];
-type FerrySchedule = Database['public']['Tables']['ferry_schedules']['Row'];
 type Athlete = Database['public']['Tables']['athletes']['Row'];
 type Event = Database['public']['Tables']['events']['Row'];
 type TechnicalStaff = Database['public']['Tables']['technical_staff']['Row'];
@@ -67,7 +65,7 @@ const AdminTravel: React.FC = () => {
   const [events, setEvents] = useState<Event[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isAdding, setIsAdding] = useState(false);
-  const [editingRecord, setEditingRecord] = useState<any | null>(null);
+  const [editingRecord, setEditingRecord] = useState<TravelRecord | null>(null);
   const [travelSearchQuery, setTravelSearchQuery] = useState('');
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [recordToDelete, setRecordToDelete] = useState<string | null>(null);
@@ -918,74 +916,74 @@ const AdminTravel: React.FC = () => {
   return (
     <AdminLayout>
       <AdminPageHeader
-        title="Travel & Delegation Logistics"
-        description="Manage national team itineraries, hotel accommodations, and live ferry timetables."
         breadcrumbs={[
           { label: 'Admin', href: '/admin' },
           { label: 'Operations' },
           { label: 'Travel & Logistics' }
         ]}
-        actions={
-          activeTab === 'travel' ? (
-            <button
-              onClick={() => {
-                setIsAdding(!isAdding);
-                setEditingRecord(null);
-                reset();
-              }}
-              className="inline-flex items-center gap-2 px-3.5 py-2 text-xs font-semibold bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors shadow-xs"
-            >
-              {isAdding ? <X size={15} /> : <Plus size={15} />}
-              <span>{isAdding ? 'Close Editor' : 'Add Travel Record'}</span>
-            </button>
-          ) : undefined
-        }
       />
 
-      {/* Segmented Tab Navigation */}
-      <div className="flex items-center gap-1.5 p-1 bg-slate-100/90 rounded-xl w-fit border border-slate-200/80 mb-6">
-        <button
-          type="button"
-          onClick={() => setActiveTab('travel')}
-          className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs font-semibold transition-all ${
-            activeTab === 'travel'
-              ? 'bg-white text-primary-700 shadow-xs'
-              : 'text-slate-600 hover:text-slate-900 hover:bg-white/50'
-          }`}
-        >
-          <Calendar size={15} />
-          <span>Travel Records</span>
-          <span className="ml-1 px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-600">
-            {travelRecords.length}
-          </span>
-        </button>
+      {/* Segmented Tab Navigation & Actions */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
+        <div className="flex items-center gap-1.5 p-1 bg-slate-100/90 rounded-xl w-fit border border-slate-200/80">
+          <button
+            type="button"
+            onClick={() => setActiveTab('travel')}
+            className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs font-semibold transition-all ${
+              activeTab === 'travel'
+                ? 'bg-white text-primary-700 shadow-xs'
+                : 'text-slate-600 hover:text-slate-900 hover:bg-white/50'
+            }`}
+          >
+            <Calendar size={15} />
+            <span>Travel Records</span>
+            <span className="ml-1 px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-600">
+              {travelRecords.length}
+            </span>
+          </button>
 
-        <button
-          type="button"
-          onClick={() => setActiveTab('ferry')}
-          className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs font-semibold transition-all ${
-            activeTab === 'ferry'
-              ? 'bg-white text-primary-700 shadow-xs'
-              : 'text-slate-600 hover:text-slate-900 hover:bg-white/50'
-          }`}
-        >
-          <Ship size={15} />
-          <span>Ferry Timetables</span>
-          <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse ml-0.5" />
-        </button>
+          <button
+            type="button"
+            onClick={() => setActiveTab('ferry')}
+            className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs font-semibold transition-all ${
+              activeTab === 'ferry'
+                ? 'bg-white text-primary-700 shadow-xs'
+                : 'text-slate-600 hover:text-slate-900 hover:bg-white/50'
+            }`}
+          >
+            <Ship size={15} />
+            <span>Ferry Timetables</span>
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse ml-0.5" />
+          </button>
 
-        <button
-          type="button"
-          onClick={() => setActiveTab('hotels')}
-          className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs font-semibold transition-all ${
-            activeTab === 'hotels'
-              ? 'bg-white text-primary-700 shadow-xs'
-              : 'text-slate-600 hover:text-slate-900 hover:bg-white/50'
-          }`}
-        >
-          <Building2 size={15} />
-          <span>Hotels & Lodging</span>
-        </button>
+          <button
+            type="button"
+            onClick={() => setActiveTab('hotels')}
+            className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs font-semibold transition-all ${
+              activeTab === 'hotels'
+                ? 'bg-white text-primary-700 shadow-xs'
+                : 'text-slate-600 hover:text-slate-900 hover:bg-white/50'
+            }`}
+          >
+            <Building2 size={15} />
+            <span>Hotels & Lodging</span>
+          </button>
+        </div>
+
+        {activeTab === 'travel' && (
+          <button
+            type="button"
+            onClick={() => {
+              setIsAdding(!isAdding);
+              setEditingRecord(null);
+              reset();
+            }}
+            className="inline-flex items-center gap-2 px-3.5 py-2 text-xs font-semibold bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors shadow-xs self-start sm:self-auto"
+          >
+            {isAdding ? <X size={15} /> : <Plus size={15} />}
+            <span>{isAdding ? 'Close Editor' : 'Add Travel Record'}</span>
+          </button>
+        )}
       </div>
 
       {isLoading ? (
