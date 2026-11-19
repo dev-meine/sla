@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Upload, X } from 'lucide-react';
+import { optimizeImageFile } from '../../utils/imageOptimizer';
 
 interface ImageUploadProps {
   onImageUpload: (file: File) => void;
@@ -46,12 +47,14 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
     setImageLoaded(false);
 
     try {
-      // Create preview
+      const optimizedFile = await optimizeImageFile(file);
+
+      // Create preview from optimized image
       const reader = new FileReader();
       reader.onloadend = () => {
         setPreviewUrl(reader.result as string);
       };
-      reader.readAsDataURL(file);
+      reader.readAsDataURL(optimizedFile);
 
       // Simulate upload progress
       const progressInterval = setInterval(() => {
@@ -64,7 +67,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
         });
       }, 200);
 
-      onImageUpload(file);
+      onImageUpload(optimizedFile);
       clearInterval(progressInterval);
       setUploadProgress(100);
     } catch (error) {

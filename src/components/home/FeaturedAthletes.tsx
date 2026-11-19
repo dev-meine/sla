@@ -127,7 +127,7 @@ const FeaturedAthletes: React.FC = () => {
                   transition={{ type: "spring", stiffness: 300, damping: 20 }}
                 >
                   <img 
-                    src={athlete.image || "https://images.pexels.com/photos/863988/pexels-photo-863988.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"}
+                    src={athlete.image || "https://images.pexels.com/photos/863988/pexels-photo-863988.jpeg?auto=compress&cs=tinysrgb&w=800&q=75"}
                     alt={athlete.name}
                     loading="lazy"
                     decoding="async"

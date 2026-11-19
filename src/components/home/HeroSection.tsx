@@ -1,5 +1,5 @@
 import React from 'react';
-import { ArrowRight, ChevronDown } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { Link } from 'react-router-dom';
 
@@ -117,7 +117,6 @@ const HeroSection: React.FC = () => {
                   <img 
                     src="https://i.ibb.co/K3VFCBD/20240801-112429-min.jpg" 
                     alt="Sierra Leone swimming team" 
-                    loading="lazy"
                     decoding="async"
                     width="640"
                     height="480"

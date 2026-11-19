@@ -132,14 +132,14 @@ const FeaturedNews: React.FC = () => {
                     transition={{ type: "spring", stiffness: 300, damping: 20 }}
                   >
                     <img 
-                      src={post.image_url || "https://images.unsplash.com/photo-1519315901367-f34ff9154487?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80"}
+                      src={post.image_url || "https://images.unsplash.com/photo-1519315901367-f34ff9154487?auto=format&fit=crop&w=800&q=75"}
                       alt={post.title}
                       loading="lazy"
                       decoding="async"
                       className="w-full h-full object-cover filter saturate-105 transition-transform duration-700 transform group-hover:scale-105"
                       onError={(e) => {
                         const target = e.target as HTMLImageElement;
-                        target.src = "https://images.unsplash.com/photo-1519315901367-f34ff9154487?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80";
+                        target.src = "https://images.unsplash.com/photo-1519315901367-f34ff9154487?auto=format&fit=crop&w=800&q=75";
                       }}
                     />
                   </motion.div>

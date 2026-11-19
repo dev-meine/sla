@@ -6,6 +6,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+- **2026-11-19**: Modernized public top navigation bar, relocated Staff Portal to footer, and added client-side WebP image optimization:
+  - **Grouped Navigation & Dropdowns (`Header.tsx`, `navItems.ts`, `src/types/index.ts`)**: Consolidated 8 flat top-level links into a clean 4-group structure (`Home`, `Federation` -> About Us / Executive Board / Contact Us, `Aquatics` -> Athletes / Activities / Swimming Lessons, `Media` -> News & Updates / Gallery) plus a primary **Lessons** CTA button (`/register`). Implemented accessible `<button aria-expanded aria-controls>` dropdowns with hover preview, `Escape`/outside-click/blur closing, `aria-current="page"`, and mobile accordion disclosures.
+  - **Footer Staff Portal (`Footer.tsx`)**: Removed the prominent `Admin Login` pill from the top navbar and placed a discreet **Staff Portal** (`/admin`) link in the footer bottom bar, while updating the footer menu column to use `footerNavItems` (including `News`).
+  - **Image Loading & Upload Compression (`src/utils/imageOptimizer.ts`, `ImageCropUpload.tsx`, `ImageUpload.tsx`, `Logo.tsx`, `HeroSection.tsx`, `FeaturedAthletes.tsx`, `FeaturedNews.tsx`)**:
+    - Switched `Logo.tsx` from external `i.ibb.co` to local `/SLA.png` (`19 KB`) for instant same-origin loading.
+    - Added client-side image resizing (`maxDimension: 1600px`) and WebP compression (`0.84` quality, JPEG fallback) on all cropped and direct admin image uploads so Supabase Storage serves lightweight assets instead of multi-megabyte originals.
+    - Removed `loading="lazy"` from the second above-the-fold hero image in `HeroSection.tsx` (keeping `fetchPriority="high"` strictly on the primary LCP image) and reduced oversized fallback thumbnail URL dimensions (`w=800&q=75`) in `FeaturedAthletes.tsx` and `FeaturedNews.tsx`.
+
 - **2026-10-30**: Redesigned Admin Login (`AdminLogin.tsx`) with a clean, minimalistic layout and fixed `.admin-input` CSS layer cascade:
   - Stripped visual clutter from `/admin/login`: removed radial background gradients, Framer Motion entrance animations, colored icon box wrapper around the circular SLA crest, decorative `"Official Federation Administration"` and `"Encrypted 256-bit SSL Session"` badges, multi-line explanatory copy, inline left input icons, `"Contact a Super Admin for resets"` label clutter, and the unused `"Remember credentials"` checkbox.
   - Replaced with a focused `380px` single-card layout featuring the SLA crest, concise `"Sign in"` heading, accessible `Email` (`autocomplete="username"`) and `Password` (`id="current-password"`, `autocomplete="current-password"`) inputs with a show/hide password toggle, on-blur validation, and an understated `"Back to website"` link.

@@ -1,4 +1,4 @@
-import React, { useState, useRef, useCallback, useEffect } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import ReactCrop, {
   centerCrop,
   makeAspectCrop,
@@ -8,6 +8,7 @@ import ReactCrop, {
 } from 'react-image-crop';
 import { Upload, X, Crop as CropIcon, Check, Move, ArrowUp, ArrowDown, AlignCenter, RotateCcw, Image as ImageIcon } from 'lucide-react';
 import 'react-image-crop/dist/ReactCrop.css';
+import { exportOptimizedCrop } from '../../utils/imageOptimizer';
 
 export interface AspectRatioOption {
   label: string;
@@ -197,57 +198,8 @@ const ImageCropUpload: React.FC<ImageCropUploadProps> = ({
     }
   };
 
-  const getCroppedImg = useCallback(
-    (image: HTMLImageElement, cropToApply: PixelCrop): Promise<Blob> => {
-      const canvas = canvasRef.current;
-      if (!canvas) {
-        throw new Error('Canvas not found');
-      }
-
-      const ctx = canvas.getContext('2d');
-      if (!ctx) {
-        throw new Error('No 2d context');
-      }
-
-      const scaleX = image.naturalWidth / image.width;
-      const scaleY = image.naturalHeight / image.height;
-
-      const outputWidth = Math.round(cropToApply.width * scaleX);
-      const outputHeight = Math.round(cropToApply.height * scaleY);
-
-      canvas.width = outputWidth;
-      canvas.height = outputHeight;
-
-      ctx.imageSmoothingEnabled = true;
-      ctx.imageSmoothingQuality = 'high';
-
-      ctx.drawImage(
-        image,
-        cropToApply.x * scaleX,
-        cropToApply.y * scaleY,
-        cropToApply.width * scaleX,
-        cropToApply.height * scaleY,
-        0,
-        0,
-        outputWidth,
-        outputHeight,
-      );
-
-      return new Promise((resolve, reject) => {
-        canvas.toBlob((blob) => {
-          if (blob) {
-            resolve(blob);
-          } else {
-            reject(new Error('Canvas export failed'));
-          }
-        }, 'image/jpeg', 0.95);
-      });
-    },
-    []
-  );
-
   const handleCropComplete = async () => {
-    if (!completedCrop || !imgRef.current) return;
+    if (!completedCrop || !imgRef.current || !canvasRef.current) return;
 
     try {
       setIsUploading(true);
@@ -257,20 +209,20 @@ const ImageCropUpload: React.FC<ImageCropUploadProps> = ({
         setUploadProgress(prev => (prev >= 90 ? 90 : prev + 15));
       }, 120);
 
-      const croppedImageBlob = await getCroppedImg(imgRef.current, completedCrop);
-      
-      const fileName = originalFile ? originalFile.name : `header-${Date.now()}.jpg`;
-      const croppedFile = new File([croppedImageBlob], fileName, {
-        type: 'image/jpeg',
-        lastModified: Date.now(),
-      });
+      const fileName = originalFile ? originalFile.name : `header-${Date.now()}.webp`;
+      const { file: croppedFile, blob: croppedImageBlob } = await exportOptimizedCrop(
+        canvasRef.current,
+        imgRef.current,
+        completedCrop,
+        fileName
+      );
 
       onImageUpload(croppedFile);
       clearInterval(progressInterval);
       setUploadProgress(100);
       setIsCropping(false);
       setPreviewUrl(URL.createObjectURL(croppedImageBlob));
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Error cropping image:', err);
       setError('Could not process crop. Please choose another image or re-upload.');
     } finally {

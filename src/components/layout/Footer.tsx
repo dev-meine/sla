@@ -1,9 +1,9 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Facebook, Instagram, Twitter, Youtube, MapPin, Phone, Mail, ArrowUpRight } from 'lucide-react';
+import { Facebook, Instagram, Twitter, Youtube, MapPin, Phone, Mail, ArrowUpRight, Lock } from 'lucide-react';
 import { motion } from 'framer-motion';
 import Logo from '../ui/Logo';
-import { navItems } from '../../data/navItems';
+import { footerNavItems } from '../../data/navItems';
 
 const Footer: React.FC = () => {
   const currentYear = new Date().getFullYear();
@@ -75,7 +75,7 @@ const Footer: React.FC = () => {
           {/* Menu Column */}
           <motion.div className="md:col-span-4 lg:col-span-3" variants={itemVariants}>
             <ul className="space-y-4">
-              {navItems.map((item) => (
+              {footerNavItems.map((item) => (
                 <li key={item.label}>
                   <Link to={item.href} className="text-slate-300 hover:text-primary-400 font-medium transition-colors duration-300 inline-flex items-center group">
                     <motion.span whileHover={{ x: 5 }} transition={{ type: "spring", stiffness: 400 }}>
@@ -145,9 +145,16 @@ const Footer: React.FC = () => {
           <p className="text-slate-500 text-sm font-medium">
             © {currentYear} Sierra Leone Aquatics. All rights reserved.
           </p>
-          <div className="flex space-x-6 text-sm font-medium text-slate-500">
+          <div className="flex flex-wrap items-center gap-6 text-sm font-medium text-slate-500">
             <Link to="#" className="hover:text-primary-400 transition-colors">Privacy Policy</Link>
             <Link to="#" className="hover:text-primary-400 transition-colors">Terms of Service</Link>
+            <Link
+              to="/admin"
+              className="inline-flex items-center gap-1.5 text-slate-400 hover:text-primary-400 transition-colors"
+            >
+              <Lock size={12} aria-hidden="true" />
+              <span>Staff Portal</span>
+            </Link>
           </div>
         </motion.div>
       </div>
