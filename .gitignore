@@ -22,3 +22,6 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Local raw media imports (processed to public/media as optimized WebP)
+memorylane-image/

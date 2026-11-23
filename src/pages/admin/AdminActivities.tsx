@@ -74,6 +74,8 @@ const AdminActivities: React.FC = () => {
         title: data.title,
         description: data.description,
         date: data.date,
+        display_date: data.display_date || null,
+        location: data.location || null,
         category: data.category,
         image: data.image
       };
@@ -223,10 +225,13 @@ const AdminActivities: React.FC = () => {
                   className="admin-select"
                 >
                   <option value="">Select Category</option>
-                  <option value="competition">Competition</option>
+                  <option value="international">International Representation</option>
+                  <option value="competition">National Competition / Trials</option>
+                  <option value="development">Development &amp; Grassroots</option>
+                  <option value="education">Education &amp; Coaching</option>
+                  <option value="governance">Governance &amp; Media</option>
+                  <option value="community">Community &amp; Welfare</option>
                   <option value="training">Training Camp</option>
-                  <option value="development">Grassroots Clinic</option>
-                  <option value="community">Community Program</option>
                 </select>
                 {errors.category && (
                   <p className="text-rose-600 text-xs mt-1">{errors.category.message}</p>
@@ -245,6 +250,30 @@ const AdminActivities: React.FC = () => {
                 {errors.date && (
                   <p className="text-rose-600 text-xs mt-1">{errors.date.message}</p>
                 )}
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
+                  Display Date Label (Optional)
+                </label>
+                <input
+                  type="text"
+                  placeholder="e.g. 30 Oct – 13 Nov 2026 or 2021–2022"
+                  {...register('display_date')}
+                  className="admin-input"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
+                  Location / Venue (Optional)
+                </label>
+                <input
+                  type="text"
+                  placeholder="e.g. Tokeh Beach Resort, Freetown"
+                  {...register('location')}
+                  className="admin-input"
+                />
               </div>
 
               <div>

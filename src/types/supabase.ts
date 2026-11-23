@@ -386,8 +386,11 @@ export type Database = {
           created_at: string | null
           date: string | null
           description: string | null
+          display_date: string | null
           id: string
           image: string | null
+          location: string | null
+          participants: string[] | null
           title: string
         }
         Insert: {
@@ -395,8 +398,11 @@ export type Database = {
           created_at?: string | null
           date?: string | null
           description?: string | null
+          display_date?: string | null
           id?: string
           image?: string | null
+          location?: string | null
+          participants?: string[] | null
           title: string
         }
         Update: {
@@ -404,8 +410,11 @@ export type Database = {
           created_at?: string | null
           date?: string | null
           description?: string | null
+          display_date?: string | null
           id?: string
           image?: string | null
+          location?: string | null
+          participants?: string[] | null
           title?: string
         }
         Relationships: []
@@ -522,6 +531,7 @@ export type Database = {
           date: string
           description: string | null
           id: string
+          section: string
           title: string
           type: string
           updated_at: string | null
@@ -532,6 +542,7 @@ export type Database = {
           date: string
           description?: string | null
           id?: string
+          section?: string
           title: string
           type: string
           updated_at?: string | null
@@ -542,6 +553,7 @@ export type Database = {
           date?: string
           description?: string | null
           id?: string
+          section?: string
           title?: string
           type?: string
           updated_at?: string | null

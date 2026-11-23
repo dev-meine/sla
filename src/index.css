@@ -232,3 +232,50 @@
   opacity: 0.04;
   mix-blend-mode: multiply;
 }
+
+/* Native <details> vertical timeline disclosure styling & progressive animation */
+.timeline-details > summary {
+  list-style: none;
+  cursor: pointer;
+}
+
+.timeline-details > summary::-webkit-details-marker {
+  display: none;
+}
+
+.timeline-details > summary .timeline-chevron {
+  transform: rotate(-90deg);
+}
+
+.timeline-details[open] > summary .timeline-chevron {
+  transform: rotate(0deg);
+}
+
+.timeline-details::details-content {
+  interpolate-size: allow-keywords;
+  overflow: clip;
+  contain: layout;
+}
+
+.timeline-details:not([open])::details-content {
+  block-size: 0;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .timeline-details > summary .timeline-chevron {
+    transition: transform 0.2s ease;
+  }
+
+  .timeline-details::details-content {
+    transition: block-size, content-visibility, display;
+    transition-duration: 0.28s;
+    transition-timing-function: ease-in-out;
+    transition-behavior: allow-discrete;
+  }
+}
+
+/* Native <dialog> lightbox backdrop */
+dialog.media-lightbox::backdrop {
+  background: rgba(2, 6, 23, 0.88);
+  backdrop-filter: blur(6px);
+}

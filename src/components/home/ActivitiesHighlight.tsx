@@ -22,8 +22,8 @@ const ActivitiesHighlight: React.FC = () => {
         () => supabase
           .from('events')
           .select('*')
-          .order('date', { ascending: true })
-          .limit(4) // Limiting to 4 for a cleaner list
+          .order('date', { ascending: false })
+          .limit(4) // Limiting to 4 most recent activities for a cleaner list
       );
       
       if (error) throw error;

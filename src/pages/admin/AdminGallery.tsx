@@ -3,7 +3,7 @@ import AdminLayout from '../../components/admin/AdminLayout';
 import AdminPageHeader from '../../components/admin/AdminPageHeader';
 import AdminBadge from '../../components/admin/AdminBadge';
 import AdminEmptyState from '../../components/admin/AdminEmptyState';
-import { supabase } from '../../lib/supabase';
+import { supabase, invalidateCache } from '../../lib/supabase';
 import { Plus, Edit2, Trash2, Image as ImageIcon, Video, Search, X, Calendar } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { Database } from '../../types/supabase';
@@ -22,6 +22,7 @@ const AdminGallery: React.FC = () => {
   const [itemToDelete, setItemToDelete] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [typeFilter, setTypeFilter] = useState<'all' | 'image' | 'video'>('all');
+  const [sectionFilter, setSectionFilter] = useState<'all' | 'main' | 'memory_lane' | 'press'>('all');
 
   const { register, handleSubmit, reset, setValue, watch, formState: { errors } } = useForm<GalleryItem>();
   const itemType = watch('type', 'image');
@@ -98,6 +99,7 @@ const AdminGallery: React.FC = () => {
           .update({
             title: data.title,
             type: data.type,
+            section: data.section || 'main',
             url: data.url,
             description: data.description,
             date: data.date
@@ -111,6 +113,7 @@ const AdminGallery: React.FC = () => {
           .insert([{
             title: data.title,
             type: data.type,
+            section: data.section || 'main',
             url: data.url,
             description: data.description,
             date: data.date
@@ -122,6 +125,7 @@ const AdminGallery: React.FC = () => {
       reset();
       setIsAdding(false);
       setEditingItem(null);
+      invalidateCache('gallery');
       fetchGalleryItems();
     } catch (error) {
       console.error('Error saving gallery item:', error);
@@ -159,6 +163,7 @@ const AdminGallery: React.FC = () => {
         .eq('id', itemToDelete);
 
       if (error) throw error;
+      invalidateCache('gallery');
       fetchGalleryItems();
     } catch (error) {
       console.error('Error deleting gallery item:', error);
@@ -175,7 +180,9 @@ const AdminGallery: React.FC = () => {
       (item.description && item.description.toLowerCase().includes(searchQuery.toLowerCase()));
 
     const matchesType = typeFilter === 'all' || item.type === typeFilter;
-    return matchesSearch && matchesType;
+    const itemSection = item.section || 'main';
+    const matchesSection = sectionFilter === 'all' || itemSection === sectionFilter;
+    return matchesSearch && matchesType && matchesSection;
   });
 
   return (
@@ -226,7 +233,7 @@ const AdminGallery: React.FC = () => {
           </div>
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
               <div>
                 <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
                   Title / Caption *
@@ -240,6 +247,21 @@ const AdminGallery: React.FC = () => {
                 {errors.title && (
                   <p className="text-rose-600 text-xs mt-1">{errors.title.message}</p>
                 )}
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
+                  Gallery Section *
+                </label>
+                <select
+                  defaultValue="main"
+                  {...register('section')}
+                  className="admin-select"
+                >
+                  <option value="main">Main Gallery (Recent)</option>
+                  <option value="memory_lane">Memory Lane</option>
+                  <option value="press">Press &amp; Announcements</option>
+                </select>
               </div>
 
               <div>
@@ -269,7 +291,7 @@ const AdminGallery: React.FC = () => {
                 )}
               </div>
 
-              <div className="md:col-span-3">
+              <div className="md:col-span-2 lg:col-span-4">
                 {itemType === 'image' ? (
                   <div>
                     <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
@@ -348,8 +370,21 @@ const AdminGallery: React.FC = () => {
           />
         </div>
 
-        {/* Type Filter Pills */}
-        <div className="flex items-center gap-1.5">
+        {/* Section & Type Filter Pills */}
+        <div className="flex flex-wrap items-center gap-2">
+          <select
+            aria-label="Filter by gallery section"
+            value={sectionFilter}
+            onChange={(e) => setSectionFilter(e.target.value as 'all' | 'main' | 'memory_lane' | 'press')}
+            className="px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs font-semibold text-slate-700 focus:bg-white focus:outline-none focus:border-primary-600"
+          >
+            <option value="all">All Sections</option>
+            <option value="main">Main Gallery</option>
+            <option value="memory_lane">Memory Lane</option>
+            <option value="press">Press &amp; Announcements</option>
+          </select>
+
+          <div className="flex items-center gap-1.5">
           <button
             onClick={() => setTypeFilter('all')}
             className={`px-3 py-1.5 rounded-lg text-xs font-semibold capitalize transition-colors ${
@@ -380,6 +415,7 @@ const AdminGallery: React.FC = () => {
           >
             <Video size={13} /> Videos
           </button>
+          </div>
         </div>
       </div>
 
@@ -446,9 +482,16 @@ const AdminGallery: React.FC = () => {
                   </div>
                 )}
 
-                <div className="absolute top-2.5 left-2.5">
+                <div className="absolute top-2.5 left-2.5 flex items-center gap-1.5">
                   <AdminBadge variant={item.type === 'video' ? 'warning' : 'info'} size="sm">
                     {item.type === 'video' ? 'Video' : 'Photo'}
+                  </AdminBadge>
+                  <AdminBadge variant="neutral" size="sm">
+                    {item.section === 'memory_lane'
+                      ? 'Memory Lane'
+                      : item.section === 'press'
+                      ? 'Press'
+                      : 'Main'}
                   </AdminBadge>
                 </div>
               </div>
