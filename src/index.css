@@ -279,3 +279,138 @@ dialog.media-lightbox::backdrop {
   background: rgba(2, 6, 23, 0.88);
   backdrop-filter: blur(6px);
 }
+
+/* Custom branded & animated category select (progressive base-select + clean fallback) */
+:root {
+  interpolate-size: allow-keywords;
+}
+
+.sla-category-select {
+  appearance: none;
+  -webkit-appearance: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.625rem;
+  min-width: 13rem;
+  padding: 0.5rem 2.25rem 0.5rem 0.95rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1.25;
+  color: #0f172a;
+  background-color: #ffffff;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23005FB3' stroke-width='2.25' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.85rem center;
+  background-size: 0.875rem 0.875rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 9999px;
+  cursor: pointer;
+  transition: border-color 0.18s ease, background-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.sla-category-select:hover {
+  border-color: #cbd5e1;
+  background-color: #f8fafc;
+}
+
+.sla-category-select:focus-visible {
+  outline: none;
+  border-color: #005fb3;
+  box-shadow: 0 0 0 3px rgba(0, 95, 179, 0.14);
+}
+
+@supports (appearance: base-select) {
+  .sla-category-select,
+  .sla-category-select::picker(select) {
+    appearance: base-select;
+  }
+
+  .sla-category-select {
+    background-image: none;
+    padding: 0.5rem 0.95rem;
+  }
+
+  .sla-category-select::picker-icon {
+    content: "";
+    width: 0.875rem;
+    height: 0.875rem;
+    flex-shrink: 0;
+    margin-inline-start: auto;
+    background-color: #005fb3;
+    -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.25' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") no-repeat center / contain;
+    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.25' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") no-repeat center / contain;
+    transition: transform 0.24s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .sla-category-select:open::picker-icon {
+    transform: rotate(180deg);
+  }
+
+  .sla-category-select::picker(select) {
+    background: #ffffff;
+    color: #0f172a;
+    border: 1px solid #e2e8f0;
+    border-radius: 1rem;
+    box-shadow: 0 14px 32px -8px rgba(15, 23, 42, 0.14), 0 4px 10px -4px rgba(15, 23, 42, 0.06);
+    padding: 0.375rem;
+    margin-top: 0.375rem;
+    min-width: anchor-size(width);
+    opacity: 0;
+    transform: translateY(-6px);
+    transition: display, overlay, opacity cubic-bezier(0.16, 1, 0.3, 1), transform cubic-bezier(0.16, 1, 0.3, 1);
+    transition-duration: 0.24s;
+    transition-behavior: allow-discrete;
+  }
+
+  .sla-category-select:open::picker(select) {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .sla-category-select option {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.625rem;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: #334155;
+    cursor: pointer;
+    transition: background-color 0.15s ease, color 0.15s ease;
+  }
+
+  .sla-category-select option:hover,
+  .sla-category-select option:focus-visible {
+    background-color: #f1f5f9;
+    color: #0f172a;
+  }
+
+  .sla-category-select option:checked {
+    font-weight: 700;
+    background-color: #eff6ff;
+    color: #004c90;
+  }
+
+  .sla-category-select option::checkmark {
+    color: #005fb3;
+    font-weight: 700;
+    margin-inline-start: auto;
+    order: 1;
+  }
+}
+
+@starting-style {
+  .sla-category-select:open::picker(select) {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sla-category-select::picker(select),
+  .sla-category-select::picker-icon {
+    transition: none !important;
+  }
+}

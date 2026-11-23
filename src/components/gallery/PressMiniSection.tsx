@@ -53,18 +53,10 @@ const PressMiniSection: React.FC<PressMiniSectionProps> = ({ items, onOpenLightb
   return (
     <section className="section bg-slate-50 border-t border-slate-200/80" aria-labelledby="press-mini-heading">
       <div className="container-custom">
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary-600 mb-2">
-              Press Archive &amp; Social Highlights
-            </p>
-            <h2 id="press-mini-heading" className="text-2xl md:text-3xl font-bold text-slate-900 font-heading">
-              News Clippings &amp; Announcements
-            </h2>
-            <p className="text-sm text-slate-600 mt-1.5 max-w-2xl">
-              Newspaper features, official federation notices, race schedules, and social media announcements. Select any clipping to read full size.
-            </p>
-          </div>
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+          <h2 id="press-mini-heading" className="text-2xl md:text-3xl font-bold text-slate-900 font-heading">
+            Press Archive &amp; Social Highlights
+          </h2>
 
           {/* Sub-filter pills */}
           <div className="flex flex-wrap gap-2">

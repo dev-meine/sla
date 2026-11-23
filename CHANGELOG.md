@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+- **2026-11-23**: Streamlined Activities timeline controls and polished Gallery page layout per client review:
+  - **Activities Timeline (`ActivitiesPage.tsx`, `src/index.css`)**: Removed instructional subtitle copy, replaced the 7 category buttons with a custom-styled `.sla-category-select` dropdown (`appearance: base-select` + animated `::picker(select)` + rotated `::picker-icon` with clean `appearance: none` inset-chevron fallback so the arrow stays neatly aligned), and simplified the year quick-jump bar into clean year pills (`2026`–`2021`).
+  - **Gallery Page (`GalleryPage.tsx`, `DriftWall.css`, `PressMiniSection.tsx`)**: Removed redundant Main Gallery header copy, removed the narrow `max-w-7xl` container and excess vertical padding so `AccordionGallery` spans nearly full width (`w-full`, `py-4 md:py-6`), and populated it up to 5 featured Sierra Leone Aquatics panels (`ml-201`, `ml-227`, `ml-199`, `ml-206` alongside Supabase `main` photos); expanded `DriftWall` Memory Lane to full-bleed viewport width and `78vh` height (up to 8 columns) with zero bottom padding and tightened radial/edge mask (`fade={0.22}`) to eliminate the dark divider band above Press Archive; simplified the press mini-section heading strictly to `"Press Archive & Social Highlights"`.
+
 - **2026-11-23**: Implemented 2026–2021 Activities vertical timeline, seeded official federation activities to Supabase, and redesigned the Gallery with ReactBits `AccordionGallery`, `DriftWall` Memory Lane, and a dedicated Press & Announcements mini section:
   - **Database Schema & Seeding (`supabase/migrations/20261123120000_add_timeline_and_gallery_sections.sql`, `public.events`, `public.gallery_items`, `src/types/supabase.ts`)**:
     - Added nullable `location`, `display_date`, and `participants` columns plus descending date index on `public.events` and seeded all 46 chronological Sierra Leone Aquatics activities from 2021 through 2026 (`Activities_content.md`).

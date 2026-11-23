@@ -183,64 +183,60 @@ const ActivitiesPage: React.FC = () => {
 
       <section className="section bg-white">
         <div className="container-custom max-w-4xl">
-          {/* Intro & Controls */}
-          <div className="mb-10 pb-8 border-b border-slate-200">
-            <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-6">
+          {/* Header & Simplified Controls */}
+          <div className="mb-10 pb-6 border-b border-slate-200">
+            <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-5">
               <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary-600 mb-2">
+                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary-600 mb-1.5">
                   2026 – 2021 Activity Timeline
                 </p>
                 <h2 className="text-2xl md:text-3xl font-bold text-slate-900 font-heading">
                   Federation Milestones
                 </h2>
-                <p className="text-sm text-slate-600 mt-1.5">
-                  Select any heading below to view full details, venues, and athlete delegations.
-                </p>
               </div>
 
-              {filteredEvents.length > 0 && (
-                <button
-                  type="button"
-                  onClick={handleToggleAll}
-                  aria-expanded={allExpanded}
-                  className="inline-flex items-center gap-2 self-start sm:self-auto px-4 py-2 rounded-full text-xs font-semibold border border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50 transition-colors"
+              <div className="flex flex-wrap items-center gap-2.5">
+                <label htmlFor="activities-category-filter" className="sr-only">
+                  Filter activities by category
+                </label>
+                <select
+                  id="activities-category-filter"
+                  name="category"
+                  value={activeCategory}
+                  onChange={(e) => setActiveCategory(e.target.value)}
+                  className="sla-category-select"
                 >
-                  <ChevronsUpDown size={14} className="text-primary-600" />
-                  <span>{allExpanded ? 'Collapse all' : 'Expand all'}</span>
-                </button>
-              )}
+                  {categories.map((category) => (
+                    <option key={category} value={category}>
+                      {CATEGORY_LABELS[category] || category}
+                    </option>
+                  ))}
+                </select>
+
+                {filteredEvents.length > 0 && (
+                  <button
+                    type="button"
+                    onClick={handleToggleAll}
+                    aria-expanded={allExpanded}
+                    className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full text-xs font-semibold border border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50 transition-colors"
+                  >
+                    <ChevronsUpDown size={14} className="text-primary-600" />
+                    <span>{allExpanded ? 'Collapse all' : 'Expand all'}</span>
+                  </button>
+                )}
+              </div>
             </div>
 
-            {/* Category filter pills */}
-            <div className="flex flex-wrap gap-2 mb-5">
-              {categories.map((category) => (
-                <button
-                  key={category}
-                  type="button"
-                  onClick={() => setActiveCategory(category)}
-                  className={`px-4 py-1.5 rounded-full text-xs font-semibold transition-colors ${
-                    activeCategory === category
-                      ? 'bg-slate-900 text-white'
-                      : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
-                  }`}
-                >
-                  {CATEGORY_LABELS[category] || category}
-                </button>
-              ))}
-            </div>
-
-            {/* Year quick-jump bar */}
+            {/* Compact Year Quick-Jump Pills */}
             {groupedByYear.length > 1 && (
-              <nav aria-label="Jump to year" className="flex flex-wrap items-center gap-2 text-xs">
-                <span className="text-slate-400 font-medium mr-1">Jump to year:</span>
-                {groupedByYear.map(([year, list]) => (
+              <nav aria-label="Jump to year" className="flex flex-wrap items-center gap-1.5">
+                {groupedByYear.map(([year]) => (
                   <a
                     key={year}
                     href={`#timeline-year-${year}`}
-                    className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md border border-slate-200 text-slate-700 hover:border-primary-500 hover:text-primary-700 transition-colors font-medium"
+                    className="px-3 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-900 hover:text-white transition-colors"
                   >
-                    <span>{year}</span>
-                    <span className="text-[10px] text-slate-400">({list.length})</span>
+                    {year}
                   </a>
                 ))}
               </nav>
