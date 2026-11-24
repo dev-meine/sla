@@ -112,17 +112,17 @@ const FeaturedAthletes: React.FC = () => {
         </div>
 
         <motion.div 
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 lg:gap-14"
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 lg:gap-14 items-stretch"
           variants={container}
           initial="hidden"
           whileInView="show"
           viewport={{ once: true, margin: "-100px" }}
         >
           {athletes.map((athlete) => (
-            <motion.article key={athlete.id} className="group cursor-pointer" variants={item}>
-              <Link to={`/athletes/${athlete.id}`} className="block">
+            <motion.article key={athlete.id} className="group cursor-pointer h-full flex flex-col" variants={item}>
+              <Link to={`/athletes/${athlete.id}`} className="flex flex-col h-full">
                 <motion.div 
-                  className="w-full aspect-[3/4] rounded-2xl overflow-hidden mb-6 bg-slate-200 relative shadow-sm border border-slate-100 transition-shadow duration-500 group-hover:shadow-md"
+                  className="w-full aspect-[3/4] rounded-2xl overflow-hidden mb-5 bg-slate-200 relative flex-shrink-0 shadow-sm border border-slate-100 transition-shadow duration-500 group-hover:shadow-md"
                   whileHover={{ y: -8, scale: 1.02 }}
                   transition={{ type: "spring", stiffness: 300, damping: 20 }}
                 >
@@ -131,47 +131,51 @@ const FeaturedAthletes: React.FC = () => {
                     alt={athlete.name}
                     loading="lazy"
                     decoding="async"
-                    className="w-full h-full object-cover object-top transition-transform duration-[1.5s] ease-out transform group-hover:scale-110"
+                    className="absolute inset-0 w-full h-full object-cover object-top transition-transform duration-[1.5s] ease-out transform group-hover:scale-110"
                   />
                 </motion.div>
                 
-                <div className="flex justify-between items-start mb-4 px-2">
-                  <div>
-                    <h3 className="font-heading text-2xl font-bold text-slate-900 group-hover:text-primary-600 transition-colors">
+                <div className="flex flex-col flex-1 px-2">
+                  <div className="flex flex-col justify-between flex-1 mb-4">
+                    <h3 className="font-heading text-xl xl:text-2xl font-bold text-slate-900 leading-snug group-hover:text-primary-600 transition-colors">
                       {athlete.name}
                     </h3>
-                    <p className="inline-block px-2 py-1 bg-white shadow-sm ring-1 ring-slate-200 rounded text-primary-600 font-bold tracking-widest text-[10px] uppercase mt-2">
-                      {athlete.sport?.replace('-', ' ') || 'Athlete'}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="pt-4 border-t border-slate-200/60 grid grid-cols-2 gap-4 px-2">
-                  {athlete.specialties.length > 0 && (
-                    <div>
-                      <span className="block text-slate-400 text-[10px] uppercase tracking-widest mb-2 font-bold flex items-center">
-                        <span className="w-1.5 h-1.5 rounded-full bg-secondary-400 mr-1.5"></span>
-                        Specialties
-                      </span>
-                      <ul className="text-sm font-sans text-slate-700 font-medium space-y-1">
-                        {athlete.specialties.slice(0, 2).map((specialty, index) => (
-                          <li key={index} className="truncate group-hover:text-slate-900 transition-colors">{specialty.specialty}</li>
-                        ))}
-                      </ul>
+                    <div className="mt-2.5">
+                      <p className="inline-block px-2.5 py-1 bg-white shadow-sm ring-1 ring-slate-200 rounded text-primary-600 font-bold tracking-widest text-[10px] uppercase">
+                        {athlete.sport?.replace('-', ' ') || 'Athlete'}
+                      </p>
                     </div>
-                  )}
+                  </div>
 
-                  {athlete.achievements.length > 0 && (
-                    <div>
-                      <span className="block text-slate-400 text-[10px] uppercase tracking-widest mb-2 font-bold flex items-center">
-                        <span className="w-1.5 h-1.5 rounded-full bg-primary-400 mr-1.5"></span>
-                        Key Wins
-                      </span>
-                      <ul className="text-sm font-sans text-slate-700 font-medium space-y-1">
-                        {athlete.achievements.slice(0, 2).map((achievement, index) => (
-                          <li key={index} className="truncate group-hover:text-slate-900 transition-colors">{achievement.achievement}</li>
-                        ))}
-                      </ul>
+                  {(athlete.specialties.length > 0 || athlete.achievements.length > 0) && (
+                    <div className="pt-4 border-t border-slate-200/60 grid grid-cols-2 gap-4 mt-auto">
+                      {athlete.specialties.length > 0 && (
+                        <div>
+                          <span className="block text-slate-400 text-[10px] uppercase tracking-widest mb-2 font-bold flex items-center">
+                            <span className="w-1.5 h-1.5 rounded-full bg-secondary-400 mr-1.5"></span>
+                            Specialties
+                          </span>
+                          <ul className="text-sm font-sans text-slate-700 font-medium space-y-1">
+                            {athlete.specialties.slice(0, 2).map((specialty, index) => (
+                              <li key={index} className="truncate group-hover:text-slate-900 transition-colors">{specialty.specialty}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+
+                      {athlete.achievements.length > 0 && (
+                        <div>
+                          <span className="block text-slate-400 text-[10px] uppercase tracking-widest mb-2 font-bold flex items-center">
+                            <span className="w-1.5 h-1.5 rounded-full bg-primary-400 mr-1.5"></span>
+                            Key Wins
+                          </span>
+                          <ul className="text-sm font-sans text-slate-700 font-medium space-y-1">
+                            {athlete.achievements.slice(0, 2).map((achievement, index) => (
+                              <li key={index} className="truncate group-hover:text-slate-900 transition-colors">{achievement.achievement}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>
