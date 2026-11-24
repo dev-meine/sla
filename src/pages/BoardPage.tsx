@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { Mail } from 'lucide-react';
 import { supabase, cachedQuery } from '../lib/supabase';
 import { Database } from '../types/supabase';
+import { sortBoardMembers } from '../utils/boardOrder';
 
 type BoardMember = Database['public']['Tables']['board_members']['Row'];
 
@@ -22,11 +23,12 @@ const BoardPage: React.FC = () => {
         () => supabase
           .from('board_members')
           .select('*')
+          .order('display_order', { ascending: true, nullsFirst: false })
           .order('name')
       );
       
       if (error) throw error;
-      setBoardMembers(data || []);
+      setBoardMembers(sortBoardMembers(data || []));
     } catch (error) {
       console.error('Error fetching board members:', error);
     } finally {
@@ -110,7 +112,7 @@ const BoardPage: React.FC = () => {
                     <p className="text-primary-600 font-medium mb-4">{member.position}</p>
                     <p className="text-slate-600 mb-4 text-sm leading-relaxed">{member.bio}</p>
                     <a 
-                      href={`mailto:${member.position.toLowerCase().replace(' ', '')}@slsdwa.org`}
+                      href={`mailto:${member.position.toLowerCase().replace(/[^a-z0-9]/g, '')}@slsdwa.org`}
                       className="inline-flex items-center text-sm font-medium text-slate-500 hover:text-primary-600 transition-colors"
                     >
                       <Mail size={16} className="mr-2" />

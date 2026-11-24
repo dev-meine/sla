@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+- **2026-11-24**: Enforced official Executive Board protocol ordering and added an interactive board organizer in the Admin Panel (`src/utils/boardOrder.ts`, `BoardPage.tsx`, `AdminBoard.tsx`, `supabase/migrations/20261124120000_add_board_members_display_order.sql`):
+  - Added nullable `display_order` column + index on `public.board_members` for custom ordering.
+  - Added automatic protocol hierarchy sorting (`President` → `Vice-President` → `Secretary General` → `Asst. Secretary General` → `Treasurer` → `Women's Rep` → `Public Relations Officers (1, 2)` → `Members` → `Honorary President`) applied on both `/board` and `/admin/board`.
+  - Added drag-and-drop row reordering, accessible Up/Down move buttons, live position numbers, a Save/Discard order bar, and a one-click **Reset to Official Order** button in `/admin/board`.
 - **2026-11-24**: Fixed runtime crash when clicking "Add Board Member" (and editing board/news items) in the Admin Portal (`ImageCropUpload.tsx`, `AdminBoard.tsx`):
   - Added the missing `useCallback` import in `ImageCropUpload.tsx` (which caused `ReferenceError: useCallback is not defined` upon opening the editor), cleaned up unused symbols, revoked temporary `blob:` preview URLs, made crop labels context-aware (portrait vs. header), and `await`ed `onImageUpload` before closing the cropper to eliminate upload race conditions.
   - Hardened `AdminBoard.tsx` with explicit `image` field registration, clean default form resets, upload/save button disabling (`Uploading Photo...` / `Saving...`), and a visible `role="alert"` error banner for upload or save errors.

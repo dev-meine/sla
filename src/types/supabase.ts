@@ -354,6 +354,7 @@ export type Database = {
         Row: {
           bio: string | null
           created_at: string | null
+          display_order: number | null
           id: string
           image: string | null
           name: string
@@ -363,6 +364,7 @@ export type Database = {
         Insert: {
           bio?: string | null
           created_at?: string | null
+          display_order?: number | null
           id?: string
           image?: string | null
           name: string
@@ -372,6 +374,7 @@ export type Database = {
         Update: {
           bio?: string | null
           created_at?: string | null
+          display_order?: number | null
           id?: string
           image?: string | null
           name?: string
@@ -894,35 +897,6 @@ export type Database = {
           updated_at?: string | null
         }
         Relationships: []
-      }
-      board_members: {
-        Row: {
-          id: string
-          name: string
-          position: string
-          image: string | null
-          bio: string | null
-          created_at: string | null
-          updated_at: string | null
-        }
-        Insert: {
-          id?: string
-          name: string
-          position: string
-          image?: string | null
-          bio?: string | null
-          created_at?: string | null
-          updated_at?: string | null
-        }
-        Update: {
-          id?: string
-          name?: string
-          position?: string
-          image?: string | null
-          bio?: string | null
-          created_at?: string | null
-          updated_at?: string | null
-        }
       }
     }
     Views: {
