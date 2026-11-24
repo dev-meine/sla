@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import ReactCrop, {
   centerCrop,
   makeAspectCrop,
@@ -6,7 +6,7 @@ import ReactCrop, {
   PixelCrop,
   convertToPixelCrop,
 } from 'react-image-crop';
-import { Upload, X, Crop as CropIcon, Check, Move, ArrowUp, ArrowDown, AlignCenter, RotateCcw, Image as ImageIcon } from 'lucide-react';
+import { Upload, X, Crop as CropIcon, Check, Move, ArrowUp, ArrowDown, AlignCenter, Image as ImageIcon } from 'lucide-react';
 import 'react-image-crop/dist/ReactCrop.css';
 import { exportOptimizedCrop } from '../../utils/imageOptimizer';
 
@@ -16,7 +16,7 @@ export interface AspectRatioOption {
 }
 
 interface ImageCropUploadProps {
-  onImageUpload: (file: File) => void;
+  onImageUpload: (file: File) => void | Promise<void>;
   currentImage?: string | null;
   onImageRemove?: () => void;
   aspectRatio?: number; // e.g. 16/9 for landscape header, 1 for square portrait
@@ -37,7 +37,6 @@ const ImageCropUpload: React.FC<ImageCropUploadProps> = ({
   const [uploadProgress, setUploadProgress] = useState(0);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [imageLoaded, setImageLoaded] = useState(false);
   const [isCropping, setIsCropping] = useState(false);
   const [crop, setCrop] = useState<Crop>();
   const [completedCrop, setCompletedCrop] = useState<PixelCrop>();
@@ -48,6 +47,15 @@ const ImageCropUpload: React.FC<ImageCropUploadProps> = ({
   const imgRef = useRef<HTMLImageElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const objectUrlRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (objectUrlRef.current) {
+        URL.revokeObjectURL(objectUrlRef.current);
+      }
+    };
+  }, []);
 
   useEffect(() => {
     setCurrentAspect(aspectRatio);
@@ -98,7 +106,6 @@ const ImageCropUpload: React.FC<ImageCropUploadProps> = ({
     const initialCrop = calculateInitialCrop(width, height, currentAspect);
     setCrop(initialCrop);
     setCompletedCrop(convertToPixelCrop(initialCrop, width, height));
-    setImageLoaded(true);
   }, [currentAspect, calculateInitialCrop]);
 
   const handleAspectChange = (newAspect: number | undefined) => {
@@ -142,7 +149,6 @@ const ImageCropUpload: React.FC<ImageCropUploadProps> = ({
 
     setError(null);
     setOriginalFile(file);
-    setImageLoaded(false);
 
     const reader = new FileReader();
     reader.onloadend = () => {
@@ -201,15 +207,18 @@ const ImageCropUpload: React.FC<ImageCropUploadProps> = ({
   const handleCropComplete = async () => {
     if (!completedCrop || !imgRef.current || !canvasRef.current) return;
 
+    let progressInterval: ReturnType<typeof setInterval> | null = null;
+
     try {
+      setError(null);
       setIsUploading(true);
-      setUploadProgress(0);
+      setUploadProgress(10);
 
-      const progressInterval = setInterval(() => {
-        setUploadProgress(prev => (prev >= 90 ? 90 : prev + 15));
-      }, 120);
+      progressInterval = setInterval(() => {
+        setUploadProgress(prev => (prev >= 85 ? 85 : prev + 15));
+      }, 140);
 
-      const fileName = originalFile ? originalFile.name : `header-${Date.now()}.webp`;
+      const fileName = originalFile ? originalFile.name : `photo-${Date.now()}.webp`;
       const { file: croppedFile, blob: croppedImageBlob } = await exportOptimizedCrop(
         canvasRef.current,
         imgRef.current,
@@ -217,15 +226,26 @@ const ImageCropUpload: React.FC<ImageCropUploadProps> = ({
         fileName
       );
 
-      onImageUpload(croppedFile);
-      clearInterval(progressInterval);
+      await onImageUpload(croppedFile);
+
+      if (objectUrlRef.current) {
+        URL.revokeObjectURL(objectUrlRef.current);
+      }
+      const nextUrl = URL.createObjectURL(croppedImageBlob);
+      objectUrlRef.current = nextUrl;
+
       setUploadProgress(100);
       setIsCropping(false);
-      setPreviewUrl(URL.createObjectURL(croppedImageBlob));
+      setPreviewUrl(nextUrl);
     } catch (err: unknown) {
-      console.error('Error cropping image:', err);
-      setError('Could not process crop. Please choose another image or re-upload.');
+      console.error('Error cropping or uploading image:', err);
+      const message =
+        err instanceof Error && err.message
+          ? err.message
+          : 'Could not process or upload image. Please try again.';
+      setError(message);
     } finally {
+      if (progressInterval) clearInterval(progressInterval);
       setIsUploading(false);
       setUploadProgress(0);
     }
@@ -241,12 +261,16 @@ const ImageCropUpload: React.FC<ImageCropUploadProps> = ({
   };
 
   const handleRemove = () => {
+    if (objectUrlRef.current) {
+      URL.revokeObjectURL(objectUrlRef.current);
+      objectUrlRef.current = null;
+    }
     setPreviewUrl(null);
-    setImageLoaded(false);
     setIsCropping(false);
     setOriginalFile(null);
     setCrop(undefined);
     setCompletedCrop(undefined);
+    setError(null);
     if (onImageRemove) {
       onImageRemove();
     }
@@ -279,7 +303,7 @@ const ImageCropUpload: React.FC<ImageCropUploadProps> = ({
                   </div>
                   <div>
                     <h4 className="text-xs font-bold text-white uppercase tracking-wider">
-                      Select Header Area
+                      {isWideAspect ? 'Select Header Area' : 'Select Portrait Area'}
                     </h4>
                     <p className="text-[11px] text-slate-400">
                       Drag the box or its corner handles to select what area of the image is shown.
@@ -398,11 +422,10 @@ const ImageCropUpload: React.FC<ImageCropUploadProps> = ({
               <div className={`relative w-full ${isWideAspect ? 'aspect-[16/9] max-h-72' : 'h-56'} bg-slate-900/10 flex items-center justify-center overflow-hidden`}>
                 <img
                   src={previewUrl}
-                  alt="Selected header preview"
+                  alt={isWideAspect ? 'Selected header preview' : 'Selected photo preview'}
                   className={`w-full h-full object-cover transition-transform duration-300 ${
                     cropShape === 'round' ? 'rounded-full' : 'rounded-none'
                   }`}
-                  onLoad={() => setImageLoaded(true)}
                   onError={() => setError('Failed to load image preview')}
                 />
 
@@ -447,7 +470,9 @@ const ImageCropUpload: React.FC<ImageCropUploadProps> = ({
               <div className="p-3 bg-white border-t border-slate-200/80 flex items-center justify-between text-xs text-slate-500">
                 <span className="flex items-center gap-1 text-[11px]">
                   <Check size={13} className="text-emerald-600" />
-                  <span>Header image selected. Click <strong>"Select Area"</strong> to readjust visible framing anytime.</span>
+                  <span>
+                    {isWideAspect ? 'Header image selected.' : 'Photo uploaded.'} Click <strong>"Select Area"</strong> to readjust visible framing anytime.
+                  </span>
                 </span>
                 <button
                   type="button"

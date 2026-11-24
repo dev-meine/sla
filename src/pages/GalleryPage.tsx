@@ -342,7 +342,7 @@ const GalleryPage: React.FC = () => {
                 }`}
               >
                 <Layers size={13} aria-hidden="true" />
-                Drift Wall
+                Wall
               </button>
               <button
                 type="button"

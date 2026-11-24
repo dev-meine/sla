@@ -4,7 +4,7 @@ import AdminPageHeader from '../../components/admin/AdminPageHeader';
 import AdminBadge from '../../components/admin/AdminBadge';
 import AdminEmptyState from '../../components/admin/AdminEmptyState';
 import { supabase, invalidateCache } from '../../lib/supabase';
-import { Plus, Edit2, Trash2, Users2, Search, X, Mail } from 'lucide-react';
+import { Plus, Edit2, Trash2, Users2, Search, X, Mail, AlertCircle } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { Database } from '../../types/supabase';
 import ImageCropUpload from '../../components/ui/ImageCropUpload';
@@ -15,13 +15,38 @@ type BoardMember = Database['public']['Tables']['board_members']['Row'];
 const AdminBoard: React.FC = () => {
   const [boardMembers, setBoardMembers] = useState<BoardMember[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
+  const [formError, setFormError] = useState<string | null>(null);
   const [isAdding, setIsAdding] = useState(false);
   const [editingMember, setEditingMember] = useState<BoardMember | null>(null);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [memberToDelete, setMemberToDelete] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
 
-  const { register, handleSubmit, reset, setValue, formState: { errors } } = useForm<BoardMember>();
+  const { register, handleSubmit, reset, setValue, formState: { errors } } = useForm<BoardMember>({
+    defaultValues: {
+      name: '',
+      position: '',
+      bio: '',
+      image: null
+    }
+  });
+
+  useEffect(() => {
+    register('image');
+  }, [register]);
+
+  const resetFormState = () => {
+    setFormError(null);
+    setEditingMember(null);
+    reset({
+      name: '',
+      position: '',
+      bio: '',
+      image: null
+    });
+  };
 
   useEffect(() => {
     fetchBoardMembers();
@@ -43,15 +68,17 @@ const AdminBoard: React.FC = () => {
     }
   };
 
-  const uploadImage = async (file: File): Promise<string | null> => {
+  const uploadImage = async (file: File): Promise<string> => {
+    setIsUploadingImage(true);
+    setFormError(null);
     try {
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${Math.random()}.${fileExt}`;
+      const fileExt = file.name.split('.').pop()?.toLowerCase() || 'webp';
+      const fileName = `${Date.now()}-${Math.random().toString(36).slice(2, 10)}.${fileExt}`;
       const filePath = `board/${fileName}`;
 
       const { error: uploadError } = await supabase.storage
         .from('images')
-        .upload(filePath, file);
+        .upload(filePath, file, { contentType: file.type || 'image/webp' });
 
       if (uploadError) throw uploadError;
 
@@ -61,8 +88,13 @@ const AdminBoard: React.FC = () => {
 
       return publicUrl;
     } catch (error) {
+      const message =
+        error instanceof Error ? error.message : 'Failed to upload portrait image. Please try again.';
       console.error('Error uploading image:', error);
-      return null;
+      setFormError(`Photo upload failed: ${message}`);
+      throw new Error(message);
+    } finally {
+      setIsUploadingImage(false);
     }
   };
 
@@ -82,55 +114,60 @@ const AdminBoard: React.FC = () => {
   };
 
   const onSubmit = async (data: BoardMember) => {
+    if (isUploadingImage) return;
+
     try {
-      setIsLoading(true);
+      setIsSaving(true);
+      setFormError(null);
+
+      const payload = {
+        name: data.name.trim(),
+        position: data.position.trim(),
+        image: data.image || null,
+        bio: data.bio?.trim() || null
+      };
 
       if (editingMember) {
-        if (data.image !== editingMember.image && editingMember.image) {
+        if (payload.image !== editingMember.image && editingMember.image) {
           await deleteImage(editingMember.image);
         }
 
         const { error } = await supabase
           .from('board_members')
-          .update({
-            name: data.name,
-            position: data.position,
-            image: data.image,
-            bio: data.bio
-          })
+          .update(payload)
           .eq('id', editingMember.id);
 
         if (error) throw error;
       } else {
         const { error } = await supabase
           .from('board_members')
-          .insert([{
-            name: data.name,
-            position: data.position,
-            image: data.image,
-            bio: data.bio
-          }]);
+          .insert([payload]);
 
         if (error) throw error;
       }
 
-      reset();
+      resetFormState();
       setIsAdding(false);
-      setEditingMember(null);
       invalidateCache('board');
-      fetchBoardMembers();
+      await fetchBoardMembers();
     } catch (error) {
       console.error('Error saving board member:', error);
+      const message =
+        error instanceof Error ? error.message : 'Could not save board member. Please try again.';
+      setFormError(message);
     } finally {
-      setIsLoading(false);
+      setIsSaving(false);
     }
   };
 
   const handleEdit = (member: BoardMember) => {
+    setFormError(null);
     setEditingMember(member);
     setIsAdding(true);
-    Object.keys(member).forEach((key) => {
-      setValue(key as keyof BoardMember, member[key as keyof BoardMember]);
+    reset({
+      ...member,
+      bio: member.bio || '',
+      image: member.image || null
     });
   };
 
@@ -187,10 +224,11 @@ const AdminBoard: React.FC = () => {
         ]}
         actions={
           <button
+            type="button"
             onClick={() => {
-              setIsAdding(!isAdding);
-              setEditingMember(null);
-              reset();
+              const next = !isAdding;
+              setIsAdding(next);
+              resetFormState();
             }}
             className="inline-flex items-center gap-2 px-3.5 py-2 text-xs font-semibold bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors shadow-xs"
           >
@@ -211,16 +249,26 @@ const AdminBoard: React.FC = () => {
               <p className="text-xs text-slate-500">Provide executive credentials, position title, and professional profile photo.</p>
             </div>
             <button
+              type="button"
               onClick={() => {
                 setIsAdding(false);
-                setEditingMember(null);
-                reset();
+                resetFormState();
               }}
               className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100"
             >
               <X size={18} />
             </button>
           </div>
+
+          {formError && (
+            <div
+              role="alert"
+              className="mb-5 p-3.5 rounded-lg bg-rose-50 border border-rose-200 flex items-start gap-2.5 text-rose-800"
+            >
+              <AlertCircle size={16} className="text-rose-600 flex-shrink-0 mt-0.5" />
+              <p className="text-xs font-medium leading-relaxed">{formError}</p>
+            </div>
+          )}
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -262,9 +310,9 @@ const AdminBoard: React.FC = () => {
                   currentImage={editingMember?.image}
                   onImageUpload={async (file) => {
                     const url = await uploadImage(file);
-                    if (url) setValue('image', url);
+                    setValue('image', url, { shouldDirty: true });
                   }}
-                  onImageRemove={() => setValue('image', null)}
+                  onImageRemove={() => setValue('image', null, { shouldDirty: true })}
                   aspectRatio={1}
                 />
               </div>
@@ -287,18 +335,25 @@ const AdminBoard: React.FC = () => {
                 type="button"
                 onClick={() => {
                   setIsAdding(false);
-                  setEditingMember(null);
-                  reset();
+                  resetFormState();
                 }}
-                className="px-4 py-2 text-xs font-semibold text-slate-700 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors"
+                disabled={isSaving}
+                className="px-4 py-2 text-xs font-semibold text-slate-700 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors disabled:opacity-50"
               >
                 Cancel
               </button>
               <button
                 type="submit"
-                className="px-4 py-2 text-xs font-semibold text-white bg-primary-600 hover:bg-primary-700 rounded-lg transition-colors shadow-xs"
+                disabled={isSaving || isUploadingImage}
+                className="px-4 py-2 text-xs font-semibold text-white bg-primary-600 hover:bg-primary-700 rounded-lg transition-colors shadow-xs disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {editingMember ? 'Save Changes' : 'Appoint Member'}
+                {isUploadingImage
+                  ? 'Uploading Photo...'
+                  : isSaving
+                  ? 'Saving...'
+                  : editingMember
+                  ? 'Save Changes'
+                  : 'Appoint Member'}
               </button>
             </div>
           </form>

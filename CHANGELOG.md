@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+- **2026-11-24**: Fixed runtime crash when clicking "Add Board Member" (and editing board/news items) in the Admin Portal (`ImageCropUpload.tsx`, `AdminBoard.tsx`):
+  - Added the missing `useCallback` import in `ImageCropUpload.tsx` (which caused `ReferenceError: useCallback is not defined` upon opening the editor), cleaned up unused symbols, revoked temporary `blob:` preview URLs, made crop labels context-aware (portrait vs. header), and `await`ed `onImageUpload` before closing the cropper to eliminate upload race conditions.
+  - Hardened `AdminBoard.tsx` with explicit `image` field registration, clean default form resets, upload/save button disabling (`Uploading Photo...` / `Saving...`), and a visible `role="alert"` error banner for upload or save errors.
+- **2026-11-24**: Renamed the Memory Lane view toggle button from `"Drift Wall"` to `"Wall"` in `GalleryPage.tsx`.
 - **2026-11-24**: Equalized athlete card heights in the homepage "Our Athletes" section (`FeaturedAthletes.tsx`): locked `aspect-[3/4]` image boxes with `absolute inset-0` framing, stretched grid cards via `h-full flex flex-col` so multi-line names (e.g., `ANAYA M'CORMACK-HALE`) align cleanly with single-line cards, and hid empty specialties/achievements divider containers.
 - **2026-11-24**: Added **Sierra Leone Aquatics Elective General Assembly & Election of Office Bearers** (`2026-12-19`) to `public.events` in Supabase so it appears at the top of the 2026–2021 Activities vertical timeline (including the official Congress Roadmap milestones, elective positions, and roadmap graphic).
 
