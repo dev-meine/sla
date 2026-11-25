@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import PageHeader from '../components/ui/PageHeader';
 import { motion } from 'framer-motion';
-import { Mail } from 'lucide-react';
+import { Mail, FileText, Download, ExternalLink } from 'lucide-react';
 import { supabase, cachedQuery } from '../lib/supabase';
 import { Database } from '../types/supabase';
 import { sortBoardMembers } from '../utils/boardOrder';
@@ -126,7 +126,99 @@ const BoardPage: React.FC = () => {
         </div>
       </section>
 
-      <section className="section bg-slate-50">
+      <section className="section bg-slate-50 border-y border-slate-100">
+        <div className="container-custom">
+          <div className="max-w-3xl mx-auto text-center mb-10">
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary-600 mb-2">
+              Governance &amp; Statutes
+            </p>
+            <h2 className="mb-3 text-slate-900">Official Documents</h2>
+            <p className="text-slate-600 leading-relaxed">
+              Review or download the governing statutes and General Assembly records of Sierra Leone Aquatics.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+            <article className="bg-white rounded-2xl border border-slate-200/80 p-6 sm:p-7 flex flex-col justify-between hover:shadow-md transition-shadow duration-300">
+              <div>
+                <div className="flex items-start justify-between gap-4 mb-4">
+                  <div className="w-11 h-11 rounded-xl bg-primary-50 text-primary-600 flex items-center justify-center flex-shrink-0">
+                    <FileText size={22} />
+                  </div>
+                  <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-600">
+                    PDF · 13 Pages
+                  </span>
+                </div>
+                <h3 className="text-xl font-semibold text-slate-900 mb-2">
+                  FINA Approved Constitution
+                </h3>
+                <p className="text-sm text-slate-600 leading-relaxed mb-6">
+                  Official statutes of the Sierra Leone Swimming, Diving and Water Polo Association (SLSDWA), covering federation governance, membership, elections, committees, and FINA/World Aquatics compliance.
+                </p>
+              </div>
+              <div className="flex flex-wrap items-center gap-3 pt-4 border-t border-slate-100">
+                <a
+                  href="/documents/fina-approved-constitution.pdf"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 rounded-lg transition-colors"
+                >
+                  <ExternalLink size={15} />
+                  View PDF
+                </a>
+                <a
+                  href="/documents/fina-approved-constitution.pdf"
+                  download="FINA-Approved-Constitution.pdf"
+                  className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-slate-700 bg-slate-100 hover:bg-slate-200/80 rounded-lg transition-colors"
+                >
+                  <Download size={15} />
+                  Download
+                </a>
+              </div>
+            </article>
+
+            <article className="bg-white rounded-2xl border border-slate-200/80 p-6 sm:p-7 flex flex-col justify-between hover:shadow-md transition-shadow duration-300">
+              <div>
+                <div className="flex items-start justify-between gap-4 mb-4">
+                  <div className="w-11 h-11 rounded-xl bg-primary-50 text-primary-600 flex items-center justify-center flex-shrink-0">
+                    <FileText size={22} />
+                  </div>
+                  <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-600">
+                    PDF · 6 Pages · Oct 2021
+                  </span>
+                </div>
+                <h3 className="text-xl font-semibold text-slate-900 mb-2">
+                  2021 Congress Minutes
+                </h3>
+                <p className="text-sm text-slate-600 leading-relaxed mb-6">
+                  Official minutes of the Elective General Assembly held at Negus Nagas Multi-Purpose Complex, Grafton on 23 October 2021, including attendance, reports, election results, and executive appointments.
+                </p>
+              </div>
+              <div className="flex flex-wrap items-center gap-3 pt-4 border-t border-slate-100">
+                <a
+                  href="/documents/2021-congress-minutes.pdf"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 rounded-lg transition-colors"
+                >
+                  <ExternalLink size={15} />
+                  View PDF
+                </a>
+                <a
+                  href="/documents/2021-congress-minutes.pdf"
+                  download="2021-Congress-Minutes.pdf"
+                  className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-slate-700 bg-slate-100 hover:bg-slate-200/80 rounded-lg transition-colors"
+                >
+                  <Download size={15} />
+                  Download
+                </a>
+              </div>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section className="section bg-white">
         <div className="container-custom">
           <div className="max-w-3xl mx-auto text-center">
             <h2 className="mb-6 text-slate-900">Our Mission</h2>
@@ -134,17 +226,17 @@ const BoardPage: React.FC = () => {
               The Executive Board of the Sierra Leone Swimming Federation is committed to developing aquatic sports across the country, providing opportunities for athletes of all ages and abilities, and representing Sierra Leone with excellence in international competitions.
             </p>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              <div className="bg-white p-8 rounded-2xl border border-slate-100">
+              <div className="bg-slate-50 p-8 rounded-2xl border border-slate-100">
 
                 <h3 className="text-xl mb-3 text-slate-900">Development</h3>
                 <p className="text-slate-600">Creating pathways for athletes from grassroots to elite levels</p>
               </div>
-              <div className="bg-white p-8 rounded-2xl border border-slate-100">
+              <div className="bg-slate-50 p-8 rounded-2xl border border-slate-100">
 
                 <h3 className="text-xl mb-3 text-slate-900">Representation</h3>
                 <p className="text-slate-600">Representing Sierra Leone on the global aquatics stage</p>
               </div>
-              <div className="bg-white p-8 rounded-2xl border border-slate-100">
+              <div className="bg-slate-50 p-8 rounded-2xl border border-slate-100">
 
                 <h3 className="text-xl mb-3 text-slate-900">Community</h3>
                 <p className="text-slate-600">Promoting water safety and aquatic education nationwide</p>

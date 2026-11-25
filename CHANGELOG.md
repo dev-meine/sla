@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+- **2026-11-25**: Added Official Governance Documents section to the Executive Board page (`src/pages/BoardPage.tsx`, `public/documents/fina-approved-constitution.pdf`, `public/documents/2021-congress-minutes.pdf`):
+  - Added view and download cards for **FINA Approved Constitution** (cleaned PDF title metadata removing "Amended", 13 pages) and **2021 Congress Minutes** (General Assembly minutes of 23 October 2021, 6 pages).
 - **2026-11-24**: Enforced official Executive Board protocol ordering and added an interactive board organizer in the Admin Panel (`src/utils/boardOrder.ts`, `BoardPage.tsx`, `AdminBoard.tsx`, `supabase/migrations/20261124120000_add_board_members_display_order.sql`):
   - Added nullable `display_order` column + index on `public.board_members` for custom ordering.
   - Added automatic protocol hierarchy sorting (`President` → `Vice-President` → `Secretary General` → `Asst. Secretary General` → `Treasurer` → `Women's Rep` → `Public Relations Officers (1, 2)` → `Members` → `Honorary President`) applied on both `/board` and `/admin/board`.
